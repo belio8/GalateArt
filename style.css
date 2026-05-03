@@ -58,8 +58,14 @@ input, button {
 .btn-artist { background: var(--accent); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; }
 .btn-signup { background: var(--purple); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; }
 
-.nav-icons { display: flex; gap: 15px; font-size: 18px; color: var(--text-gray); margin-left: 10px;}
-
+/* Sembunyikan ikon navigasi secara default */
+.nav-icons {
+    display: none; /* Akan diubah menjadi 'flex' lewat JS saat login */
+    align-items: center;
+    gap: 15px;
+    font-size: 18px;
+    color: var(--text-gray);
+}
 /* Main Content */
 .container { padding: 20px 5%; }
 

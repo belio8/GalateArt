@@ -63,15 +63,21 @@ const userForm = document.querySelector('#registerModal form');
 const artistForm = document.querySelector('#artistModal form');
 
 function setLoggedInState(isArtist = false) {
+    // Sembunyikan tombol Daftar dan Jadi Artis
     if (btnSignup) btnSignup.style.display = 'none'; 
     if (btnArtistNav) btnArtistNav.style.display = 'none'; 
     
+    // Tampilkan Ikon Navigasi (Pesan, Lonceng, Keranjang)
+    const navIcons = document.querySelector('.nav-icons');
+    if (navIcons) {
+        navIcons.style.display = 'flex';
+    }
+    
+    // Tampilkan Link Profil
     if (userProfileLink) {
         userProfileLink.style.display = 'flex';
-        // Beri warna border oranye jika mendaftar sebagai artis
         if (isArtist) userProfileLink.querySelector('img').style.borderColor = 'var(--accent)';
     }
-    console.log("Status: Pengguna telah masuk.");
 }
 
 // Cek status login saat memuat halaman utama (landing page)
