@@ -100,7 +100,6 @@ document.addEventListener('click', function(event) {
 // Jalankan render saat awal
 renderNotifications();
 
-<<<<<<< HEAD
 // ==========================================
 // SCRIPT KHUSUS HALAMAN PROFIL
 // ==========================================
@@ -125,7 +124,6 @@ function switchTab(clickedBtn, targetContentId) {
         targetContent.classList.add('active');
     }
 }
-=======
 // --- Fungsi Modal Register Artis ---
 const btnArtist = document.getElementById('btnArtist');
 const artistModal = document.getElementById('artistModal');
@@ -184,4 +182,3 @@ if (artistForm) {
         setLoggedInState(); // Jalankan fungsi sembunyikan tombol
     });
 }
->>>>>>> 958090c453514bcd3d8e2babb59674308ac96bc7

@@ -387,7 +387,6 @@ input, button {
     margin: 0;
 }
 
-<<<<<<< HEAD
 /* =========================================
 STYLE UNTUK HALAMAN PROFIL
    ========================================= */
@@ -661,7 +660,6 @@ STYLE KONTEN TAB PROFIL
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
 }
-=======
 /* --- Styling Khusus Input File (Portofolio) --- */
 .register-form input[type="file"] {
     padding: 8px;
@@ -690,4 +688,3 @@ STYLE KONTEN TAB PROFIL
     background-color: #e66a22;
 }
 
->>>>>>> 958090c453514bcd3d8e2babb59674308ac96bc7
