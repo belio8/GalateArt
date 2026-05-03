@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - GalateArt</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div style="background: #333; padding: 10px; text-align: center; font-size: 14px;">
+        <span>Simulasi Tampilan Profil: </span>
+        <button id="btnToggleRole" style="padding: 5px 15px; border-radius: 15px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold;">
+            Ganti ke Tampilan Regular
+        </button>
+    </div>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-container">
+                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
+            </div>
+            <div class="logo"><a href="landing.html" style="color: inherit; text-decoration: none;">Galate<span>Art</span></a></div>
+        </div>
+
+        <div class="nav-center">
+            <button class="btn-discover" style="border-radius: 20px; padding: 8px 20px;"><i class="far fa-compass"></i> Discover</button>
+        </div>
+
+        <div class="nav-right" style="gap: 20px;">
+            <div class="search-bar">
+                <input type="text" placeholder="Search..." style="background: #2a2a35;">
+            </div>
+            <div class="nav-icons" style="display: flex; gap: 15px; align-items: center;">
+                <i class="far fa-comment" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
+                <i class="far fa-bell" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
+                <i class="fas fa-shopping-cart" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
+                <img src="https://via.placeholder.com/40" alt="User" style="width: 35px; height: 35px; border-radius: 50%; cursor: pointer;">
+            </div>
+        </div>
+    </header>
+
+    <main class="profile-page-container is-artist" id="profileWrapper">
+        
+        <div class="profile-main">
+            <div class="account-badge" id="accountBadgeText">Artist Account</div>
+            
+            <div class="cover-photo" style="background-image: url('https://via.placeholder.com/800x250/222222/555555?text=Cover+Image');"></div>
+            
+            <div class="profile-info-section">
+                <div class="avatar-container">
+                    <img src="https://via.placeholder.com/150" alt="Avatar User">
+                </div>
+                
+                <div class="profile-text">
+                    <h1 id="userName">Miew</h1>
+                    <p id="userHandle">@cyb3r4rti</p>
+                </div>
+                
+                <div class="commission-status">
+                    <label>Set commission status</label>
+                    <select>
+                        <option>Open</option>
+                        <option>Closed</option>
+                        <option>Waitlist</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <span><strong>67</strong> Following</span>
+                <span><strong>3</strong> Followers</span>
+            </div>
+
+            <div class="profile-tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'content-bio')">Bio</button>
+                <button class="tab-btn tab-posts" onclick="switchTab(this, 'content-posts')">Posts</button>
+                <button class="tab-btn" onclick="switchTab(this, 'content-saved')">Saved</button>
+                <button class="tab-btn" onclick="switchTab(this, 'content-liked')">Liked</button>
+            </div>
+
+            <div class="profile-content">
+                
+                <div class="tab-content active" id="content-bio">
+                    <p>No character yet...</p>
+                </div>
+
+                <div class="tab-content" id="content-posts">
+                    <div class="empty-state">
+                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486831.png" alt="No Posts">
+                        <p>No Post Yet . . .</p>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="content-saved">
+                    <div class="profile-art-grid">
+                        <div class="art-card">
+                            <img src="https://via.placeholder.com/300x400/b3b3b3/ffffff?text=Kobo" alt="Art">
+                            <div class="art-info">
+                                <p class="hashtags">#kobokanaeru #hololive #holoid</p>
+                                <p class="artist-name">@jasper_xandros</p>
+                            </div>
+                        </div>
+                        <div class="art-card">
+                            <img src="https://via.placeholder.com/300x400/ff7e33/ffffff?text=Exusiai" alt="Art">
+                            <div class="art-info">
+                                <p class="hashtags">#exusiai #arknight #exiaalter</p>
+                                <p class="artist-name">@artist_3</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="content-liked">
+                    <div class="profile-art-grid">
+                        <div class="art-card">
+                            <img src="https://via.placeholder.com/300x400/8e54e9/ffffff?text=Liked+Art" alt="Art">
+                            <div class="art-info">
+                                <p class="hashtags">#illustration #digitalart</p>
+                                <p class="artist-name">@ichigowarano</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="profile-sidebar">
+            <div class="suggestions">
+                <h3>You might like</h3>
+                
+                <div class="suggestion-item">
+                    <div class="suggestion-info">
+                        <img src="https://via.placeholder.com/40" class="suggestion-avatar" alt="Ichigo">
+                        <div class="suggestion-text">
+                            <h4>Ichigowarano</h4>
+                            <p>@ichigowarano</p>
+                        </div>
+                    </div>
+                    <button class="btn-follow">Follow</button>
+                </div>
+
+                <div class="suggestion-item">
+                    <div class="suggestion-info">
+                        <img src="https://via.placeholder.com/40" class="suggestion-avatar" alt="Keen">
+                        <div class="suggestion-text">
+                            <h4>keenbiscuit</h4>
+                            <p>@keenbiscuit</p>
+                        </div>
+                    </div>
+                    <button class="btn-follow">Follow</button>
+                </div>
+
+                <div class="suggestion-item">
+                    <div class="suggestion-info">
+                        <img src="https://via.placeholder.com/40" class="suggestion-avatar" alt="Jasper">
+                        <div class="suggestion-text">
+                            <h4>Jasper Alexandros</h4>
+                            <p>@jasper_xandros</p>
+                        </div>
+                    </div>
+                    <button class="btn-follow">Follow</button>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

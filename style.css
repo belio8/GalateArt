@@ -386,3 +386,277 @@ input, button {
     font-size: 14px;
     margin: 0;
 }
+
+/* =========================================
+STYLE UNTUK HALAMAN PROFIL
+   ========================================= */
+
+.profile-page-container {
+    display: flex;
+    gap: 20px;
+    padding: 30px 5%;
+    max-width: 1300px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+.profile-main {
+    flex: 1;
+    background: #1a1a24;
+    border-radius: 15px;
+    position: relative;
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+/* Badge Akun di pojok kiri atas */
+.account-badge {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    padding: 5px 20px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    font-weight: 600;
+    font-size: 13px;
+    z-index: 10;
+}
+
+/* Pewarnaan Badge berdasarkan role */
+.is-artist .account-badge {
+    background-color: var(--accent);
+    color: white;
+}
+.is-regular .account-badge {
+    background-color: #9d72e8; /* Warna ungu terang sesuai gambar Regular */
+    color: white;
+}
+
+.cover-photo {
+    width: 100%;
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+}
+
+.profile-info-section {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 30px;
+    margin-top: -60px; /* Agar avatar tumpang tindih dengan cover */
+    position: relative;
+}
+
+.avatar-container {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 5px solid var(--nav-bg);
+    overflow: hidden;
+    position: relative;
+    z-index: 5;
+    background-color: var(--nav-bg);
+}
+
+/* Border Avatar berdasarkan role */
+.is-artist .avatar-container { border-color: var(--accent); }
+.is-regular .avatar-container { border-color: #9d72e8; }
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-text {
+    margin-left: 20px;
+    margin-bottom: 10px;
+    flex-grow: 1;
+}
+
+.profile-text h1 { margin: 0; font-size: 24px; color: var(--text-white); }
+.profile-text p { margin: 2px 0 0 0; color: var(--text-gray); font-size: 14px; }
+
+/* Status Komisi (Hanya Artist) */
+.commission-status {
+    margin-bottom: 10px;
+    display: none; /* Disembunyikan default */
+}
+.is-artist .commission-status {
+    display: flex;
+    flex-direction: column;
+}
+
+.commission-status label {
+    font-size: 13px;
+    color: var(--text-white);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.commission-status select {
+    background: #2a2a35;
+    color: white;
+    border: 1px solid #444;
+    padding: 8px 15px;
+    border-radius: 20px;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+}
+
+.profile-stats {
+    padding: 15px 30px;
+    display: flex;
+    gap: 25px;
+    font-size: 15px;
+}
+.profile-stats strong { color: white; }
+.profile-stats span { color: var(--text-gray); }
+
+/* Tab Navigasi Profil */
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid #333;
+    padding: 0 30px;
+    gap: 35px;
+    background: linear-gradient(to bottom, transparent, #15151c);
+    border-radius: 0 0 15px 15px;
+}
+
+.profile-tabs button {
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    font-size: 15px;
+    padding: 15px 0;
+    cursor: pointer;
+    position: relative;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.profile-tabs button:hover { color: var(--text-white); }
+.profile-tabs button.active { color: white; }
+.profile-tabs button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #9d72e8;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+/* Sembunyikan tab Posts untuk Regular Account */
+.tab-posts { display: none; }
+.is-artist .tab-posts { display: inline-block; }
+
+.profile-content {
+    padding: 40px 30px;
+    min-height: 250px;
+    color: var(--text-gray);
+    font-size: 14px;
+    background-color: #121218;
+}
+
+/* Sidebar (You Might Like) */
+.profile-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.suggestions {
+    background: #1a1a24;
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid #333;
+}
+
+.suggestions h3 {
+    margin-top: 0;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--text-white);
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.suggestion-item:last-child { margin-bottom: 0; }
+
+.suggestion-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.suggestion-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.suggestion-text h4 { margin: 0; font-size: 14px; color: var(--text-white); }
+.suggestion-text p { margin: 0; font-size: 12px; color: var(--text-gray); }
+
+.btn-follow {
+    background: white;
+    color: black;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+.btn-follow:hover { background: #e0e0e0; }
+
+/* =========================================
+STYLE KONTEN TAB PROFIL
+   ========================================= */
+
+/* Menyembunyikan semua konten tab secara default */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Hanya menampilkan konten yang memiliki class 'active' */
+.tab-content.active {
+    display: block;
+}
+
+/* Tampilan kosong untuk menu Posts */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state img {
+    width: 150px;
+    opacity: 0.8;
+    margin-bottom: 15px;
+    filter: invert(1); /* Membalik warna jika icon aslinya hitam agar terlihat di dark mode */
+}
+
+.empty-state p {
+    color: var(--text-white);
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Grid untuk Saved & Liked di Profil */
+.profile-art-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}

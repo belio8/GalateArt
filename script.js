@@ -97,3 +97,28 @@ document.addEventListener('click', function(event) {
 
 // Jalankan render saat awal
 renderNotifications();
+
+// ==========================================
+// SCRIPT KHUSUS HALAMAN PROFIL
+// ==========================================
+
+// Fungsi Ganti Tab di Profil
+// Fungsi Ganti Tab di Profil
+function switchTab(clickedBtn, targetContentId) {
+    // 1. Hapus class 'active' dari semua tombol tab
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    // 2. Tambahkan class 'active' ke tombol yang baru saja diklik
+    clickedBtn.classList.add('active');
+
+    // 3. Sembunyikan semua isi konten tab
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+
+    // 4. Tampilkan isi konten yang sesuai dengan tombol yang diklik
+    const targetContent = document.getElementById(targetContentId);
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+}
