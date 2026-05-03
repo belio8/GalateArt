@@ -39,19 +39,19 @@
         </div>
 
         <div class="nav-right">
-            <button class="btn-artist">Saya seorang artis</button>
+            <button class="btn-artist" id="btnArtist">Saya seorang artis</button>
             <button class="btn-signup" id="btnSignup">Daftar</button>
             
             <div class="nav-icons">
                 <i class="far fa-comment"></i>
                 
-            <div class="notification-container">
-                <i class="far fa-bell" id="notifToggle"></i>
-                <div class="notif-dropdown" id="notifDropdown">
-                    <div class="notif-header">Notifikasi</div>
-                    <div class="notif-body" id="notifBody"></div>
-                    </div>
-            </div>
+                <div class="notification-container">
+                    <i class="far fa-bell" id="notifToggle"></i>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">Notifikasi</div>
+                        <div class="notif-body" id="notifBody"></div>
+                        </div>
+                </div>
 
                 <i class="fas fa-shopping-cart"></i>
             </div>
@@ -119,6 +119,39 @@
                     <p class="login-link">Sudah punya akun? <a href="#">Masuk di sini</a></p>
                 </div>
             </div>
+            <div class="modal-overlay" id="artistModal">
+                <div class="modal-content">
+                    <span class="close-btn" id="closeArtistModal">&times;</span>
+                    <h2>Daftar sebagai Artis</h2>
+                    <form action="#" method="POST" class="register-form">
+                        <div class="input-group">
+                            <label for="artistName">Nama Panggung / Username</label>
+                            <input type="text" id="artistName" placeholder="Nama panggung Anda..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="artistEmail">Email</label>
+                            <input type="email" id="artistEmail" placeholder="Masukkan alamat email..." required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="portfolioLink">Link Portofolio (ArtStation, Behance, dll)</label>
+                            <input type="url" id="portfolioLink" placeholder="https://..." required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="portfolioFile">Atau Unggah Karya/CV (PDF/ZIP)</label>
+                            <input type="file" id="portfolioFile" accept=".pdf,.zip,.rar,.png,.jpg">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="artistPassword">Kata Sandi</label>
+                            <input type="password" id="artistPassword" placeholder="Buat kata sandi yang kuat..." required>
+                        </div>
+                        <button type="submit" class="btn-submit">Daftar Menjadi Artis</button>
+                    </form>
+                </div>
+            </div>
+
     </main>
     <script src="script.js"></script>
 </body>

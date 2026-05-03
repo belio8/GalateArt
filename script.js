@@ -32,11 +32,13 @@ closeModal.addEventListener('click', function() {
 
 // Tutup modal jika user mengklik area gelap di luar form
 window.addEventListener('click', function(event) {
-    if (event.target === registerModal) {
+    if (registerModal && event.target === registerModal) {
         registerModal.classList.remove('show');
     }
+    if (artistModal && event.target === artistModal) {
+        artistModal.classList.remove('show');
+    }
 });
-
 // 1. Data Notifikasi (8 Item)
 const notifications = [
     { id: 1, text: "<strong>@artis_lokal</strong> mengunggah karya baru!", time: "2 menit lalu" },
@@ -98,6 +100,7 @@ document.addEventListener('click', function(event) {
 // Jalankan render saat awal
 renderNotifications();
 
+<<<<<<< HEAD
 // ==========================================
 // SCRIPT KHUSUS HALAMAN PROFIL
 // ==========================================
@@ -122,3 +125,63 @@ function switchTab(clickedBtn, targetContentId) {
         targetContent.classList.add('active');
     }
 }
+=======
+// --- Fungsi Modal Register Artis ---
+const btnArtist = document.getElementById('btnArtist');
+const artistModal = document.getElementById('artistModal');
+const closeArtistModal = document.getElementById('closeArtistModal');
+
+// Buka modal artis saat tombol "Saya seorang artis" diklik
+if (btnArtist && artistModal) {
+    btnArtist.addEventListener('click', function() {
+        artistModal.classList.add('show');
+    });
+}
+
+// Tutup modal artis saat tombol "X" diklik
+if (closeArtistModal && artistModal) {
+    closeArtistModal.addEventListener('click', function() {
+        artistModal.classList.remove('show');
+    });
+}
+
+// --- Logika Simulasi Setelah Mendaftar ---
+
+// Ambil elemen formulir
+const userForm = document.querySelector('#registerModal form');
+const artistForm = document.querySelector('#artistModal form');
+
+// Fungsi untuk mengubah status menjadi "Sudah Masuk"
+function setLoggedInState() {
+    if (btnSignup) btnSignup.style.display = 'none'; // Hilangkan tombol Daftar
+    if (btnArtist) btnArtist.style.display = 'none'; // Hilangkan tombol Artis
+    
+    // Opsional: Tampilkan pesan sukses atau ikon profil
+    console.log("Status: Pengguna telah terdaftar dan masuk.");
+}
+
+// Menangani pendaftaran Pengguna Biasa
+if (userForm) {
+    userForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Mencegah reload halaman
+        alert('Pendaftaran Berhasil! Selamat datang di GalateArt.');
+        
+        registerModal.classList.remove('show'); // Tutup modal
+        setLoggedInState(); // Jalankan fungsi sembunyikan tombol
+    });
+}
+
+// Menangani pendaftaran Artis
+if (artistForm) {
+    artistForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Mencegah reload halaman
+        alert('Pendaftaran Artist Berhasil! Portofolio Anda sedang ditinjau.');
+        
+        // Pastikan variabel artistModal sudah didefinisikan di bagian atas script
+        if (typeof artistModal !== 'undefined') {
+            artistModal.classList.remove('show'); // Tutup modal artis
+        }
+        setLoggedInState(); // Jalankan fungsi sembunyikan tombol
+    });
+}
+>>>>>>> 958090c453514bcd3d8e2babb59674308ac96bc7
