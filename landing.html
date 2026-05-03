@@ -1,1 +1,116 @@
-test
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GalateArt - Koleksi Seni Lokal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-container">
+                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
+                
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <ul>
+                        <li><a href="#"><i class="fas fa-th-large"></i> Categories</a></li>
+                        <li><a href="#"><i class="fas fa-star"></i> Top Artist</a></li>
+                        <li><a href="#"><i class="fas fa-fire"></i> Trending</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="logo">Galate<span>Art</span></div>
+        </div>
+        
+        <div class="nav-center">
+            <div class="search-bar">
+                <input type="text" placeholder="Cari karya seni...">
+            </div>
+            <button class="btn-discover"><i class="far fa-compass"></i> Discover</button>
+        </div>
+
+        <div class="nav-right">
+            <button class="btn-artist">Saya seorang artis</button>
+            <button class="btn-signup" id="btnSignup">Daftar</button>
+            <div class="nav-icons">
+                <i class="far fa-comment"></i>
+                <i class="far fa-bell"></i>
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-grid">
+            <div class="hero-card main-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
+                <div class="hero-text">
+                    <h2>Dibuat oleh artis lokal</h2>
+                    <p>Semua yang Anda butuhkan untuk vtuber, game, dan aset digital ada di sini!</p>
+                </div>
+            </div>
+            <div class="hero-card ai-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
+                <div class="hero-text">
+                    <h2>Tanpa Generative AI</h2>
+                    <p>Kami menghargai orisinalitas. Karya tanpa persetujuan dan kredit tidak diterima.</p>
+                </div>
+            </div>
+            <div class="hero-card talent-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
+                <div class="hero-text">
+                    <h2>Temukan Bakat</h2>
+                    <p>Temukan artis dengan gaya seni dan budget yang cocok untuk Anda.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="art-grid">
+            <div class="art-card">
+                <img src="https://via.placeholder.com/300x400" alt="Art">
+                <div class="art-info">
+                    <p class="hashtags">#original #illustration</p>
+                    <p class="artist-name">@artis_lokal</p>
+                </div>
+            </div>
+            <div class="art-card">
+                <img src="https://via.placeholder.com/300x400" alt="Art">
+                <div class="art-info">
+                    <p class="hashtags">#fantasy #character</p>
+                    <p class="artist-name">@seniman_digital</p>
+                </div>
+            </div>
+            </section>
+
+            <div class="modal-overlay" id="registerModal">
+                <div class="modal-content">
+                    <span class="close-btn" id="closeModal">&times;</span>
+                    <h2>Daftar ke GalateArt</h2>
+                    <form action="#" method="POST" class="register-form">
+                        <div class="input-group">
+                            <label for="username">Nama Pengguna</label>
+                            <input type="text" id="username" placeholder="Pilih nama pengguna..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="Masukkan alamat email..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Kata Sandi</label>
+                            <input type="password" id="password" placeholder="Buat kata sandi yang kuat..." required>
+                        </div>
+                        <button type="submit" class="btn-submit">Buat Akun</button>
+                    </form>
+                    <p class="login-link">Sudah punya akun? <a href="#">Masuk di sini</a></p>
+                </div>
+            </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
