@@ -280,3 +280,109 @@ input, button {
 }
 
 .login-link a:hover { text-decoration: underline; }
+
+/* Container untuk posisi relatif */
+.notification-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#notifToggle {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+/* Kotak Dropdown Notifikasi */
+.notif-dropdown {
+    display: none; /* Sembunyi secara default */
+    position: absolute;
+    top: 40px;
+    right: 0; /* Rata kanan agar tidak terpotong layar */
+    background-color: var(--nav-bg);
+    border: 1px solid #333;
+    border-radius: 12px;
+    width: 280px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    z-index: 200;
+    overflow: hidden;
+}
+
+/* Tampilkan saat class 'show' ditambahkan */
+.notif-dropdown.show {
+    display: block;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.notif-header {
+    padding: 15px;
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+}
+
+.notif-body {
+    max-height: 350px; /* Batasi tinggi agar tidak terlalu panjang */
+    overflow-y: auto;  /* Munculkan scroll jika item lebih dari batas tinggi */
+}
+
+/* Opsional: Mempercantik tampilan scrollbar (khusus Chrome/Edge/Safari) */
+.notif-body::-webkit-scrollbar {
+    width: 6px;
+}
+.notif-body::-webkit-scrollbar-thumb {
+    background-color: #333;
+    border-radius: 10px;
+}
+
+.notif-item {
+    padding: 15px;
+    border-bottom: 1px solid #2a2a35;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notif-item:hover {
+    background-color: #2a2a35;
+}
+
+.notif-item p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-white);
+}
+
+.notif-item span {
+    font-size: 11px;
+    color: var(--text-gray);
+}
+
+.notif-footer {
+    padding: 10px;
+    text-align: center;
+    background-color: #21212b;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.empty-notif {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-gray);
+}
+
+.empty-notif i {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 0.3; /* Membuat ikon terlihat redup */
+}
+
+.empty-notif p {
+    font-size: 14px;
+    margin: 0;
+}
