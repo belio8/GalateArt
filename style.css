@@ -688,3 +688,54 @@ STYLE KONTEN TAB PROFIL
     background-color: #e66a22;
 }
 
+/* --- Styling Ikon Profil Navbar --- */
+.profile-icon-link {
+    display: none; /* Disembunyikan sebelum login */
+    align-items: center;
+    margin-left: 10px;
+    text-decoration: none;
+}
+
+.profile-icon-link img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--purple); /* Garis batas sesuai tema */
+    cursor: pointer;
+    transition: transform 0.3s ease, border-color 0.3s;
+}
+
+.profile-icon-link img:hover {
+    transform: scale(1.1); /* Efek membesar saat di-hover */
+    border-color: var(--accent);
+}
+
+/* --- Styling Tombol Logout --- */
+.logout-container {
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    color: #ff4d4d; /* Warna merah untuk indikasi keluar/hapus */
+    border: 1px solid #ff4d4d;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #ff4d4d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+}

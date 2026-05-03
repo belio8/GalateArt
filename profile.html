@@ -13,14 +13,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div style="background: #333; padding: 10px; text-align: center; font-size: 14px;">
-        <span>Simulasi Tampilan Profil: </span>
-        <button id="btnToggleRole" style="padding: 5px 15px; border-radius: 15px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold;">
-            Ganti ke Tampilan Regular
-        </button>
-    </div>
-
     <header class="navbar">
         <div class="nav-left">
             <div class="menu-container">
@@ -51,16 +43,18 @@
         <div class="profile-main">
             <div class="account-badge" id="accountBadgeText">Artist Account</div>
             
-            <div class="cover-photo" style="background-image: url('https://via.placeholder.com/800x250/222222/555555?text=Cover+Image');"></div>
+            <div class="cover-photo" style="background-image: url('https://via.placeholder.com/800x250/222222/555555?text=Cover+Image');">
+                <!-- <img src="Assets/draw2.png" width="800" height="250"> -->
+            </div>
             
             <div class="profile-info-section">
                 <div class="avatar-container">
-                    <img src="https://via.placeholder.com/150" alt="Avatar User">
+                    <img src="Assets/draw2.png">
                 </div>
                 
                 <div class="profile-text">
                     <h1 id="userName">Miew</h1>
-                    <p id="userHandle">@cyb3r4rti</p>
+                    <p id="userHandle">@Miew</p>
                 </div>
                 
                 <div class="commission-status">
@@ -168,6 +162,11 @@
                     </div>
                     <button class="btn-follow">Follow</button>
                 </div>
+            </div>
+            <div class="logout-container">
+                    <button id="btnLogout" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Keluar dari Akun
+                    </button>
             </div>
         </div>
         
