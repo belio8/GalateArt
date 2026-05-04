@@ -88,6 +88,28 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedRole && userProfileLink) {
         setLoggedInState(savedRole === 'artist');
     }
+
+    // Inisialisasi notifikasi setelah DOM ready
+    const notifToggle = document.getElementById('notifToggle');
+    const notifDropdown = document.getElementById('notifDropdown');
+    const notifBody = document.getElementById('notifBody');
+
+    if (notifToggle && notifDropdown) {
+        notifToggle.addEventListener('click', (e) => {
+            notifDropdown.classList.toggle('show');
+            if (dropdownMenu) dropdownMenu.classList.remove('show'); // Tutup kategori jika terbuka
+            e.stopPropagation();
+        });
+        
+        // Tutup dropdown notifikasi saat klik di luar
+        document.addEventListener('click', (e) => {
+            if (!notifDropdown.contains(e.target) && !notifToggle.contains(e.target)) {
+                notifDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    renderNotifications();
 });
 
 if (userForm) {
@@ -124,11 +146,8 @@ const notifications = [
     { id: 3, text: "Seseorang menyukai karya Anda.", time: "3 jam lalu" }
 ];
 
-const notifToggle = document.getElementById('notifToggle');
-const notifDropdown = document.getElementById('notifDropdown');
-const notifBody = document.getElementById('notifBody');
-
 function renderNotifications() {
+    const notifBody = document.getElementById('notifBody');
     if (!notifBody) return;
     notifBody.innerHTML = ''; 
 
@@ -147,23 +166,6 @@ function renderNotifications() {
         });
     }
 }
-
-if (notifToggle && notifDropdown) {
-    notifToggle.addEventListener('click', (e) => {
-        notifDropdown.classList.toggle('show');
-        if (dropdownMenu) dropdownMenu.classList.remove('show'); // Tutup kategori jika terbuka
-        e.stopPropagation();
-    });
-    
-    // Tutup dropdown notifikasi saat klik di luar
-    document.addEventListener('click', (e) => {
-        if (!notifDropdown.contains(e.target) && !notifToggle.contains(e.target)) {
-            notifDropdown.classList.remove('show');
-        }
-    });
-}
-
-renderNotifications();
 
 
 // ==========================================
