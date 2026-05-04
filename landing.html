@@ -40,6 +40,7 @@
 
         <div class="nav-right">
             <button class="btn-artist" id="btnArtist">Saya seorang artis</button>
+            <button class="btn-login" id="btnLogin">Masuk</button>
             <button class="btn-signup" id="btnSignup">Daftar</button>
             
             <div class="nav-icons">
@@ -133,8 +134,8 @@
                     <h2>Daftar sebagai Artis</h2>
                     <form action="#" method="POST" class="register-form">
                         <div class="input-group">
-                            <label for="artistName">Nama Panggung / Username</label>
-                            <input type="text" id="artistName" placeholder="Nama panggung Anda..." required>
+                            <label for="artistName">Username</label>
+                            <input type="text" id="artistName" placeholder="Masukkan username Anda..." required>
                         </div>
                         <div class="input-group">
                             <label for="artistEmail">Email</label>
@@ -157,6 +158,25 @@
                         </div>
                         <button type="submit" class="btn-submit">Daftar Menjadi Artis</button>
                     </form>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="loginModal">
+                <div class="modal-content">
+                    <span class="close-btn" id="closeLoginModal">&times;</span>
+                    <h2>Masuk ke GalateArt</h2>
+                    <form action="#" method="POST" class="register-form" id="loginForm">
+                        <div class="input-group">
+                            <label for="loginUsername">Username</label>
+                            <input type="text" id="loginUsername" placeholder="Masukkan username Anda..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="loginPassword">Kata Sandi</label>
+                            <input type="password" id="loginPassword" placeholder="Masukkan kata sandi..." required>
+                        </div>
+                        <button type="submit" class="btn-submit">Masuk</button>
+                    </form>
+                    <p class="login-link">Belum punya akun? <a href="#" id="switchToSignup">Daftar di sini</a></p>
                 </div>
             </div>
 

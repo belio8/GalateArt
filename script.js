@@ -32,6 +32,11 @@ const btnArtistNav = document.getElementById('btnArtist');
 const artistModal = document.getElementById('artistModal');
 const closeArtistModal = document.getElementById('closeArtistModal');
 const userProfileLink = document.getElementById('userProfileLink');
+const btnLogin = document.getElementById('btnLogin');
+const loginModal = document.getElementById('loginModal');
+const closeLoginModal = document.getElementById('closeLoginModal');
+const loginForm = document.getElementById('loginForm');
+const switchToSignup = document.getElementById('switchToSignup');
 
 // Buka/Tutup Modal User
 if (btnSignup && registerModal) {
@@ -63,20 +68,17 @@ const userForm = document.querySelector('#registerModal form');
 const artistForm = document.querySelector('#artistModal form');
 
 function setLoggedInState(isArtist = false) {
-    // Sembunyikan tombol Daftar dan Jadi Artis
     if (btnSignup) btnSignup.style.display = 'none'; 
     if (btnArtistNav) btnArtistNav.style.display = 'none'; 
+    // Sembunyikan tombol login saat sudah masuk
+    if (btnLogin) btnLogin.style.display = 'none'; 
     
-    // Tampilkan Ikon Navigasi (Pesan, Lonceng, Keranjang)
+    // Logika penampilan ikon dan profil tetap sama
     const navIcons = document.querySelector('.nav-icons');
-    if (navIcons) {
-        navIcons.style.display = 'flex';
-    }
+    if (navIcons) navIcons.style.display = 'flex';
     
-    // Tampilkan Link Profil
     if (userProfileLink) {
         userProfileLink.style.display = 'flex';
-        if (isArtist) userProfileLink.querySelector('img').style.borderColor = 'var(--accent)';
     }
 }
 
@@ -230,5 +232,40 @@ if (btnLogout) {
             // Gunakan window.location.href untuk berpindah halaman
             window.location.href = 'landing.html';
         }
+    });
+}
+
+// Buka/Tutup Modal Masuk
+if (btnLogin && loginModal) {
+    btnLogin.addEventListener('click', () => loginModal.classList.add('show'));
+}
+if (closeLoginModal) {
+    closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+}
+
+// Berpindah dari Modal Masuk ke Daftar
+if (switchToSignup) {
+    switchToSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.remove('show');
+        registerModal.classList.add('show');
+    });
+}
+
+// Tutup modal jika klik area luar (perbarui event listener yang sudah ada)
+window.addEventListener('click', function(event) {
+    if (event.target === registerModal) registerModal.classList.remove('show');
+    if (event.target === artistModal) artistModal.classList.remove('show');
+    if (event.target === loginModal) loginModal.classList.remove('show'); // Tambahan
+});
+
+// Simulasi Submit Login
+if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Berhasil Masuk!');
+        loginModal.classList.remove('show');
+        setLoggedInState(false); 
+        localStorage.setItem('userRole', 'regular'); 
     });
 }
