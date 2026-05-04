@@ -2,6 +2,7 @@
     --bg-dark: #121218;
     --nav-bg: #1a1a24;
     --accent: #ff7e33;
+    --accent2: linear-gradient(45deg, #68a819, #f1e61d);
     --purple: #8e54e9;
     --text-white: #ffffff;
     --text-gray: #b3b3b3;
@@ -55,8 +56,8 @@ input, button {
 }
 
 .nav-right { display: flex; align-items: center; gap: 15px; }
-.btn-artist { background: var(--accent); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; }
-.btn-signup { background: var(--purple); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; }
+.btn-artist { background: var(--accent2); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600;}
+.btn-signup { background: var(--purple); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600;}
 .btn-login { background: var(--accent); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; }
 /* Sembunyikan ikon navigasi secara default */
 .nav-icons {
