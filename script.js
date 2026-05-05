@@ -261,13 +261,20 @@ window.addEventListener('click', function(event) {
     if (event.target === loginModal) loginModal.classList.remove('show'); // Tambahan
 });
 
+const artist_acc = "Miew";
+const user_acc = "ridho";
 // Simulasi Submit Login
 if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
         alert('Berhasil Masuk!');
         loginModal.classList.remove('show');
-        setLoggedInState(false); 
-        localStorage.setItem('userRole', 'regular'); 
+        setLoggedInState(false);
+        if (username === artist_acc) {
+            localStorage.setItem('userRole', 'artist'); 
+        } else {
+            localStorage.setItem('userRole', 'regular');
+        }
     });
 }
