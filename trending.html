@@ -111,6 +111,80 @@
                 <!-- Tambahkan lebih banyak post-card sesuai kebutuhan -->
             </div>
         </section>
+
+        <!-- ✅ Modal dipindahkan ke luar post-card agar event bubbling tidak menyebabkan glitch -->
+        <div class="modal-bg" id="modalBg">
+            <div class="modal-box" id="modalBox">
+                <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
+                
+                <div class="modal-img">
+                    <img src="" alt="Art Image" id="modalImageDisplay">
+                </div>
+                
+                <div class="modal-panel">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="Avatar" class="post-av" id="phAv">
+                        <div class="post-author">
+                            <strong id="phName">@artist_name</strong>
+                            <span id="phSpec">Trending Artist</span>
+                        </div>
+                        <button class="order-btn" id="orderBtn" onclick="location.href='commission.html'"><i class="fas fa-shopping-cart"></i> Order</button>
+                        <button class="follow-btn" id="followBtn">Follow</button>
+                    </div>
+                    
+                    <div class="comment-feed" id="commentFeed">
+                        <div class="caption-block">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="" class="c-av" id="capAv">
+                            <div class="c-body">
+                                <strong id="captionName">@artist_name</strong>
+                                <span>Karya trending terbaru!</span>
+                                <div class="tags" id="captionTags">#trending</div>
+                                <span class="c-time">Baru saja trending</span>
+                            </div>
+                        </div>
+                        <div class="feed-divider"></div>
+                        <div class="comment-count">1 Komentar</div>
+                        <div class="comment-item">
+                            <img class="c-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="">
+                            <div class="c-body">
+                                <div class="c-top">
+                                    <strong>@user_galateart</strong> <span class="c-text">Karyanya keren banget! Pantas trending.</span>
+                                </div>
+                                <div class="c-bottom">
+                                    <span class="c-time">5m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ Like & Save action bar -->
+                    <div class="like-action-bar" id="likeActionBar">
+                        <div class="like-action-left">
+                            <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-icon-btn" onclick="focusCommentInput()">
+                                <i class="far fa-comment"></i>
+                            </button>
+                        </div>
+                        <button class="save-post-btn" id="savePostBtn" onclick="toggleSavePost()">
+                            <i class="far fa-bookmark"></i>
+                        </button>
+                    </div>
+                    <div class="like-count-bar" id="likeCountBar">
+                        <span id="likeCountText"><strong>0</strong> <span>orang menyukai ini</span></span>
+                    </div>
+                    
+                    <div class="input-area">
+                        <img class="input-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
+                        <div class="input-wrap">
+                            <input type="text" class="comment-input" id="commentInput" placeholder="Tambahkan komentar..." autocomplete="off">
+                        </div>
+                        <button class="post-btn" id="postBtn">Kirim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="script.js"></script>

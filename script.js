@@ -278,3 +278,138 @@ if (loginForm) {
         }
     });
 }
+
+// ==========================================
+// 7. LIKE & SAVE POST (MODAL POPUP)
+// ==========================================
+
+// State per-post (keyed by card index, reset setiap modal dibuka)
+let currentPostLiked = false;
+let currentPostSaved = false;
+let currentPostLikes = 0; // Angka likes awal dari card
+
+function resetModalLikeState(initialLikes) {
+    currentPostLiked = false;
+    currentPostSaved = false;
+    currentPostLikes = initialLikes;
+
+    const likeBtn = document.getElementById('likePostBtn');
+    const saveBtn = document.getElementById('savePostBtn');
+    const likeCountText = document.getElementById('likeCountText');
+
+    if (likeBtn) {
+        likeBtn.innerHTML = '<i class="far fa-heart"></i>';
+        likeBtn.classList.remove('liked');
+    }
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+        saveBtn.classList.remove('saved');
+    }
+    if (likeCountText) {
+        likeCountText.innerHTML = `<strong>${currentPostLikes.toLocaleString('id')}</strong> <span>orang menyukai ini</span>`;
+    }
+}
+
+function toggleLikePost() {
+    currentPostLiked = !currentPostLiked;
+    currentPostLikes += currentPostLiked ? 1 : -1;
+
+    const likeBtn = document.getElementById('likePostBtn');
+    const likeCountText = document.getElementById('likeCountText');
+
+    if (likeBtn) {
+        likeBtn.innerHTML = currentPostLiked
+            ? '<i class="fas fa-heart"></i>'
+            : '<i class="far fa-heart"></i>';
+        likeBtn.classList.toggle('liked', currentPostLiked);
+    }
+    if (likeCountText) {
+        likeCountText.innerHTML = `<strong>${currentPostLikes.toLocaleString('id')}</strong> <span>orang menyukai ini</span>`;
+    }
+}
+
+function toggleSavePost() {
+    currentPostSaved = !currentPostSaved;
+    const saveBtn = document.getElementById('savePostBtn');
+    if (saveBtn) {
+        saveBtn.innerHTML = currentPostSaved
+            ? '<i class="fas fa-bookmark"></i>'
+            : '<i class="far fa-bookmark"></i>';
+        saveBtn.classList.toggle('saved', currentPostSaved);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const cards = document.querySelectorAll('.art-card, .post-card');
+    const modalBg = document.getElementById('modalBg');
+    const closeModalPost = document.getElementById('closeModalPost');
+    
+    const modalImageDisplay = document.getElementById('modalImageDisplay');
+    const phName = document.getElementById('phName');
+    const captionName = document.getElementById('captionName');
+    const captionTags = document.getElementById('captionTags');
+
+    if(cards && modalBg) {
+        cards.forEach(card => {
+            card.style.cursor = 'pointer';
+            
+            card.addEventListener('click', function(e) {
+                // KUNCI: Hentikan event agar tidak naik ke window/background
+                e.stopPropagation(); 
+
+                // Ambil data (tambahkan pengecekan agar tidak error jika elemen tidak ada)
+                const imgEl = this.querySelector('img');
+                const nameEl = this.querySelector('.artist-name');
+                const tagEl = this.querySelector('.hashtags');
+
+                if (imgEl) modalImageDisplay.src = imgEl.src;
+                if (nameEl) {
+                    phName.innerText = nameEl.innerText;
+                    captionName.innerText = nameEl.innerText;
+                }
+                if (tagEl) captionTags.innerText = tagEl.innerText;
+
+                // Ambil like count dari card jika ada, fallback ke 0
+                const likesEl = this.querySelector('.likes');
+                const initialLikes = likesEl
+                    ? parseInt(likesEl.innerText.replace(/\D/g, '')) || 0
+                    : 0;
+
+                // Reset like/save state untuk post yang baru dibuka
+                resetModalLikeState(initialLikes);
+
+                // Tampilkan modal
+                modalBg.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+    }
+
+    // Fungsi Tutup
+    function closeMyModal() {
+        modalBg.classList.remove('open');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (closeModalPost) {
+        closeModalPost.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMyModal();
+        });
+    }
+    
+    // Menutup hanya jika yang diklik adalah background (overlay) nya saja
+    modalBg.addEventListener('click', function(e) {
+        if (e.target === modalBg) {
+            closeMyModal();
+        }
+    });
+
+    // Mencegah klik di dalam kotak modal (modal-box) agar tidak menutup modal
+    const modalBox = document.getElementById('modalBox');
+    if(modalBox) {
+        modalBox.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
