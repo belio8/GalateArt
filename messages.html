@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesan - GalateArt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .messages-page {
+            display: flex;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* ---- Sidebar ---- */
+        .msg-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+            background: #1a1a24;
+            border-right: 1px solid #2a2a35;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-top {
+            padding: 20px 16px 12px;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .sidebar-top h2 { margin: 0 0 12px; font-size: 18px; }
+        .msg-search {
+            width: 100%; padding: 9px 14px; box-sizing: border-box;
+            background: #2a2a35; border: 1px solid #3a3a45; border-radius: 20px;
+            color: white; font-family: inherit; font-size: 13px;
+        }
+        .msg-search:focus { outline: none; border-color: var(--purple); }
+
+        .conv-list { flex: 1; overflow-y: auto; }
+        .conv-item {
+            display: flex; gap: 12px; align-items: center;
+            padding: 14px 16px; cursor: pointer;
+            border-bottom: 1px solid #1e1e28;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .conv-item:hover { background: #1e1e2e; }
+        .conv-item.active { background: #22223a; }
+
+        .conv-avatar {
+            width: 46px; height: 46px; border-radius: 50%;
+            object-fit: cover; flex-shrink: 0;
+            border: 2px solid transparent;
+        }
+        .conv-item.active .conv-avatar { border-color: var(--purple); }
+
+        .conv-body { flex: 1; min-width: 0; }
+        .conv-name { font-size: 14px; font-weight: 600; margin: 0 0 3px; }
+        .conv-preview { font-size: 12px; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+        .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .conv-time { font-size: 11px; color: var(--text-gray); }
+        .conv-unread {
+            background: var(--purple); color: white;
+            font-size: 10px; font-weight: 700;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ---- Chat Area ---- */
+        .msg-chat {
+            flex: 1; display: flex; flex-direction: column;
+            background: #121218; min-width: 0;
+        }
+
+        .chat-header {
+            padding: 14px 20px;
+            background: #1a1a24;
+            border-bottom: 1px solid #2a2a35;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .chat-header-info { flex: 1; }
+        .chat-header-info strong { display: block; font-size: 15px; }
+        .chat-status { font-size: 12px; color: #4caf50; }
+        .chat-actions { display: flex; gap: 12px; color: var(--text-gray); font-size: 18px; }
+        .chat-actions i { cursor: pointer; transition: color 0.2s; }
+        .chat-actions i:hover { color: var(--accent); }
+
+        .chat-messages {
+            flex: 1; overflow-y: auto;
+            padding: 20px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+
+        .msg-date-divider {
+            text-align: center; font-size: 11px; color: var(--text-gray);
+            position: relative;
+        }
+        .msg-date-divider::before, .msg-date-divider::after {
+            content: ''; position: absolute; top: 50%;
+            width: 35%; height: 1px; background: #2a2a35;
+        }
+        .msg-date-divider::before { left: 0; }
+        .msg-date-divider::after { right: 0; }
+
+        .msg-bubble-row { display: flex; gap: 10px; align-items: flex-end; }
+        .msg-bubble-row.me { flex-direction: row-reverse; }
+
+        .bubble-av { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+        .bubble {
+            max-width: 60%; padding: 10px 14px;
+            border-radius: 18px; font-size: 13px; line-height: 1.5;
+            word-break: break-word;
+        }
+        .bubble.them { background: #1e1e2e; border-radius: 18px 18px 18px 4px; color: #f2f2fa; }
+        .bubble.me { background: var(--purple); border-radius: 18px 18px 4px 18px; color: white; }
+
+        .bubble-img { max-width: 220px; border-radius: 12px; cursor: pointer; }
+        .bubble-time { font-size: 10px; color: var(--text-gray); margin-top: 4px; text-align: right; }
+        .bubble.them + .bubble-time { text-align: left; }
+
+        .commission-card {
+            background: #1e1e26; border: 1px solid #2a2a42;
+            border-radius: 12px; padding: 14px; max-width: 280px;
+        }
+        .commission-card .cc-label { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+        .commission-card .cc-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .commission-card .cc-detail { font-size: 12px; color: var(--text-gray); margin-bottom: 10px; }
+        .commission-card .cc-price { font-size: 16px; font-weight: 700; color: var(--accent); }
+        .btn-cc-action {
+            width: 100%; margin-top: 10px; padding: 8px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+            background: var(--purple); color: white; transition: background 0.2s;
+        }
+        .btn-cc-action:hover { background: #7a42d1; }
+
+        /* ---- Input ---- */
+        .chat-input-bar {
+            padding: 14px 20px;
+            border-top: 1px solid #2a2a35;
+            background: #1a1a24;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .chat-input-bar i { font-size: 18px; color: var(--text-gray); cursor: pointer; transition: color 0.2s; }
+        .chat-input-bar i:hover { color: var(--accent); }
+        .chat-text-input {
+            flex: 1; padding: 10px 16px; border-radius: 20px;
+            background: #2a2a35; border: 1px solid #3a3a45;
+            color: white; font-family: inherit; font-size: 13px;
+        }
+        .chat-text-input:focus { outline: none; border-color: var(--purple); }
+        .btn-send {
+            background: var(--purple); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; transition: background 0.2s; flex-shrink: 0;
+        }
+        .btn-send:hover { background: #7a42d1; }
+
+        /* ---- No chat selected ---- */
+        .no-chat {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--text-gray); gap: 12px;
+        }
+        .no-chat i { font-size: 48px; color: #2a2a42; }
+        .no-chat p { font-size: 15px; }
+
+        @media (max-width: 768px) {
+            .msg-sidebar { width: 100%; display: none; }
+            .msg-sidebar.mobile-show { display: flex; position: fixed; inset: 60px 0 0 0; z-index: 50; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-container">
+                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <ul>
+                        <li><a href="#"><i class="fas fa-th-large"></i> Categories</a></li>
+                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
+                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="logo"><a href="landing.html" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
+        </div>
+        <div class="nav-center">
+            <button class="btn-discover" style="border-radius:20px;padding:8px 20px;"><i class="far fa-compass"></i> Discover</button>
+        </div>
+        <div class="nav-right" style="gap:20px;">
+            <div class="search-bar">
+                <input type="text" placeholder="Search..." style="background:#2a2a35;">
+            </div>
+            <div class="nav-icons" style="display:flex;gap:15px;align-items:center;">
+                <i class="far fa-comment" style="cursor:pointer;padding:8px;border:1px solid var(--accent);border-radius:50%;color:var(--accent);"></i>
+                <div class="notification-container">
+                    <i class="far fa-bell" id="notifToggle"></i>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">Notifikasi</div>
+                        <div class="notif-body" id="notifBody"></div>
+                    </div>
+                </div>
+                <i class="fas fa-shopping-cart" style="cursor:pointer;padding:8px;border:1px solid #444;border-radius:50%;"></i>
+                <img src="Assets/draw2.png" alt="User" style="width:35px;height:35px;border-radius:50%;cursor:pointer;">
+            </div>
+        </div>
+    </header>
+
+    <div class="messages-page">
+        <!-- Sidebar Conversations -->
+        <div class="msg-sidebar">
+            <div class="sidebar-top">
+                <h2><i class="far fa-comment" style="color:var(--accent);margin-right:8px;"></i>Pesan</h2>
+                <input class="msg-search" type="text" placeholder="Cari percakapan..." oninput="filterConvs(this.value)">
+            </div>
+            <div class="conv-list" id="convList">
+                <div class="conv-item active" onclick="openChat('ichigo')">
+                    <img class="conv-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="Ichigo">
+                    <div class="conv-body">
+                        <p class="conv-name">Ichigowarano</p>
+                        <p class="conv-preview" id="preview-ichigo">Siap! Saya akan mulai sketsa besok ya 😊</p>
+                    </div>
+                    <div class="conv-meta">
+                        <span class="conv-time">14:32</span>
+                    </div>
+                </div>
+                <div class="conv-item" onclick="openChat('jasper')">
+                    <img class="conv-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=jasper" alt="Jasper">
+                    <div class="conv-body">
+                        <p class="conv-name">Jasper Xandros</p>
+                        <p class="conv-preview">Bisa kirimkan referensi warna yang diinginkan?</p>
+                    </div>
+                    <div class="conv-meta">
+                        <span class="conv-time">Kemarin</span>
+                        <span class="conv-unread">2</span>
+                    </div>
+                </div>
+                <div class="conv-item" onclick="openChat('keen')">
+                    <img class="conv-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=keen" alt="Keen">
+                    <div class="conv-body">
+                        <p class="conv-name">Keenbiscuit</p>
+                        <p class="conv-preview">Commission selesai! Cek DM untuk file-nya.</p>
+                    </div>
+                    <div class="conv-meta">
+                        <span class="conv-time">Sen</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="msg-chat" id="chatPanel">
+            <div class="chat-header">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="Avatar" id="chatAvatar">
+                <div class="chat-header-info">
+                    <strong id="chatName">Ichigowarano</strong>
+                    <span class="chat-status"><i class="fas fa-circle" style="font-size:8px;"></i> Online</span>
+                </div>
+                <div class="chat-actions">
+                    <i class="fas fa-info-circle" title="Detail Commission"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg-date-divider">Senin, 5 Mei 2026</div>
+
+                <!-- Commission card (them) -->
+                <div class="msg-bubble-row">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
+                    <div>
+                        <div class="commission-card">
+                            <div class="cc-label"><i class="fas fa-file-contract"></i> REQUEST COMMISSION</div>
+                            <div class="cc-title">Ilustrasi Karakter Fullbody</div>
+                            <div class="cc-detail">Karakter original · Fullbody · Warna penuh</div>
+                            <div class="cc-price">Rp 350.000</div>
+                            <button class="btn-cc-action">Lihat Detail Order</button>
+                        </div>
+                        <div class="bubble-time">09:01</div>
+                    </div>
+                </div>
+
+                <div class="msg-bubble-row">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
+                    <div>
+                        <div class="bubble them">Halo! Terima kasih sudah memesan. Bisa ceritakan lebih lanjut karakter yang ingin digambar? 😊</div>
+                        <div class="bubble-time">09:03</div>
+                    </div>
+                </div>
+
+                <div class="msg-bubble-row me">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
+                    <div>
+                        <div class="bubble me">Halo kak! Saya mau buat karakter cewek dengan rambut biru panjang, pakai baju casual modern. Referensinya ada di bawah ini ya!</div>
+                        <div class="bubble-time" style="text-align:right;">09:15</div>
+                    </div>
+                </div>
+
+                <div class="msg-bubble-row me">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
+                    <div>
+                        <img class="bubble-img" src="https://via.placeholder.com/220x280/8e54e9/ffffff?text=Referensi" alt="Ref">
+                        <div class="bubble-time" style="text-align:right;">09:16</div>
+                    </div>
+                </div>
+
+                <div class="msg-bubble-row">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
+                    <div>
+                        <div class="bubble them">Wah, keren banget referensinya! Nanti saya buat sketsa dulu ya, sekitar 2-3 hari. Nanti saya kabari via chat ini kalau sudah siap untuk review. 🎨</div>
+                        <div class="bubble-time">09:30</div>
+                    </div>
+                </div>
+
+                <div class="msg-date-divider">Hari ini</div>
+
+                <div class="msg-bubble-row">
+                    <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
+                    <div>
+                        <div class="bubble them">Siap! Saya akan mulai sketsa besok ya 😊</div>
+                        <div class="bubble-time">14:32</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-bar">
+                <i class="fas fa-paperclip" title="Lampirkan file"></i>
+                <i class="fas fa-image" title="Kirim gambar"></i>
+                <input class="chat-text-input" type="text" id="chatInput" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const conversations = {
+            ichigo: {
+                name: 'Ichigowarano',
+                seed: 'ichigo',
+                status: 'Online'
+            },
+            jasper: {
+                name: 'Jasper Xandros',
+                seed: 'jasper',
+                status: 'Aktif 1j lalu'
+            },
+            keen: {
+                name: 'Keenbiscuit',
+                seed: 'keen',
+                status: 'Aktif kemarin'
+            }
+        };
+
+        function openChat(key) {
+            document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            const c = conversations[key];
+            document.getElementById('chatAvatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${c.seed}`;
+            document.getElementById('chatName').textContent = c.name;
+            document.querySelector('.chat-status').innerHTML = `<i class="fas fa-circle" style="font-size:8px;color:${c.status==='Online'?'#4caf50':'#888'}"></i> ${c.status}`;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const feed = document.getElementById('chatMessages');
+            const row = document.createElement('div');
+            row.className = 'msg-bubble-row me';
+            row.innerHTML = `
+                <img class="bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
+                <div>
+                    <div class="bubble me">${text}</div>
+                    <div class="bubble-time" style="text-align:right;">${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</div>
+                </div>`;
+            feed.appendChild(row);
+            feed.scrollTop = feed.scrollHeight;
+            input.value = '';
+
+            // Update preview
+            document.getElementById('preview-ichigo').textContent = text;
+        }
+
+        function filterConvs(q) {
+            document.querySelectorAll('.conv-item').forEach(item => {
+                const name = item.querySelector('.conv-name').textContent.toLowerCase();
+                item.style.display = name.includes(q.toLowerCase()) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

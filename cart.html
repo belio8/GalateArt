@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang - GalateArt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cart-page { display: flex; gap: 30px; padding: 30px 5%; align-items: flex-start; }
+
+        /* --- Cart Items Column --- */
+        .cart-items-col { flex: 1; min-width: 0; }
+        .cart-items-col h1 { font-size: 24px; margin-bottom: 5px; }
+        .cart-subtitle { color: var(--text-gray); font-size: 14px; margin-bottom: 25px; }
+
+        .cart-item {
+            background: #1e1e26;
+            border-radius: 15px;
+            padding: 18px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            transition: transform 0.2s;
+        }
+        .cart-item:hover { transform: translateY(-2px); }
+
+        .cart-item-img {
+            width: 80px; height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #2a2a35;
+        }
+
+        .cart-item-body { flex: 1; min-width: 0; }
+        .cart-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .cart-item-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+        .cart-item-artist { font-size: 13px; color: var(--purple); margin: 0 0 6px; }
+        .cart-item-type { font-size: 12px; color: var(--text-gray); background: #2a2a35; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+
+        .cart-item-price { font-size: 16px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+        .cart-item-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-remove {
+            background: none; border: 1px solid #ff4d4d; color: #ff4d4d;
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-remove:hover { background: #ff4d4d; color: #fff; }
+        .btn-save-later {
+            background: none; border: 1px solid #444; color: var(--text-gray);
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save-later:hover { border-color: var(--purple); color: var(--purple); }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+        .empty-cart i { font-size: 48px; color: #333; margin-bottom: 15px; display: block; }
+        .empty-cart p { font-size: 16px; }
+        .empty-cart a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        /* --- Summary Column --- */
+        .cart-summary-col { width: 320px; flex-shrink: 0; }
+
+        .summary-box {
+            background: #1e1e26;
+            border-radius: 15px;
+            padding: 24px;
+            position: sticky;
+            top: 90px;
+        }
+        .summary-box h2 { font-size: 18px; margin: 0 0 20px; }
+
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; color: var(--text-gray); }
+        .summary-row span:last-child { color: var(--text-white); font-weight: 500; }
+        .summary-divider { border: none; border-top: 1px solid #2a2a35; margin: 16px 0; }
+        .summary-total { display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; }
+        .summary-total span:last-child { color: var(--accent); }
+
+        .btn-checkout {
+            width: 100%;
+            background: var(--purple);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .btn-checkout:hover { background: #7a42d1; }
+        .btn-checkout i { margin-right: 8px; }
+
+        .promo-row { margin-top: 16px; display: flex; gap: 8px; }
+        .promo-input {
+            flex: 1; padding: 10px 14px; border-radius: 8px;
+            background: #2a2a35; border: 1px solid #444; color: white;
+            font-family: inherit; font-size: 13px;
+        }
+        .promo-input:focus { outline: none; border-color: var(--purple); }
+        .btn-promo {
+            background: none; border: 1px solid var(--accent); color: var(--accent);
+            padding: 10px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+            font-weight: 600; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-promo:hover { background: var(--accent); color: white; }
+
+        .payment-icons { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .payment-badge {
+            font-size: 11px; background: #2a2a35; border: 1px solid #3a3a45;
+            color: var(--text-gray); padding: 4px 10px; border-radius: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .cart-page { flex-direction: column; }
+            .cart-summary-col { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-container">
+                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <ul>
+                        <li><a href="#"><i class="fas fa-th-large"></i> Categories</a></li>
+                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
+                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="logo"><a href="landing.html" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
+        </div>
+        <div class="nav-center">
+            <button class="btn-discover" style="border-radius:20px;padding:8px 20px;"><i class="far fa-compass"></i> Discover</button>
+        </div>
+        <div class="nav-right" style="gap:20px;">
+            <div class="search-bar">
+                <input type="text" placeholder="Search..." style="background:#2a2a35;">
+            </div>
+            <div class="nav-icons" style="display:flex;gap:15px;align-items:center;">
+                <i class="far fa-comment" style="cursor:pointer;padding:8px;border:1px solid #444;border-radius:50%;"></i>
+                <div class="notification-container">
+                    <i class="far fa-bell" id="notifToggle"></i>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">Notifikasi</div>
+                        <div class="notif-body" id="notifBody"></div>
+                    </div>
+                </div>
+                <i class="fas fa-shopping-cart" style="cursor:pointer;padding:8px;border:1px solid var(--accent);border-radius:50%;color:var(--accent);"></i>
+                <img src="Assets/draw2.png" alt="User" style="width:35px;height:35px;border-radius:50%;cursor:pointer;">
+            </div>
+        </div>
+    </header>
+
+    <div class="cart-page">
+        <!-- Cart Items -->
+        <div class="cart-items-col">
+            <h1><i class="fas fa-shopping-cart" style="color:var(--accent);margin-right:10px;"></i>Keranjang</h1>
+            <p class="cart-subtitle" id="cartSubtitle">3 item menunggu checkout</p>
+
+            <div id="cartList">
+                <!-- Item 1 -->
+                <div class="cart-item" id="item-1">
+                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/8e54e9/ffffff?text=Art" alt="Art">
+                    <div class="cart-item-body">
+                        <div class="cart-item-top">
+                            <div>
+                                <p class="cart-item-title">Ilustrasi Karakter Fullbody</p>
+                                <p class="cart-item-artist">@ichigowarano</p>
+                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                            </div>
+                            <span class="cart-item-price">Rp 350.000</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-remove" onclick="removeItem('item-1')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="cart-item" id="item-2">
+                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/ff7e33/ffffff?text=Art" alt="Art">
+                    <div class="cart-item-body">
+                        <div class="cart-item-top">
+                            <div>
+                                <p class="cart-item-title">Desain Chibi VTuber</p>
+                                <p class="cart-item-artist">@jasper_xandros</p>
+                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                            </div>
+                            <span class="cart-item-price">Rp 200.000</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-remove" onclick="removeItem('item-2')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="cart-item" id="item-3">
+                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/68a819/ffffff?text=Art" alt="Art">
+                    <div class="cart-item-body">
+                        <div class="cart-item-top">
+                            <div>
+                                <p class="cart-item-title">Concept Art Environment</p>
+                                <p class="cart-item-artist">@seniman_digital</p>
+                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                            </div>
+                            <span class="cart-item-price">Rp 500.000</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-remove" onclick="removeItem('item-3')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-cart" id="emptyCart" style="display:none;">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Keranjangmu kosong.<br><a href="landing.html">Jelajahi karya seni →</a></p>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="cart-summary-col">
+            <div class="summary-box">
+                <h2>Ringkasan Order</h2>
+
+                <div class="summary-row"><span>Subtotal (3 item)</span><span id="subtotalVal">Rp 1.050.000</span></div>
+                <div class="summary-row"><span>Biaya platform (5%)</span><span id="feeVal">Rp 52.500</span></div>
+                <div class="summary-row"><span>Diskon promo</span><span id="discountVal" style="color:#4caf50;">- Rp 0</span></div>
+                <hr class="summary-divider">
+                <div class="summary-total"><span>Total</span><span id="totalVal">Rp 1.102.500</span></div>
+
+                <div class="promo-row">
+                    <input class="promo-input" type="text" placeholder="Kode promo..." id="promoInput">
+                    <button class="btn-promo" onclick="applyPromo()">Pakai</button>
+                </div>
+                <div id="promoMsg" style="font-size:12px;margin-top:6px;color:var(--text-gray);"></div>
+
+                <button class="btn-checkout" onclick="location.href='commission.html'">
+                    <i class="fas fa-lock"></i> Lanjut ke Pembayaran
+                </button>
+
+                <div style="margin-top:16px;">
+                    <div style="font-size:12px;color:var(--text-gray);margin-bottom:8px;">Metode pembayaran yang diterima:</div>
+                    <div class="payment-icons">
+                        <span class="payment-badge">GoPay</span>
+                        <span class="payment-badge">DANA</span>
+                        <span class="payment-badge">OVO</span>
+                        <span class="payment-badge">QRIS</span>
+                        <span class="payment-badge">BCA</span>
+                        <span class="payment-badge">BRI</span>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px;font-size:12px;color:var(--text-gray);display:flex;gap:6px;align-items:center;">
+                    <i class="fas fa-shield-alt" style="color:var(--accent);"></i>
+                    Pembayaran aman & terlindungi GalateArt
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const prices = { 'item-1': 350000, 'item-2': 200000, 'item-3': 500000 };
+        let removed = new Set();
+
+        function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+        function recalc() {
+            let sub = 0;
+            for (const [id, price] of Object.entries(prices)) {
+                if (!removed.has(id)) sub += price;
+            }
+            const count = Object.keys(prices).length - removed.size;
+            const fee = Math.round(sub * 0.05);
+            document.getElementById('subtotalVal').textContent = fmt(sub);
+            document.getElementById('feeVal').textContent = fmt(fee);
+            document.getElementById('totalVal').textContent = fmt(sub + fee);
+            document.getElementById('cartSubtitle').textContent = count + ' item menunggu checkout';
+            if (count === 0) {
+                document.getElementById('emptyCart').style.display = 'block';
+                document.querySelector('.cart-summary-col').style.display = 'none';
+            }
+        }
+
+        function removeItem(id) {
+            const el = document.getElementById(id);
+            el.style.transition = 'opacity 0.3s, transform 0.3s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(20px)';
+            setTimeout(() => { el.remove(); removed.add(id); recalc(); }, 300);
+        }
+
+        function applyPromo() {
+            const code = document.getElementById('promoInput').value.trim().toUpperCase();
+            const msg = document.getElementById('promoMsg');
+            if (code === 'GALATE10') {
+                msg.textContent = '✅ Promo diterapkan! Diskon 10% aktif.';
+                msg.style.color = '#4caf50';
+                document.getElementById('discountVal').textContent = '- Rp 105.000';
+            } else {
+                msg.textContent = '❌ Kode promo tidak valid.';
+                msg.style.color = '#ff4d4d';
+            }
+        }
+    </script>
+</body>
+</html>
