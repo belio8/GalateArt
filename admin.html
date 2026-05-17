@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – GalateArt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f17;
+      --surface:   #16161f;
+      --surface2:  #1e1e2c;
+      --border:    #2a2a3a;
+      --accent:    #7c6aff;
+      --accent2:   #5cdd8b;
+      --danger:    #e05c5c;
+      --warn:      #f0a030;
+      --text:      #e0e0e8;
+      --muted:     #666680;
+      --sidebar-w: 220px;
+    }
+
+    body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh;
+      z-index: 50;
+    }
+    .sidebar-logo {
+      padding: 22px 20px 18px;
+      font-size: 20px; font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo span { color: var(--accent); }
+    .sidebar-logo small { display: block; font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: .05em; }
+
+    .sidebar nav { flex: 1; padding: 14px 10px; }
+    .nav-group-label {
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em;
+      padding: 10px 10px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 13.5px; color: var(--muted);
+      transition: background .15s, color .15s;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(124,106,255,.15); color: var(--accent); font-weight: 600; }
+    .nav-item .badge {
+      margin-left: auto; background: var(--danger); color: #fff;
+      font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px;
+    }
+
+    .sidebar-footer {
+      padding: 14px 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .topbar h1 { font-size: 18px; font-weight: 700; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .admin-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: #fff;
+    }
+
+    .content { padding: 28px; flex: 1; }
+
+    /* ── TABS ── */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ── STAT CARDS ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .stat-card .label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+    .stat-card .sub { font-size: 11px; color: var(--muted); }
+    .stat-card.accent .value { color: var(--accent); }
+    .stat-card.green  .value { color: var(--accent2); }
+    .stat-card.red    .value { color: var(--danger); }
+    .stat-card.warn   .value { color: var(--warn); }
+
+    /* ── TABLES ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-header h2 { font-size: 16px; font-weight: 700; }
+    .section-header .filters { display: flex; gap: 8px; }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+      background: none; color: var(--muted); font-family: 'Poppins', sans-serif;
+      font-size: 12px; cursor: pointer; transition: all .15s;
+    }
+    .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .search-input {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      color: var(--text); font-family: 'Poppins', sans-serif; font-size: 13px;
+      outline: none; width: 220px;
+    }
+    .search-input:focus { border-color: var(--accent); }
+
+    .table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--surface2); padding: 12px 16px;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em;
+      text-align: left; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    td { padding: 12px 16px; font-size: 13px; vertical-align: middle; }
+
+    .badge-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .badge-status.pending  { background: rgba(240,160,48,.12); color: var(--warn); }
+    .badge-status.approved { background: rgba(92,221,139,.12); color: var(--accent2); }
+    .badge-status.rejected { background: rgba(224,92,92,.12);  color: var(--danger); }
+    .badge-status.active   { background: rgba(92,221,139,.12); color: var(--accent2); }
+    .badge-status.banned   { background: rgba(224,92,92,.12);  color: var(--danger); }
+    .badge-status.artist   { background: rgba(124,106,255,.12); color: var(--accent); }
+
+    .action-btns { display: flex; gap: 6px; }
+    .btn-sm {
+      padding: 5px 12px; border-radius: 7px; border: none;
+      font-family: 'Poppins', sans-serif; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: opacity .15s;
+    }
+    .btn-sm:hover { opacity: .85; }
+    .btn-approve { background: rgba(92,221,139,.15); color: var(--accent2); }
+    .btn-reject  { background: rgba(224,92,92,.15);  color: var(--danger); }
+    .btn-view    { background: rgba(124,106,255,.15); color: var(--accent); }
+    .btn-ban     { background: rgba(224,92,92,.15);  color: var(--danger); }
+    .btn-unban   { background: rgba(92,221,139,.15); color: var(--accent2); }
+    .btn-delete  { background: rgba(224,92,92,.1);  color: var(--danger); }
+
+    .user-cell { display: flex; align-items: center; gap: 10px; }
+    .u-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center;
+      justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .u-name { font-weight: 600; font-size: 13px; }
+    .u-handle { font-size: 11px; color: var(--muted); }
+
+    /* ── DETAIL DRAWER ── */
+    #drawerOverlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); z-index: 200; backdrop-filter: blur(3px);
+    }
+    #drawerOverlay.open { display: flex; justify-content: flex-end; }
+    #drawer {
+      width: 420px; max-width: 95vw;
+      background: var(--surface); border-left: 1px solid var(--border);
+      height: 100vh; overflow-y: auto; padding: 28px 26px;
+      animation: slideIn .22s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(40px); opacity:0; } to { transform: none; opacity:1; } }
+    .drawer-close {
+      background: none; border: none; color: var(--muted); font-size: 18px;
+      cursor: pointer; float: right; margin-bottom: 16px;
+    }
+    .drawer-close:hover { color: var(--text); }
+    .drawer-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; clear: both; }
+    .detail-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+    .detail-row label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .detail-row span { font-size: 13.5px; color: var(--text); }
+    .drawer-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+    .drawer-actions .btn-sm { padding: 9px 18px; font-size: 13px; border-radius: 9px; }
+
+    /* ── EMPTY ── */
+    .empty-table {
+      text-align: center; padding: 48px 24px;
+      color: var(--muted); font-size: 13px;
+    }
+    .empty-table i { font-size: 36px; display: block; margin-bottom: 12px; opacity: .4; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 20px;
+      font-size: 13px; color: var(--text);
+      display: none; z-index: 9999;
+      animation: fadeIn .2s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: none; } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Galate<span>Art</span><small>Admin Panel</small></div>
+  <nav>
+    <div class="nav-group-label">Overview</div>
+    <button class="nav-item active" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</button>
+
+    <div class="nav-group-label">Moderasi</div>
+    <button class="nav-item" data-page="reports"><i class="fas fa-flag"></i> Laporan <span class="badge" id="reportBadge">0</span></button>
+    <button class="nav-item" data-page="posts"><i class="fas fa-images"></i> Postingan</button>
+    <button class="nav-item" data-page="accounts"><i class="fas fa-users"></i> Akun</button>
+
+    <div class="nav-group-label">Sistem</div>
+    <button class="nav-item" onclick="alert('Fitur log aktivitas akan segera hadir.')"><i class="fas fa-history"></i> Log Aktivitas</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item" style="color:var(--danger)" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">Dashboard</h1>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--muted)">Admin</span>
+      <div class="admin-avatar">A</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <section class="page-section active" id="page-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card warn">
+          <div class="label"><i class="fas fa-flag"></i> Laporan Pending</div>
+          <div class="value" id="statPending">0</div>
+          <div class="sub">Menunggu tinjauan admin</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label"><i class="fas fa-check"></i> Laporan Disetujui</div>
+          <div class="value" id="statApproved">0</div>
+          <div class="sub">Tindakan telah diambil</div>
+        </div>
+        <div class="stat-card accent">
+          <div class="label"><i class="fas fa-images"></i> Total Postingan</div>
+          <div class="value" id="statPosts">0</div>
+          <div class="sub">Di seluruh platform</div>
+        </div>
+        <div class="stat-card red">
+          <div class="label"><i class="fas fa-users"></i> Total Akun</div>
+          <div class="value" id="statAccounts">0</div>
+          <div class="sub">Pengguna terdaftar</div>
+        </div>
+      </div>
+
+      <!-- Recent reports preview -->
+      <div class="section-header">
+        <h2>Laporan Terbaru</h2>
+        <button class="filter-btn" onclick="showPage('reports')">Lihat Semua</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th><th>Alasan</th><th>Tipe</th><th>Status</th><th>Waktu</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="dashReportTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── REPORTS ── -->
+    <section class="page-section" id="page-reports">
+      <div class="section-header">
+        <h2>Semua Laporan</h2>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all" onclick="filterReports(this)">Semua</button>
+          <button class="filter-btn" data-filter="pending" onclick="filterReports(this)">Pending</button>
+          <button class="filter-btn" data-filter="approved" onclick="filterReports(this)">Disetujui</button>
+          <button class="filter-btn" data-filter="rejected" onclick="filterReports(this)">Ditolak</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Target</th><th>Alasan</th><th>Tipe</th><th>Status</th><th>Waktu</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="reportTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── POSTS ── -->
+    <section class="page-section" id="page-posts">
+      <div class="section-header">
+        <h2>Manajemen Postingan</h2>
+        <input class="search-input" type="text" placeholder="Cari postingan..." oninput="filterTable(this.value,'postTbody')">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Postingan</th><th>Artis</th><th>Tags</th><th>Likes</th><th>Status</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="postTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── ACCOUNTS ── -->
+    <section class="page-section" id="page-accounts">
+      <div class="section-header">
+        <h2>Manajemen Akun</h2>
+        <input class="search-input" type="text" placeholder="Cari akun..." oninput="filterTable(this.value,'accountTbody')">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pengguna</th><th>Tipe</th><th>Postingan</th><th>Followers</th><th>Status</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="accountTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- DRAWER -->
+<div id="drawerOverlay">
+  <div id="drawer">
+    <button class="drawer-close" onclick="closeDrawer()"><i class="fas fa-times"></i></button>
+    <div class="drawer-title" id="drawerTitle">Detail</div>
+    <div id="drawerBody"></div>
+    <div class="drawer-actions" id="drawerActions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   AUTH GUARD — redirect ke login jika belum auth
+═══════════════════════════════════════════════ */
+(function () {
+  if (sessionStorage.getItem('ga_admin_auth') !== 'true') {
+    location.replace('admin-login.html');
+  }
+  const adminUser = sessionStorage.getItem('ga_admin_user') || 'Admin';
+  const avatarEl = document.querySelector('.admin-avatar');
+  const labelEl  = document.querySelector('.topbar-right span');
+  if (avatarEl) avatarEl.textContent = adminUser[0].toUpperCase();
+  if (labelEl)  labelEl.textContent  = adminUser;
+})();
+
+/* ═══════════════════════════════════════════════
+   SEED DATA
+═══════════════════════════════════════════════ */
+const REASON_LABELS = {
+  sensitive: 'Unmarked sensitive content',
+  hashtag:   'Misused hashtags / category',
+  ai:        'AI / tracing / scam / fraud',
+  harass:    'Harassment / doxxing / threats',
+  hate:      'Incites hate, violence or self-harm',
+  misrep:    'Misrepresentation',
+  other:     'Something else',
+};
+
+// Seed mock posts
+const MOCK_POSTS = [
+  { id:'p1', title:'Character Illustration #1', artist:'@artis_lokal',  tags:'#original #illustration', likes:120, status:'active' },
+  { id:'p2', title:'VTuber Design Kobo',        artist:'@ichigowarano', tags:'#vtuber #hololive',       likes:250, status:'active' },
+  { id:'p3', title:'Fantasy Landscape',          artist:'@jasper_xandros', tags:'#fantasy #landscape',  likes:88,  status:'active' },
+  { id:'p4', title:'Anime Style Portrait',       artist:'@keenbiscuit', tags:'#anime #portrait',         likes:64,  status:'flagged' },
+  { id:'p5', title:'Dark Concept Art',           artist:'@seniman_digital', tags:'#concept #dark',       likes:310, status:'active' },
+];
+
+const MOCK_ACCOUNTS = [
+  { id:'a1', name:'Artis Lokal',     handle:'@artis_lokal',      type:'artist', posts:150, followers:2500, status:'active' },
+  { id:'a2', name:'Ichigowarano',    handle:'@ichigowarano',     type:'artist', posts:180, followers:3200, status:'active' },
+  { id:'a3', name:'Jasper Xandros',  handle:'@jasper_xandros',   type:'artist', posts:140, followers:2100, status:'active' },
+  { id:'a4', name:'Keenbiscuit',     handle:'@keenbiscuit',      type:'artist', posts:95,  followers:1500, status:'banned'  },
+  { id:'a5', name:'Seniman Digital', handle:'@seniman_digital',  type:'artist', posts:120, followers:1800, status:'active' },
+  { id:'a6', name:'User GalateArt',  handle:'@user_galateart',   type:'user',   posts:4,   followers:12,   status:'active' },
+];
+
+/* Seed default reports if localStorage empty */
+function seedReports() {
+  if (localStorage.getItem('galateart_reports')) return;
+  const now = new Date();
+  const ago = (m) => new Date(now - m * 60000).toISOString();
+  const defaults = [
+    { id:1, type:'post',    targetId:'p4', targetTitle:'Anime Style Portrait', reason:'sensitive', status:'pending',  createdAt: ago(10) },
+    { id:2, type:'account', targetId:'a4', targetTitle:'@keenbiscuit',          reason:'ai',        status:'pending',  createdAt: ago(45) },
+    { id:3, type:'post',    targetId:'p5', targetTitle:'Dark Concept Art',      reason:'hate',      status:'approved', createdAt: ago(120) },
+    { id:4, type:'account', targetId:'a6', targetTitle:'@user_galateart',       reason:'harass',    status:'rejected', createdAt: ago(200) },
+  ];
+  localStorage.setItem('galateart_reports', JSON.stringify(defaults));
+}
+seedReports();
+
+function getReports() { return JSON.parse(localStorage.getItem('galateart_reports') || '[]'); }
+function saveReports(arr) { localStorage.setItem('galateart_reports', JSON.stringify(arr)); }
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════ */
+const PAGE_TITLES = { dashboard:'Dashboard', reports:'Laporan', posts:'Postingan', accounts:'Akun' };
+
+function showPage(name) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.nav-item[data-page="${name}"]`);
+  if (btn) btn.classList.add('active');
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[name] || name;
+  renderAll();
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+
+/* ═══════════════════════════════════════════════
+   RENDER HELPERS
+═══════════════════════════════════════════════ */
+function timeAgo(iso) {
+  const d = (Date.now() - new Date(iso)) / 1000;
+  if (d < 60)    return `${~~d}d lalu`;
+  if (d < 3600)  return `${~~(d/60)}m lalu`;
+  if (d < 86400) return `${~~(d/3600)}j lalu`;
+  return `${~~(d/86400)}h lalu`;
+}
+
+function badgeStatus(s) {
+  const map = { pending:'Pending', approved:'Disetujui', rejected:'Ditolak', active:'Aktif', banned:'Banned', artist:'Artist', user:'User', flagged:'Ditandai' };
+  return `<span class="badge-status ${s}">${map[s]||s}</span>`;
+}
+
+/* ═══════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════ */
+let reportFilter = 'all';
+
+function filterReports(btn) {
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  reportFilter = btn.dataset.filter;
+  renderReports();
+}
+
+function reportRow(r, idx, bodyId) {
+  const short = (REASON_LABELS[r.reason]||r.reason).substring(0,32)+'...';
+  return `<tr>
+    ${bodyId === 'reportTbody' ? `<td style="color:var(--muted);font-size:12px">#${r.id}</td>` : ''}
+    <td><strong>${r.targetTitle}</strong></td>
+    <td title="${REASON_LABELS[r.reason]||r.reason}" style="color:var(--muted);font-size:12px">${short}</td>
+    <td>${r.type === 'post' ? '<i class="fas fa-image" style="color:var(--accent)"></i> Post' : '<i class="fas fa-user" style="color:var(--warn)"></i> Akun'}</td>
+    <td>${badgeStatus(r.status)}</td>
+    <td style="color:var(--muted);font-size:12px">${timeAgo(r.createdAt)}</td>
+    <td>
+      <div class="action-btns">
+        <button class="btn-sm btn-view" onclick="viewReport(${r.id})">Detail</button>
+        ${r.status==='pending' ? `
+          <button class="btn-sm btn-approve" onclick="updateReport(${r.id},'approved')">Setuju</button>
+          <button class="btn-sm btn-reject"  onclick="updateReport(${r.id},'rejected')">Tolak</button>
+        ` : ''}
+      </div>
+    </td>
+  </tr>`;
+}
+
+function renderReports() {
+  let reports = getReports();
+  if (reportFilter !== 'all') reports = reports.filter(r => r.status === reportFilter);
+  const tbody = document.getElementById('reportTbody');
+  tbody.innerHTML = reports.length
+    ? reports.map(r => reportRow(r, r.id, 'reportTbody')).join('')
+    : `<tr><td colspan="7"><div class="empty-table"><i class="fas fa-flag"></i>Tidak ada laporan</div></td></tr>`;
+}
+
+function renderDashReports() {
+  const reports = getReports().slice(0,5);
+  const tbody = document.getElementById('dashReportTbody');
+  tbody.innerHTML = reports.length
+    ? reports.map(r => reportRow(r, r.id, 'dashReportTbody')).join('')
+    : `<tr><td colspan="6"><div class="empty-table"><i class="fas fa-flag"></i>Belum ada laporan</div></td></tr>`;
+}
+
+function updateReport(id, status) {
+  const reports = getReports();
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  r.status = status;
+  saveReports(reports);
+  renderAll();
+  toast(status === 'approved' ? '✅ Laporan disetujui' : '❌ Laporan ditolak');
+}
+
+function viewReport(id) {
+  const r = getReports().find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('drawerTitle').textContent = 'Detail Laporan';
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="detail-row"><label>ID</label><span>#${r.id}</span></div>
+    <div class="detail-row"><label>Tipe Target</label><span>${r.type === 'post' ? 'Postingan' : 'Akun'}</span></div>
+    <div class="detail-row"><label>Target</label><span>${r.targetTitle}</span></div>
+    <div class="detail-row"><label>Alasan</label><span>${REASON_LABELS[r.reason]||r.reason}</span></div>
+    <div class="detail-row"><label>Status</label><span>${badgeStatus(r.status)}</span></div>
+    <div class="detail-row"><label>Waktu</label><span>${new Date(r.createdAt).toLocaleString('id-ID')}</span></div>
+  `;
+  const actions = document.getElementById('drawerActions');
+  actions.innerHTML = r.status === 'pending' ? `
+    <button class="btn-sm btn-approve" onclick="updateReport(${r.id},'approved');closeDrawer()">Setujui Laporan</button>
+    <button class="btn-sm btn-reject"  onclick="updateReport(${r.id},'rejected');closeDrawer()">Tolak Laporan</button>
+  ` : `<button class="btn-sm btn-view" onclick="closeDrawer()">Tutup</button>`;
+  openDrawer();
+}
+
+/* ═══════════════════════════════════════════════
+   POSTS
+═══════════════════════════════════════════════ */
+let posts = JSON.parse(localStorage.getItem('ga_posts') || 'null') || MOCK_POSTS;
+function savePosts() { localStorage.setItem('ga_posts', JSON.stringify(posts)); }
+
+function renderPosts(filter='') {
+  const tbody = document.getElementById('postTbody');
+  const list = filter ? posts.filter(p => (p.title+p.artist+p.tags).toLowerCase().includes(filter.toLowerCase())) : posts;
+  tbody.innerHTML = list.map(p => `<tr>
+    <td><strong>${p.title}</strong></td>
+    <td style="color:var(--muted)">${p.artist}</td>
+    <td style="font-size:12px;color:var(--muted)">${p.tags}</td>
+    <td><i class="fas fa-heart" style="color:var(--danger);font-size:11px"></i> ${p.likes}</td>
+    <td>${badgeStatus(p.status)}</td>
+    <td>
+      <div class="action-btns">
+        <button class="btn-sm btn-view" onclick="viewPost('${p.id}')">Detail</button>
+        <button class="btn-sm btn-delete" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </td>
+  </tr>`).join('') || `<tr><td colspan="6"><div class="empty-table"><i class="fas fa-images"></i>Tidak ada postingan</div></td></tr>`;
+}
+
+function deletePost(id) {
+  if (!confirm('Hapus postingan ini?')) return;
+  posts = posts.filter(p => p.id !== id);
+  savePosts(); renderAll(); toast('🗑 Postingan dihapus');
+}
+
+function viewPost(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('drawerTitle').textContent = 'Detail Postingan';
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="detail-row"><label>Judul</label><span>${p.title}</span></div>
+    <div class="detail-row"><label>Artis</label><span>${p.artist}</span></div>
+    <div class="detail-row"><label>Tags</label><span>${p.tags}</span></div>
+    <div class="detail-row"><label>Likes</label><span>${p.likes}</span></div>
+    <div class="detail-row"><label>Status</label><span>${badgeStatus(p.status)}</span></div>
+  `;
+  document.getElementById('drawerActions').innerHTML = `
+    <button class="btn-sm btn-delete" onclick="deletePost('${p.id}');closeDrawer()">Hapus Postingan</button>
+    <button class="btn-sm btn-view" onclick="closeDrawer()">Tutup</button>
+  `;
+  openDrawer();
+}
+
+/* ═══════════════════════════════════════════════
+   ACCOUNTS
+═══════════════════════════════════════════════ */
+let accounts = JSON.parse(localStorage.getItem('ga_accounts') || 'null') || MOCK_ACCOUNTS;
+function saveAccounts() { localStorage.setItem('ga_accounts', JSON.stringify(accounts)); }
+
+function renderAccounts(filter='') {
+  const tbody = document.getElementById('accountTbody');
+  const list = filter ? accounts.filter(a => (a.name+a.handle).toLowerCase().includes(filter.toLowerCase())) : accounts;
+  tbody.innerHTML = list.map(a => `<tr>
+    <td>
+      <div class="user-cell">
+        <div class="u-avatar">${a.name[0].toUpperCase()}</div>
+        <div><div class="u-name">${a.name}</div><div class="u-handle">${a.handle}</div></div>
+      </div>
+    </td>
+    <td>${badgeStatus(a.type)}</td>
+    <td>${a.posts}</td>
+    <td>${a.followers.toLocaleString('id')}</td>
+    <td>${badgeStatus(a.status)}</td>
+    <td>
+      <div class="action-btns">
+        <button class="btn-sm btn-view" onclick="viewAccount('${a.id}')">Detail</button>
+        ${a.status === 'banned'
+          ? `<button class="btn-sm btn-unban" onclick="toggleBan('${a.id}')">Unban</button>`
+          : `<button class="btn-sm btn-ban"   onclick="toggleBan('${a.id}')">Ban</button>`}
+      </div>
+    </td>
+  </tr>`).join('') || `<tr><td colspan="6"><div class="empty-table"><i class="fas fa-users"></i>Tidak ada akun</div></td></tr>`;
+}
+
+function toggleBan(id) {
+  const a = accounts.find(x => x.id === id);
+  if (!a) return;
+  const willBan = a.status !== 'banned';
+  if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${a.handle}?`)) return;
+  a.status = willBan ? 'banned' : 'active';
+  saveAccounts(); renderAll();
+  toast(willBan ? `🚫 ${a.handle} di-ban` : `✅ ${a.handle} di-unban`);
+}
+
+function viewAccount(id) {
+  const a = accounts.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('drawerTitle').textContent = 'Detail Akun';
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="detail-row"><label>Nama</label><span>${a.name}</span></div>
+    <div class="detail-row"><label>Username</label><span>${a.handle}</span></div>
+    <div class="detail-row"><label>Tipe</label><span>${badgeStatus(a.type)}</span></div>
+    <div class="detail-row"><label>Postingan</label><span>${a.posts}</span></div>
+    <div class="detail-row"><label>Followers</label><span>${a.followers.toLocaleString('id')}</span></div>
+    <div class="detail-row"><label>Status</label><span>${badgeStatus(a.status)}</span></div>
+  `;
+  document.getElementById('drawerActions').innerHTML = `
+    ${a.status === 'banned'
+      ? `<button class="btn-sm btn-unban" onclick="toggleBan('${a.id}');closeDrawer()">Unban Akun</button>`
+      : `<button class="btn-sm btn-ban"   onclick="toggleBan('${a.id}');closeDrawer()">Ban Akun</button>`}
+    <button class="btn-sm btn-view" onclick="closeDrawer()">Tutup</button>
+  `;
+  openDrawer();
+}
+
+/* ═══════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════ */
+function renderStats() {
+  const reports = getReports();
+  document.getElementById('statPending').textContent  = reports.filter(r=>r.status==='pending').length;
+  document.getElementById('statApproved').textContent = reports.filter(r=>r.status==='approved').length;
+  document.getElementById('statPosts').textContent    = posts.length;
+  document.getElementById('statAccounts').textContent = accounts.length;
+  document.getElementById('reportBadge').textContent  = reports.filter(r=>r.status==='pending').length;
+}
+
+/* ═══════════════════════════════════════════════
+   FILTER TABLE (search)
+═══════════════════════════════════════════════ */
+function filterTable(val, tbodyId) {
+  if (tbodyId === 'postTbody')    renderPosts(val);
+  if (tbodyId === 'accountTbody') renderAccounts(val);
+}
+
+/* ═══════════════════════════════════════════════
+   DRAWER
+═══════════════════════════════════════════════ */
+function openDrawer() { document.getElementById('drawerOverlay').classList.add('open'); }
+function closeDrawer() { document.getElementById('drawerOverlay').classList.remove('open'); }
+document.getElementById('drawerOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('drawerOverlay')) closeDrawer();
+});
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { el.style.display='none'; }, 2500);
+}
+
+/* ═══════════════════════════════════════════════
+   LOGOUT
+═══════════════════════════════════════════════ */
+function adminLogout() {
+  if (!confirm('Yakin ingin keluar dari Admin Panel?')) return;
+  sessionStorage.removeItem('ga_admin_auth');
+  sessionStorage.removeItem('ga_admin_user');
+  location.href = 'admin-login.html';
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════════ */
+function renderAll() {
+  renderStats();
+  renderDashReports();
+  renderReports();
+  renderPosts();
+  renderAccounts();
+}
+renderAll();
+</script>
+</body>
+</html>
