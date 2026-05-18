@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – GalateArt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="admin_login.css">
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-logo">Galate<span>Art</span></div>
+  <p class="login-subtitle"><i class="fas fa-shield-alt"></i> Panel Admin — Akses Terbatas</p>
+
+  <div class="error-msg" id="errorMsg">
+    <i class="fas fa-exclamation-circle"></i>
+    <span id="errorText">Username atau kata sandi salah.</span>
+  </div>
+
+  <div class="field-wrap">
+    <label class="field-label" for="adminUser">Username</label>
+    <i class="fas fa-user field-icon"></i>
+    <input type="text" id="adminUser" placeholder="Masukkan username admin..." autocomplete="username">
+  </div>
+
+  <div class="field-wrap">
+    <label class="field-label" for="adminPass">Kata Sandi</label>
+    <i class="fas fa-lock field-icon"></i>
+    <input type="password" id="adminPass" placeholder="Masukkan kata sandi..." autocomplete="current-password">
+    <button class="toggle-pw" id="togglePw" type="button" tabindex="-1">
+      <i class="fas fa-eye" id="eyeIcon"></i>
+    </button>
+  </div>
+
+  <button class="btn-login" id="btnLogin">
+    <span id="btnText">Masuk ke Admin Panel</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <hr class="divider">
+
+  <div class="hint-box">
+    <strong>Kredensial Default:</strong><br>
+    Username: <strong>admin</strong> &nbsp;|&nbsp; Password: <strong>galateart2024</strong><br>
+    <span style="font-size:11px;margin-top:4px;display:block;">Ganti kredensial ini setelah login pertama.</span>
+  </div>
+
+  <p class="login-footer">
+    <a href="landing.html"><i class="fas fa-arrow-left"></i> Kembali ke beranda</a>
+  </p>
+</div>
+
+<script src="admin_login.js"></script>
+</body>
+</html>
