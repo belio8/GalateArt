@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', applyLoginState);
         alert('Pendaftaran berhasil! Selamat datang di GalateArt.');
         closeModal(registerModal);
         applyLoginState();
+        window.location.href = 'landing-reguler.html';
     });
 
     // Submit: Daftar Artis
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', applyLoginState);
         alert('Pendaftaran Artis berhasil! Portofolio Anda sedang ditinjau.');
         closeModal(artistModal);
         applyLoginState();
+        window.location.href = 'landing-artist.html';
     });
 
     // Submit: Masuk
@@ -117,6 +119,13 @@ document.addEventListener('DOMContentLoaded', applyLoginState);
         alert('Berhasil masuk!');
         closeModal(loginModal);
         applyLoginState();
+        if (role === 'admin') {
+            window.location.href = 'admin.html';
+        } else if (role === 'artist') {
+            window.location.href = 'landing-artist.html';
+        } else {
+            window.location.href = 'landing-reguler.html';
+        }
     });
 })();
 
