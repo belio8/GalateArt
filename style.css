@@ -1234,3 +1234,485 @@ STYLE UNTUK HALAMAN TRENDING
 }
 
 .like-count-bar strong { color: #fff; }
+
+/* postingan */
+
+/* ============================================================
+   GalateArt — post-modal.css
+   Styling untuk fitur Post Artist (tombol FAB + modal buat postingan)
+   ============================================================ */
+
+/* ── FAB BUTTON (tombol buat postingan mengambang) ─────────── */
+#fabPostBtn {
+    display: none; /* ditampilkan via JS jika role === 'artist' */
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 900;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8e54e9, #ff7e33);
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(142, 84, 233, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    align-items: center;
+    justify-content: center;
+}
+
+#fabPostBtn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(142, 84, 233, 0.7);
+}
+
+#fabPostBtn i {
+    pointer-events: none;
+}
+
+/* ── OVERLAY MODAL POST ─────────────────────────────────────── */
+#postModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(4px);
+}
+
+#postModal.open {
+    display: flex;
+    animation: pmFadeIn 0.22s ease;
+}
+
+@keyframes pmFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── KOTAK MODAL ─────────────────────────────────────────────── */
+.pm-box {
+    background: #1a1a24;
+    border-radius: 20px;
+    border: 1px solid #2e2e3e;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px 32px;
+    position: relative;
+    animation: pmSlideUp 0.25s ease;
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a4e transparent;
+}
+
+@keyframes pmSlideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.pm-box::-webkit-scrollbar { width: 5px; }
+.pm-box::-webkit-scrollbar-track { background: transparent; }
+.pm-box::-webkit-scrollbar-thumb { background: #3a3a4e; border-radius: 10px; }
+
+/* ── HEADER MODAL ─────────────────────────────────────────────── */
+.pm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.pm-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    background: linear-gradient(90deg, #8e54e9, #ff7e33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pm-close-btn {
+    background: #2a2a35;
+    border: none;
+    color: #b3b3b3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.pm-close-btn:hover {
+    background: #ff4444;
+    color: #fff;
+}
+
+/* ── UPLOAD AREA ─────────────────────────────────────────────── */
+.pm-upload-area {
+    border: 2px dashed #3a3a4e;
+    border-radius: 14px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pm-upload-area:hover,
+.pm-upload-area.dragover {
+    border-color: #8e54e9;
+    background: rgba(142, 84, 233, 0.06);
+}
+
+.pm-upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.pm-upload-icon {
+    font-size: 36px;
+    color: #8e54e9;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.pm-upload-label {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin: 0;
+}
+
+.pm-upload-label span {
+    color: #8e54e9;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Preview gambar saat dipilih */
+.pm-preview-img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 10px;
+    display: none;
+}
+
+.pm-preview-img.visible { display: block; }
+
+.pm-preview-info {
+    display: none;
+    font-size: 12px;
+    color: #b3b3b3;
+    margin-top: 8px;
+}
+
+.pm-preview-info.visible { display: block; }
+
+/* ── FORM FIELD GROUPS ────────────────────────────────────────── */
+.pm-field {
+    margin-bottom: 18px;
+}
+
+.pm-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #b3b3b3;
+    margin-bottom: 7px;
+}
+
+.pm-field label .pm-required {
+    color: #ff7e33;
+    margin-left: 3px;
+}
+
+.pm-field input[type="text"],
+.pm-field input[type="number"],
+.pm-field textarea,
+.pm-field select {
+    width: 100%;
+    background: #121218;
+    border: 1px solid #2e2e3e;
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.pm-field input[type="text"]:focus,
+.pm-field input[type="number"]:focus,
+.pm-field textarea:focus,
+.pm-field select:focus {
+    border-color: #8e54e9;
+}
+
+.pm-field input[type="text"]::placeholder,
+.pm-field input[type="number"]::placeholder,
+.pm-field textarea::placeholder {
+    color: #555566;
+}
+
+.pm-field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.pm-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b3b3b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+
+.pm-field select option {
+    background: #1a1a24;
+}
+
+/* ── HARGA (opsional, dengan toggle free) ─────────────────────── */
+.pm-price-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pm-price-row input[type="number"] {
+    flex: 1;
+}
+
+.pm-free-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #b3b3b3;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.pm-free-toggle input[type="checkbox"] {
+    accent-color: #8e54e9;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* ── NSFW TOGGLE ─────────────────────────────────────────────── */
+.pm-nsfw-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #121218;
+    border: 1px solid #2e2e3e;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.pm-nsfw-icon {
+    font-size: 22px;
+    color: #ff7e33;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.pm-nsfw-text {
+    flex: 1;
+}
+
+.pm-nsfw-text strong {
+    font-size: 14px;
+    color: #fff;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.pm-nsfw-text p {
+    font-size: 12px;
+    color: #b3b3b3;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Toggle switch NSFW */
+.pm-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.pm-switch input { opacity: 0; width: 0; height: 0; }
+
+.pm-switch-slider {
+    position: absolute;
+    inset: 0;
+    background: #2a2a35;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pm-switch-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: #b3b3b3;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.pm-switch input:checked + .pm-switch-slider {
+    background: rgba(255, 126, 51, 0.25);
+}
+
+.pm-switch input:checked + .pm-switch-slider::before {
+    transform: translateX(20px);
+    background: #ff7e33;
+}
+
+/* ── FOOTER / TOMBOL POST ─────────────────────────────────────── */
+.pm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid #2e2e3e;
+}
+
+.pm-btn-cancel {
+    background: #2a2a35;
+    border: 1px solid #3a3a4e;
+    color: #b3b3b3;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pm-btn-cancel:hover { background: #333340; }
+
+.pm-btn-post {
+    background: linear-gradient(135deg, #8e54e9, #ff7e33);
+    border: none;
+    color: #fff;
+    padding: 10px 28px;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pm-btn-post:hover { opacity: 0.88; transform: scale(1.02); }
+.pm-btn-post:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── NOTIFIKASI SUKSES (toast) ────────────────────────────────── */
+#pmToast {
+    position: fixed;
+    bottom: 100px;
+    right: 32px;
+    background: #1a1a24;
+    border: 1px solid #8e54e9;
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transform: translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+#pmToast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+#pmToast i { color: #8e54e9; font-size: 18px; }
+
+/* ── NSFW BADGE pada kartu postingan ─────────────────────────── */
+.art-card .nsfw-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 126, 51, 0.9);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    z-index: 3;
+}
+
+/* Blur NSFW jika filter diaktifkan */
+body.nsfw-filter .art-card.is-nsfw img {
+    filter: blur(20px);
+    transition: filter 0.3s;
+}
+
+body.nsfw-filter .art-card.is-nsfw:hover img {
+    filter: blur(0);
+}
+
+/* ── KARTU POSTINGAN BARU (dipasang ke art-grid) ─────────────── */
+.art-card .price-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(18,18,24,0.85);
+    color: #ff7e33;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    z-index: 3;
+}
