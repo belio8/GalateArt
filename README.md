@@ -1,5 +1,6 @@
 # GalateArt
 Website for local digital artist in Indonesia with localize digital payment method.
+**Note:** this project is just a test project, so don't try to deploy it on the web.
 
 ## Team Member
 1. Abel Priya Devara (F1D02410032)

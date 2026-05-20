@@ -243,7 +243,7 @@
     <button class="nav-item" onclick="alert('Fitur log aktivitas akan segera hadir.')"><i class="fas fa-history"></i> Log Aktivitas</button>
   </nav>
   <div class="sidebar-footer">
-    <button class="nav-item" style="color:var(--danger)" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+    <button class="nav-item" id="logoutBtn" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Keluar</button>
   </div>
 </aside>
 
@@ -375,20 +375,20 @@
 
 <!-- TOAST -->
 <div id="toast"></div>
-
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
 <script>
 /* ═══════════════════════════════════════════════
    AUTH GUARD — redirect ke login jika belum auth
 ═══════════════════════════════════════════════ */
-(function () {
-  if (sessionStorage.getItem('ga_admin_auth') !== 'true') {
-    location.replace('admin-login.html');
+(function() {
+  const role = Store.get('userRole');
+  if (role !== 'admin') {
+    // Non-admin kembali ke homepage
+    alert('Anda tidak memiliki akses ke halaman admin.');
+    location.href = 'landing.html';
   }
-  const adminUser = sessionStorage.getItem('ga_admin_user') || 'Admin';
-  const avatarEl = document.querySelector('.admin-avatar');
-  const labelEl  = document.querySelector('.topbar-right span');
-  if (avatarEl) avatarEl.textContent = adminUser[0].toUpperCase();
-  if (labelEl)  labelEl.textContent  = adminUser;
+  // Jika admin, biarkan lanjut
 })();
 
 /* ═══════════════════════════════════════════════
@@ -532,7 +532,7 @@ function updateReport(id, status) {
   r.status = status;
   saveReports(reports);
   renderAll();
-  toast(status === 'approved' ? '✅ Laporan disetujui' : '❌ Laporan ditolak');
+  toast(status === 'approved' ? 'Laporan disetujui' : 'Laporan ditolak');
 }
 
 function viewReport(id) {
@@ -641,7 +641,7 @@ function toggleBan(id) {
   if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${a.handle}?`)) return;
   a.status = willBan ? 'banned' : 'active';
   saveAccounts(); renderAll();
-  toast(willBan ? `🚫 ${a.handle} di-ban` : `✅ ${a.handle} di-unban`);
+  toast(willBan ? `${a.handle} di-ban` : `${a.handle} di-unban`);
 }
 
 function viewAccount(id) {
@@ -705,18 +705,8 @@ function toast(msg) {
 }
 
 /* ═══════════════════════════════════════════════
-   LOGOUT
-═══════════════════════════════════════════════ */
-function adminLogout() {
-  if (!confirm('Yakin ingin keluar dari Admin Panel?')) return;
-  sessionStorage.removeItem('ga_admin_auth');
-  sessionStorage.removeItem('ga_admin_user');
-  location.href = 'admin-login.html';
-}
-
-/* ═══════════════════════════════════════════════
    RENDER ALL
-═══════════════════════════════════════════════ */
+═════════════════════════════════════════ */
 function renderAll() {
   renderStats();
   renderDashReports();
