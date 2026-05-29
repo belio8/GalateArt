@@ -4012,3 +4012,16 @@ body.ga-adm-page .ga-adm-empty-table i { font-size: 36px; display: block; margin
     .ga-tag-page { padding: 20px 4%; }
     .ga-tag-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
 }
+
+/* Tombol aksi — tersembunyi by default, muncul setelah login via JS */
+.ga-rpt-trigger-btn,
+.input-area,
+.btn-follow,
+.follow-btn,
+#likePostBtn,
+#savePostBtn,
+#postBtn,
+#orderBtn,
+#fabPostBtn {
+    display: none;
+}

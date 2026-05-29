@@ -18,6 +18,11 @@ function applyLoginState() {
         if (btnArtist)   btnArtist.style.display    = 'none';
         if (navIcons)    navIcons.style.display      = 'flex';
         if (profileLink) profileLink.style.display   = 'flex';
+
+        $$('.btn-follow, .follow-btn').forEach(el => el.style.display = '');
+        $$('#likePostBtn, #savePostBtn, #postBtn, #orderBtn').forEach(el => el && (el.style.display = ''));
+        $('#fabPostBtn') && ($('#fabPostBtn').style.display = role === 'artist' ? 'flex' : 'none');
+
     } else if (role === 'admin') {
         const isAdminPage = location.pathname.endsWith('/admin.html');
         if (!isAdminPage) {
