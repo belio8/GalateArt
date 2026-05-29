@@ -15,7 +15,12 @@ function _updateLikeUI() {
         btn.classList.toggle('liked', _postLiked);
     }
     if (text) {
-        text.innerHTML = `<strong>${_postLikes.toLocaleString('id')}</strong> <span>orang menyukai ini</span>`;
+        const strong = text.querySelector('strong') || document.createElement('strong');
+        const span   = text.querySelector('span')   || document.createElement('span');
+        strong.textContent = _postLikes.toLocaleString('id');
+        span.textContent   = ' orang menyukai ini';
+        if (!text.contains(strong)) { text.appendChild(strong); text.appendChild(span); }
+
     }
 }
 
@@ -128,30 +133,54 @@ function _resetModalState(initialLikes) {
         if (!commentInput || !commentFeed) return;
         const text = commentInput.value.trim();
         if (!text) return;
-
-        const item = document.createElement('div');
+ 
+        const item  = document.createElement('div');
         item.className = 'comment-item';
-        item.innerHTML = `
-            <img class="c-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
-            <div class="c-body">
-                <div class="c-top">
-                    <strong>@saya</strong>
-                    <span class="c-text">${text}</span>
-                </div>
-                <div class="c-bottom">
-                    <span class="c-time">Baru saja</span>
-                </div>
-            </div>`;
+ 
+        const img = document.createElement('img');
+        img.className = 'c-av';
+        img.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=me';
+        img.alt = '';
+ 
+        const body    = document.createElement('div');
+        body.className = 'c-body';
+ 
+        const top     = document.createElement('div');
+        top.className  = 'c-top';
+ 
+        const strong  = document.createElement('strong');
+        strong.textContent = '@saya';
+ 
+        const textSpan = document.createElement('span');
+        textSpan.className   = 'c-text';
+        textSpan.textContent = text;      // textContent — tidak mungkin XSS
+ 
+        const bottom  = document.createElement('div');
+        bottom.className = 'c-bottom';
+ 
+        const time    = document.createElement('span');
+        time.className   = 'c-time';
+        time.textContent = 'Baru saja';
+ 
+        top.appendChild(strong);
+        top.appendChild(textSpan);
+        bottom.appendChild(time);
+        body.appendChild(top);
+        body.appendChild(bottom);
+        item.appendChild(img);
+        item.appendChild(body);
+ 
         commentFeed.appendChild(item);
         commentFeed.scrollTop = commentFeed.scrollHeight;
         commentInput.value = '';
     }
-
+ 
     postBtn      && postBtn.addEventListener('click', submitComment);
     commentInput && commentInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') submitComment();
     });
 })();
+
 
 
 // ── FOLLOW BUTTON (delegasi, semua halaman) ───────────────────

@@ -208,12 +208,18 @@
         }
 
         // Info overlay
-        const info = document.createElement('div');
+        const info     = document.createElement('div');
         info.className = 'art-info';
-        info.innerHTML = `
-            <p class="hashtags">${data.tags}</p>
-            <p class="artist-name">@${Store.get('artistUsername') || 'saya'}</p>`;
+        const pTags    = document.createElement('p');
+        pTags.className   = 'hashtags';
+        pTags.textContent = data.tags;
+        const pArtist  = document.createElement('p');
+        pArtist.className   = 'artist-name';
+        pArtist.textContent = '@' + (Store.get('artistUsername') || 'saya');
+        info.appendChild(pTags);
+        info.appendChild(pArtist);
         card.appendChild(info);
+
 
         // Inject ke awal grid
         const grid = $('.art-grid');

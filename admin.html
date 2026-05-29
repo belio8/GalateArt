@@ -275,7 +275,7 @@ function reportRow(r, idx, bodyId) {
   const short = (REASON_LABELS[r.reason]||r.reason).substring(0,32)+'...';
   return `<tr>
     ${bodyId === 'ga-adm-report-tbody' ? `<td style="color:var(--ga-adm-muted);font-size:12px">#${r.id}</td>` : ''}
-    <td><strong>${r.targetTitle}</strong></td>
+    <td><strong>${escapeHtml(r.targetTitle)}</strong></td>
     <td title="${REASON_LABELS[r.reason]||r.reason}" style="color:var(--ga-adm-muted);font-size:12px">${short}</td>
     <td>${r.type === 'post' ? '<i class="fas fa-image" style="color:var(--ga-adm-accent)"></i> Post' : '<i class="fas fa-user" style="color:var(--ga-adm-warn)"></i> Akun'}</td>
     <td>${badgeStatus(r.status)}</td>
@@ -326,7 +326,7 @@ function viewReport(id) {
   document.getElementById('ga-adm-drawer-body').innerHTML = `
     <div class="ga-adm-detail-row"><label>ID</label><span>#${r.id}</span></div>
     <div class="ga-adm-detail-row"><label>Tipe Target</label><span>${r.type === 'post' ? 'Postingan' : 'Akun'}</span></div>
-    <div class="ga-adm-detail-row"><label>Target</label><span>${r.targetTitle}</span></div>
+    <div class="ga-adm-detail-row"><label>Target</label><span>${escapeHtml(r.targetTitle)}</span></div>
     <div class="ga-adm-detail-row"><label>Alasan</label><span>${REASON_LABELS[r.reason]||r.reason}</span></div>
     <div class="ga-adm-detail-row"><label>Status</label><span>${badgeStatus(r.status)}</span></div>
     <div class="ga-adm-detail-row"><label>Waktu</label><span>${new Date(r.createdAt).toLocaleString('id-ID')}</span></div>
@@ -349,9 +349,9 @@ function renderPosts(filter='') {
   const tbody = document.getElementById('ga-adm-post-tbody');
   const list = filter ? posts.filter(p => (p.title+p.artist+p.tags).toLowerCase().includes(filter.toLowerCase())) : posts;
   tbody.innerHTML = list.map(p => `<tr>
-    <td><strong>${p.title}</strong></td>
-    <td style="color:var(--ga-adm-muted)">${p.artist}</td>
-    <td style="font-size:12px;color:var(--ga-adm-muted)">${p.tags}</td>
+    <td><strong>${escapeHtml(p.title)}</strong></td>
+    <td style="color:var(--ga-adm-muted)">${escapeHtml(p.artist)}</td>
+    <td style="font-size:12px;color:var(--ga-adm-muted)">${escapeHtml(p.tags)}</td>
     <td><i class="fas fa-heart" style="color:var(--ga-adm-danger);font-size:11px"></i> ${p.likes}</td>
     <td>${badgeStatus(p.status)}</td>
     <td>
@@ -374,9 +374,9 @@ function viewPost(id) {
   if (!p) return;
   document.getElementById('ga-adm-drawer-title-el').textContent = 'Detail Postingan';
   document.getElementById('ga-adm-drawer-body').innerHTML = `
-    <div class="ga-adm-detail-row"><label>Judul</label><span>${p.title}</span></div>
-    <div class="ga-adm-detail-row"><label>Artis</label><span>${p.artist}</span></div>
-    <div class="ga-adm-detail-row"><label>Tags</label><span>${p.tags}</span></div>
+    <div class="ga-adm-detail-row"><label>Judul</label><span>${escapeHtml(p.title)}</span></div>
+    <div class="ga-adm-detail-row"><label>Artis</label><span>${escapeHtml(p.artist)}</span></div>
+    <div class="ga-adm-detail-row"><label>Tags</label><span>${escapeHtml(p.tags)}</span></div>
     <div class="ga-adm-detail-row"><label>Likes</label><span>${p.likes}</span></div>
     <div class="ga-adm-detail-row"><label>Status</label><span>${badgeStatus(p.status)}</span></div>
   `;
@@ -399,8 +399,8 @@ function renderAccounts(filter='') {
   tbody.innerHTML = list.map(a => `<tr>
     <td>
       <div class="ga-adm-user-cell">
-        <div class="ga-adm-u-avatar">${a.name[0].toUpperCase()}</div>
-        <div><div class="ga-adm-u-name">${a.name}</div><div class="ga-adm-u-handle">${a.handle}</div></div>
+        <div class="ga-adm-u-avatar">${escapeHtml(a.name[0].toUpperCase())}</div>
+        <div><div class="ga-adm-u-name">${escapeHtml(a.name)}</div><div class="ga-adm-u-handle">${escapeHtml(a.handle)}</div></div>
       </div>
     </td>
     <td>${badgeStatus(a.type)}</td>
@@ -422,10 +422,10 @@ function toggleBan(id) {
   const a = accounts.find(x => x.id === id);
   if (!a) return;
   const willBan = a.status !== 'banned';
-  if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${a.handle}?`)) return;
+  if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${escapeHtml(a.handle)}?`)) return;
   a.status = willBan ? 'banned' : 'active';
   saveAccounts(); renderAll();
-  toast(willBan ? `${a.handle} di-ban` : `${a.handle} di-unban`);
+  toast(willBan ? `${escapeHtml(a.handle)} di-ban` : `${escapeHtml(a.handle)} di-unban`);
 }
 
 function viewAccount(id) {
@@ -433,8 +433,8 @@ function viewAccount(id) {
   if (!a) return;
   document.getElementById('ga-adm-drawer-title-el').textContent = 'Detail Akun';
   document.getElementById('ga-adm-drawer-body').innerHTML = `
-    <div class="ga-adm-detail-row"><label>Nama</label><span>${a.name}</span></div>
-    <div class="ga-adm-detail-row"><label>Username</label><span>${a.handle}</span></div>
+    <div class="ga-adm-detail-row"><label>Nama</label><span>${escapeHtml(a.name)}</span></div>
+    <div class="ga-adm-detail-row"><label>Username</label><span>${escapeHtml(a.handle)}</span></div>
     <div class="ga-adm-detail-row"><label>Tipe</label><span>${badgeStatus(a.type)}</span></div>
     <div class="ga-adm-detail-row"><label>Postingan</label><span>${a.posts}</span></div>
     <div class="ga-adm-detail-row"><label>Followers</label><span>${a.followers.toLocaleString('id')}</span></div>

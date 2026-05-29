@@ -101,33 +101,26 @@ document.addEventListener('DOMContentLoaded', applyLoginState);
     });
 
     // Submit: Masuk
-    const DEFAULT_ADMIN = ['admin', 'admin123'];
-    const ARTIST_ACCOUNTS = ['Miew', 'miew'];
-
+    const DEMO_ACCOUNTS = {
+        'admin': 'admin',
+        'Miew':  'artist',
+        'miew':  'artist',
+    };
+ 
     loginForm && loginForm.addEventListener('submit', e => {
         e.preventDefault();
         const username = $('#loginUsername').value.trim();
-        let role;
-        if (username === DEFAULT_ADMIN[0]) {
-            role = 'admin';
-        } else if (ARTIST_ACCOUNTS.includes(username)) {
-            role = 'artist';
-        } else {
-            role = 'regular';
-        }
+        const role = DEMO_ACCOUNTS[username] || 'regular';
         Store.set('userRole', role);
         alert('Berhasil masuk!');
         closeModal(loginModal);
         applyLoginState();
-        if (role === 'admin') {
-            window.location.href = 'admin.html';
-        } else if (role === 'artist') {
-            window.location.href = 'landing-artist.html';
-        } else {
-            window.location.href = 'landing-reguler.html';
-        }
+        if (role === 'admin')        window.location.href = 'admin.html';
+        else if (role === 'artist')  window.location.href = 'landing-artist.html';
+        else                         window.location.href = 'landing-reguler.html';
     });
 })();
+
 
 
 // ── 3. LOGOUT (profile.html / admin.html) ────────────────────

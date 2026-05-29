@@ -11,6 +11,16 @@ function formatRupiah(num) {
     return 'Rp ' + Number(num).toLocaleString('id-ID');
 }
 
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+
 /** Simpan / baca / hapus dari localStorage dengan try-catch. */
 const Store = {
     get:    (k)    => { try { return localStorage.getItem(k); }    catch { return null; } },

@@ -367,9 +367,6 @@
             }
         }
 
-        function formatRupiah(num) {
-            return 'Rp ' + num.toLocaleString('id-ID');
-        }
 
         // Character count
         function updateCharCount(el, countId) {
@@ -406,22 +403,6 @@
             document.getElementById('successOverlay').classList.add('ga-com-open');
         }
 
-        // Notification
-        window.addEventListener('DOMContentLoaded', () => {
-            const notifToggle = document.getElementById('notifToggle');
-            const notifDropdown = document.getElementById('notifDropdown');
-            if (notifToggle && notifDropdown) {
-                notifToggle.addEventListener('click', (e) => {
-                    notifDropdown.classList.toggle('show');
-                    e.stopPropagation();
-                });
-                document.addEventListener('click', (e) => {
-                    if (!notifDropdown.contains(e.target) && !notifToggle.contains(e.target)) {
-                        notifDropdown.classList.remove('show');
-                    }
-                });
-            }
-        });
     </script>
 </body>
 </html>
