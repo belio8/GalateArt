@@ -2178,3 +2178,1456 @@ body.ga-adm-page .ga-adm-empty-table i { font-size: 36px; display: block; margin
   font-family: 'Poppins', sans-serif;
 }
 @keyframes ga-adm-fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: none; } }
+
+/* ════════════════════════════════════════════════════════════
+   Cart Page (ga-cart-)
+════════════════════════════════════════════════════════════ */
+
+.ga-cart-page { display: flex; gap: 30px; padding: 30px 5%; align-items: flex-start; }
+
+        /* --- Cart Items Column --- */
+        .ga-cart-items-col { flex: 1; min-width: 0; }
+        .ga-cart-items-col h1 { font-size: 24px; margin-bottom: 5px; }
+        .ga-cart-subtitle { color: var(--text-gray); font-size: 14px; margin-bottom: 25px; }
+
+        .ga-cart-item {
+            background: #1e1e26;
+            border-radius: 15px;
+            padding: 18px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            transition: transform 0.2s;
+        }
+        .ga-cart-item:hover { transform: translateY(-2px); }
+
+        .ga-cart-item-img {
+            width: 80px; height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #2a2a35;
+        }
+
+        .ga-cart-item-body { flex: 1; min-width: 0; }
+        .ga-cart-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .ga-cart-item-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+        .ga-cart-item-artist { font-size: 13px; color: var(--purple); margin: 0 0 6px; }
+        .ga-cart-item-type { font-size: 12px; color: var(--text-gray); background: #2a2a35; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+
+        .ga-cart-item-price { font-size: 16px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+        .ga-cart-item-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .ga-cart-btn-remove {
+            background: none; border: 1px solid #ff4d4d; color: #ff4d4d;
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ga-cart-btn-remove:hover { background: #ff4d4d; color: #fff; }
+        .ga-cart-btn-save-later {
+            background: none; border: 1px solid #444; color: var(--text-gray);
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ga-cart-btn-save-later:hover { border-color: var(--purple); color: var(--purple); }
+
+        .ga-cart-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+        .ga-cart-empty i { font-size: 48px; color: #333; margin-bottom: 15px; display: block; }
+        .ga-cart-empty p { font-size: 16px; }
+        .ga-cart-empty a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        /* --- Summary Column --- */
+        .ga-cart-summary-col { width: 320px; flex-shrink: 0; }
+
+        .ga-cart-summary-box {
+            background: #1e1e26;
+            border-radius: 15px;
+            padding: 24px;
+            position: sticky;
+            top: 90px;
+        }
+        .ga-cart-summary-box h2 { font-size: 18px; margin: 0 0 20px; }
+
+        .ga-cart-summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; color: var(--text-gray); }
+        .ga-cart-summary-row span:last-child { color: var(--text-white); font-weight: 500; }
+        .ga-cart-summary-divider { border: none; border-top: 1px solid #2a2a35; margin: 16px 0; }
+        .ga-cart-summary-total { display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; }
+        .ga-cart-summary-total span:last-child { color: var(--accent); }
+
+        .ga-cart-btn-checkout {
+            width: 100%;
+            background: var(--purple);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .ga-cart-btn-checkout:hover { background: #7a42d1; }
+        .ga-cart-btn-checkout i { margin-right: 8px; }
+
+        .ga-cart-promo-row { margin-top: 16px; display: flex; gap: 8px; }
+        .ga-cart-promo-input {
+            flex: 1; padding: 10px 14px; border-radius: 8px;
+            background: #2a2a35; border: 1px solid #444; color: white;
+            font-family: inherit; font-size: 13px;
+        }
+        .ga-cart-promo-input:focus { outline: none; border-color: var(--purple); }
+        .ga-cart-btn-promo {
+            background: none; border: 1px solid var(--accent); color: var(--accent);
+            padding: 10px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+            font-weight: 600; transition: all 0.2s; white-space: nowrap;
+        }
+        .ga-cart-btn-promo:hover { background: var(--accent); color: white; }
+
+        .ga-cart-payment-icons { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .ga-cart-payment-badge {
+            font-size: 11px; background: #2a2a35; border: 1px solid #3a3a45;
+            color: var(--text-gray); padding: 4px 10px; border-radius: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .ga-cart-page { flex-direction: column; }
+            .ga-cart-summary-col { width: 100%; }
+        }
+
+
+/* ════════════════════════════════════════════════════════════
+   Commission Page (ga-comm-)
+════════════════════════════════════════════════════════════ */
+
+/* ==========================================
+        COMMISSION PAGE STYLES
+        ========================================== */
+
+        .ga-com-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        /* --- Artist Banner --- */
+        .ga-com-banner {
+            background: linear-gradient(135deg, #1a1a24 0%, #22223a 100%);
+            border: 1px solid #2e2e44;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ga-com-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(142,84,233,0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .ga-com-banner img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .ga-com-banner-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 22px;
+        }
+
+        .ga-com-banner-info p {
+            margin: 0 0 12px 0;
+            color: var(--text-gray);
+            font-size: 14px;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .ga-com-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(100, 200, 80, 0.12);
+            border: 1px solid rgba(100, 200, 80, 0.4);
+            color: #6edc5f;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .ga-com-status-badge.ga-com-closed {
+            background: rgba(255, 77, 77, 0.12);
+            border-color: rgba(255, 77, 77, 0.4);
+            color: #ff6b6b;
+        }
+
+        .ga-com-status-badge .ga-com-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #6edc5f;
+            animation: pulse 1.5s infinite;
+        }
+
+        .ga-com-status-badge.ga-com-closed .ga-com-dot {
+            background: #ff6b6b;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        /* --- Layout: Main + Sidebar --- */
+        .ga-com-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* --- Tier Cards --- */
+        .ga-com-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ga-com-section-title i { color: var(--purple); }
+
+        .ga-com-tier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        .ga-com-tier-card {
+            background: #1a1a24;
+            border: 1px solid #2e2e44;
+            border-radius: 16px;
+            padding: 22px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .ga-com-tier-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(142,84,233,0.15);
+        }
+
+        .ga-com-tier-card.ga-com-selected {
+            border-color: var(--accent);
+            background: rgba(255,126,51,0.05);
+            box-shadow: 0 6px 20px rgba(255,126,51,0.15);
+        }
+
+        .ga-com-tier-card.ga-com-selected::after {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 16px; right: 16px;
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .ga-com-tier-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .ga-com-tier-name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .ga-com-tier-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .ga-com-tier-desc {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .ga-com-tier-features {
+            list-style: none;
+            padding: 0; margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ga-com-tier-features li {
+            font-size: 12px;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ga-com-tier-features li i {
+            color: #6edc5f;
+            font-size: 11px;
+            width: 14px;
+        }
+
+        .ga-com-tier-tag {
+            display: inline-block;
+            background: rgba(142,84,233,0.15);
+            color: #b08bff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .ga-com-tier-tag.ga-com-popular {
+            background: rgba(255,126,51,0.15);
+            color: var(--accent);
+        }
+
+        /* --- Sample Work --- */
+        .ga-com-sample-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 35px;
+        }
+
+        .ga-com-sample-img {
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background: #1e1e26;
+        }
+
+        .ga-com-sample-img img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .ga-com-sample-img:hover img { transform: scale(1.06); }
+
+        /* --- TOS Block --- */
+        .ga-com-tos-block {
+            background: #1a1a24;
+            border: 1px solid #2e2e44;
+            border-radius: 16px;
+            padding: 22px;
+        }
+
+        .ga-com-tos-block p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .ga-com-tos-block p + p { margin-top: 12px; }
+
+        /* --- Sidebar: Order Form --- */
+        .ga-com-order-sidebar {
+            background: #1a1a24;
+            border: 1px solid #2e2e44;
+            border-radius: 20px;
+            padding: 24px;
+            position: sticky;
+            top: 90px;
+        }
+
+        .ga-com-order-sidebar h3 {
+            margin: 0 0 20px 0;
+            font-size: 17px;
+        }
+
+        .ga-com-selected-tier-summary {
+            background: rgba(255,126,51,0.08);
+            border: 1px solid rgba(255,126,51,0.25);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ga-com-selected-tier-summary span {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .ga-com-selected-tier-summary strong {
+            font-size: 15px;
+            color: var(--accent);
+        }
+
+        .ga-com-form-group {
+            margin-bottom: 16px;
+        }
+
+        .ga-com-form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 7px;
+        }
+
+        .ga-com-form-group input,
+        .ga-com-form-group textarea,
+        .ga-com-form-group select {
+            width: 100%;
+            box-sizing: border-box;
+            background: #111118;
+            border: 1px solid #2e2e44;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            padding: 10px 14px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .ga-com-form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+            line-height: 1.6;
+        }
+
+        .ga-com-form-group input:focus,
+        .ga-com-form-group textarea:focus,
+        .ga-com-form-group select:focus {
+            border-color: var(--purple);
+        }
+
+        .ga-com-form-group select option { background: #1a1a24; }
+
+        .ga-com-char-count {
+            font-size: 11px;
+            color: #555568;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .ga-com-refimg-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            border: 1.5px dashed #2e2e44;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            color: var(--text-gray);
+            font-size: 13px;
+        }
+
+        .ga-com-refimg-label:hover {
+            border-color: var(--purple);
+            background: rgba(142,84,233,0.05);
+        }
+
+        .ga-com-refimg-label i { font-size: 24px; color: var(--purple); }
+
+        .ga-com-form-group input[type="file"] { display: none; }
+
+        .ga-com-price-breakdown {
+            border-top: 1px solid #2e2e44;
+            margin: 20px 0;
+            padding-top: 16px;
+        }
+
+        .ga-com-price-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .ga-com-price-row.ga-com-total {
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 6px;
+            padding-top: 10px;
+            border-top: 1px solid #2e2e44;
+        }
+
+        .ga-com-price-row.ga-com-total span:last-child { color: var(--accent); }
+
+        .ga-com-btn-order-submit {
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .ga-com-btn-order-submit:hover {
+            background: #e66a22;
+            transform: translateY(-2px);
+        }
+
+        .ga-com-btn-order-submit:active { transform: translateY(0); }
+
+        .ga-com-order-note {
+            text-align: center;
+            font-size: 11px;
+            color: #555568;
+            margin-top: 12px;
+        }
+
+        /* --- Success Modal --- */
+        .ga-com-success-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.82);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ga-com-success-overlay.ga-com-open { display: flex; animation: bgFade .22s ease; }
+
+        .ga-com-success-box {
+            background: #1a1a24;
+            border: 1px solid #2e2e44;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: popUp .25s cubic-bezier(.34,1.56,.64,1);
+        }
+
+        .ga-com-success-icon {
+            width: 70px; height: 70px;
+            background: rgba(110,220,95,0.12);
+            border: 2px solid #6edc5f;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+            color: #6edc5f;
+        }
+
+        .ga-com-success-box h3 { margin: 0 0 10px 0; font-size: 22px; }
+        .ga-com-success-box p { color: var(--text-gray); font-size: 14px; line-height: 1.6; margin: 0 0 25px 0; }
+
+        .ga-com-btn-back {
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ga-com-btn-back:hover { background: #7a42d1; }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .ga-com-layout {
+                grid-template-columns: 1fr;
+            }
+            .ga-com-order-sidebar { position: static; }
+        }
+
+        @media (max-width: 600px) {
+            .ga-com-sample-grid { grid-template-columns: repeat(2, 1fr); }
+            .ga-com-banner { flex-direction: column; text-align: center; }
+        }
+
+
+/* ════════════════════════════════════════════════════════════
+   Messages Page (ga-mess-)
+════════════════════════════════════════════════════════════ */
+
+.ga-msg-page {
+            display: flex;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* ---- Sidebar ---- */
+        .ga-msg-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+            background: #1a1a24;
+            border-right: 1px solid #2a2a35;
+            display: flex;
+            flex-direction: column;
+        }
+        .ga-msg-sidebar-top {
+            padding: 20px 16px 12px;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .ga-msg-sidebar-top h2 { margin: 0 0 12px; font-size: 18px; }
+        .ga-msg-search {
+            width: 100%; padding: 9px 14px; box-sizing: border-box;
+            background: #2a2a35; border: 1px solid #3a3a45; border-radius: 20px;
+            color: white; font-family: inherit; font-size: 13px;
+        }
+        .ga-msg-search:focus { outline: none; border-color: var(--purple); }
+
+        .ga-msg-conv-list { flex: 1; overflow-y: auto; }
+        .ga-msg-conv-item {
+            display: flex; gap: 12px; align-items: center;
+            padding: 14px 16px; cursor: pointer;
+            border-bottom: 1px solid #1e1e28;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .ga-msg-conv-item:hover { background: #1e1e2e; }
+        .ga-msg-conv-item.ga-msg-active { background: #22223a; }
+
+        .ga-msg-conv-avatar {
+            width: 46px; height: 46px; border-radius: 50%;
+            object-fit: cover; flex-shrink: 0;
+            border: 2px solid transparent;
+        }
+        .ga-msg-conv-item.ga-msg-active .ga-msg-conv-avatar { border-color: var(--purple); }
+
+        .ga-msg-conv-body { flex: 1; min-width: 0; }
+        .ga-msg-conv-name { font-size: 14px; font-weight: 600; margin: 0 0 3px; }
+        .ga-msg-conv-preview { font-size: 12px; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+        .ga-msg-conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .ga-msg-conv-time { font-size: 11px; color: var(--text-gray); }
+        .ga-msg-conv-unread {
+            background: var(--purple); color: white;
+            font-size: 10px; font-weight: 700;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ---- Chat Area ---- */
+        .ga-msg-chat {
+            flex: 1; display: flex; flex-direction: column;
+            background: #121218; min-width: 0;
+        }
+
+        .ga-msg-chat-header {
+            padding: 14px 20px;
+            background: #1a1a24;
+            border-bottom: 1px solid #2a2a35;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .ga-msg-chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .ga-msg-chat-header-info { flex: 1; }
+        .ga-msg-chat-header-info strong { display: block; font-size: 15px; }
+        .ga-msg-chat-status { font-size: 12px; color: #4caf50; }
+        .ga-msg-chat-actions { display: flex; gap: 12px; color: var(--text-gray); font-size: 18px; }
+        .ga-msg-chat-actions i { cursor: pointer; transition: color 0.2s; }
+        .ga-msg-chat-actions i:hover { color: var(--accent); }
+
+        .ga-msg-chat-messages {
+            flex: 1; overflow-y: auto;
+            padding: 20px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+
+        .ga-msg-date-divider {
+            text-align: center; font-size: 11px; color: var(--text-gray);
+            position: relative;
+        }
+        .ga-msg-date-divider::before, .ga-msg-date-divider::after {
+            content: ''; position: absolute; top: 50%;
+            width: 35%; height: 1px; background: #2a2a35;
+        }
+        .ga-msg-date-divider::before { left: 0; }
+        .ga-msg-date-divider::after { right: 0; }
+
+        .ga-msg-bubble-row { display: flex; gap: 10px; align-items: flex-end; }
+        .ga-msg-bubble-row.ga-msg-me { flex-direction: row-reverse; }
+
+        .ga-msg-bubble-av { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+        .ga-msg-bubble {
+            max-width: 60%; padding: 10px 14px;
+            border-radius: 18px; font-size: 13px; line-height: 1.5;
+            word-break: break-word;
+        }
+        .ga-msg-bubble.ga-msg-them { background: #1e1e2e; border-radius: 18px 18px 18px 4px; color: #f2f2fa; }
+        .ga-msg-bubble.ga-msg-me { background: var(--purple); border-radius: 18px 18px 4px 18px; color: white; }
+
+        .ga-msg-bubble-img { max-width: 220px; border-radius: 12px; cursor: pointer; }
+        .ga-msg-bubble-time { font-size: 10px; color: var(--text-gray); margin-top: 4px; text-align: right; }
+        .ga-msg-bubble.ga-msg-them + .ga-msg-bubble-time { text-align: left; }
+
+        .ga-msg-commission-card {
+            background: #1e1e26; border: 1px solid #2a2a42;
+            border-radius: 12px; padding: 14px; max-width: 280px;
+        }
+        .ga-msg-commission-card .ga-msg-cc-label { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+        .ga-msg-commission-card .ga-msg-cc-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .ga-msg-commission-card .ga-msg-cc-detail { font-size: 12px; color: var(--text-gray); margin-bottom: 10px; }
+        .ga-msg-commission-card .ga-msg-cc-price { font-size: 16px; font-weight: 700; color: var(--accent); }
+        .ga-msg-btn-cc-action {
+            width: 100%; margin-top: 10px; padding: 8px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+            background: var(--purple); color: white; transition: background 0.2s;
+        }
+        .ga-msg-btn-cc-action:hover { background: #7a42d1; }
+
+        /* ---- Input ---- */
+        .ga-msg-chat-input-bar {
+            padding: 14px 20px;
+            border-top: 1px solid #2a2a35;
+            background: #1a1a24;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .ga-msg-chat-input-bar i { font-size: 18px; color: var(--text-gray); cursor: pointer; transition: color 0.2s; }
+        .ga-msg-chat-input-bar i:hover { color: var(--accent); }
+        .ga-msg-chat-text-input {
+            flex: 1; padding: 10px 16px; border-radius: 20px;
+            background: #2a2a35; border: 1px solid #3a3a45;
+            color: white; font-family: inherit; font-size: 13px;
+        }
+        .ga-msg-chat-text-input:focus { outline: none; border-color: var(--purple); }
+        .ga-msg-btn-send {
+            background: var(--purple); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; transition: background 0.2s; flex-shrink: 0;
+        }
+        .ga-msg-btn-send:hover { background: #7a42d1; }
+
+        /* ---- No chat selected ---- */
+        .ga-msg-no-chat {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--text-gray); gap: 12px;
+        }
+        .ga-msg-no-chat i { font-size: 48px; color: #2a2a42; }
+        .ga-msg-no-chat p { font-size: 15px; }
+
+        @media (max-width: 768px) {
+            .ga-msg-sidebar { width: 100%; display: none; }
+            .ga-msg-sidebar.ga-msg-mobile-show { display: flex; position: fixed; inset: 60px 0 0 0; z-index: 50; width: 100%; }
+        }
+
+
+/* ════════════════════════════════════════════════════════════
+   Payment Page (ga-paym-)
+════════════════════════════════════════════════════════════ */
+
+/* ── PAYMENT PAGE LAYOUT ── */
+        .ga-pay-page {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 30px;
+            padding: 40px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ── SECTION TITLES ── */
+        .ga-pay-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-gray);
+            margin: 0 0 16px 0;
+        }
+
+        /* ── PAYMENT METHODS PANEL ── */
+        .ga-pay-panel {
+            background: #1a1a24;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #252530;
+        }
+
+        .ga-pay-panel h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .ga-pay-panel > p {
+            color: var(--text-gray);
+            font-size: 13px;
+            margin: 0 0 30px 0;
+        }
+
+        /* ── METHOD GROUPS ── */
+        .ga-pay-method-group {
+            margin-bottom: 28px;
+        }
+
+        .ga-pay-method-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .ga-pay-method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .ga-pay-method-grid.ga-pay-two-col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* ── PAYMENT CARD ── */
+        .ga-pay-card {
+            position: relative;
+            background: #12121a;
+            border: 2px solid #252535;
+            border-radius: 14px;
+            padding: 18px 14px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .ga-pay-card:hover {
+            border-color: #8e54e9;
+            background: #1a1228;
+            transform: translateY(-2px);
+        }
+
+        .ga-pay-card.ga-pay-selected {
+            border-color: #8e54e9;
+            background: linear-gradient(145deg, #1a1228, #14101f);
+            box-shadow: 0 0 0 1px #8e54e9, 0 8px 24px rgba(142, 84, 233, 0.2);
+        }
+
+        .ga-pay-card input[type="radio"] {
+            display: none;
+        }
+
+        .ga-pay-card .ga-pay-check-mark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .ga-pay-card.ga-pay-selected .ga-pay-check-mark {
+            background: #8e54e9;
+            border-color: #8e54e9;
+        }
+
+        .ga-pay-card.ga-pay-selected .ga-pay-check-mark::after {
+            content: '';
+            width: 5px;
+            height: 9px;
+            border: 2px solid #fff;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg) translate(-1px, -1px);
+            display: block;
+        }
+
+        /* ── PAYMENT LOGO ── */
+        .ga-pay-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            flex-shrink: 0;
+        }
+
+        .ga-pay-logo.ga-pay-gopay  { background: linear-gradient(135deg, #00aed6, #0077aa); color: #fff; }
+        .ga-pay-logo.ga-pay-dana   { background: linear-gradient(135deg, #118ece, #0a5fa0); color: #fff; }
+        .ga-pay-logo.ga-pay-ovo    { background: linear-gradient(135deg, #4c3494, #6a3fa6); color: #fff; }
+        .ga-pay-logo.ga-pay-qris   { background: linear-gradient(135deg, #e02020, #c01010); color: #fff; }
+        .ga-pay-logo.ga-pay-bri    { background: linear-gradient(135deg, #1a5fa8, #003e80); color: #fff; }
+        .ga-pay-logo.ga-pay-bca    { background: linear-gradient(135deg, #0066ae, #004a80); color: #fff; }
+
+        .ga-pay-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .ga-pay-type {
+            font-size: 10px;
+            color: var(--text-gray);
+            font-weight: 400;
+        }
+
+        /* ── PROMO CODE ── */
+        .ga-pay-promo-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 28px;
+        }
+
+        .ga-pay-promo-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #12121a;
+            color: #fff;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ga-pay-promo-input::placeholder { color: #555; }
+        .ga-pay-promo-input:focus { border-color: #8e54e9; }
+
+        .ga-pay-btn-apply {
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #8e54e9;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .ga-pay-btn-apply:hover { background: #7a42d1; }
+
+        .ga-pay-promo-msg {
+            font-size: 12px;
+            margin-top: 8px;
+            min-height: 16px;
+            display: none;
+        }
+
+        .ga-pay-promo-msg.ga-pay-success { color: #5dca7a; display: block; }
+        .ga-pay-promo-msg.ga-pay-error   { color: #ff4d4d; display: block; }
+
+        /* ── ORDER SUMMARY ── */
+        .ga-pay-order-summary {
+            position: sticky;
+            top: 80px;
+            align-self: start;
+        }
+
+        .ga-pay-summary-card {
+            background: #1a1a24;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid #252530;
+        }
+
+        .ga-pay-summary-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+        }
+
+        /* ── COMMISSION ITEM ── */
+        .ga-pay-commission-item {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 16px;
+            background: #12121a;
+            border-radius: 14px;
+            border: 1px solid #252535;
+            margin-bottom: 20px;
+        }
+
+        .ga-pay-commission-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #2a2a35;
+        }
+
+        .ga-pay-commission-thumb-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2a1a4a, #1a2a4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e54e9;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .ga-pay-commission-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ga-pay-commission-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ga-pay-commission-details .ga-pay-artist-tag {
+            font-size: 12px;
+            color: #8e54e9;
+            margin: 0 0 6px 0;
+        }
+
+        .ga-pay-commission-details .ga-pay-tier-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(142, 84, 233, 0.15);
+            color: #a487ff;
+            border: 1px solid rgba(142, 84, 233, 0.3);
+        }
+
+        /* ── PRICE BREAKDOWN ── */
+        .ga-pay-price-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ga-pay-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .ga-pay-price-row .ga-pay-label { color: var(--text-gray); }
+        .ga-pay-price-row .ga-pay-value { font-weight: 500; }
+        .ga-pay-price-row .ga-pay-value.ga-pay-discount { color: #5dca7a; }
+
+        .ga-pay-price-divider {
+            height: 1px;
+            background: #252535;
+            margin: 4px 0;
+        }
+
+        .ga-pay-price-row.ga-pay-total .ga-pay-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .ga-pay-price-row.ga-pay-total .ga-pay-value {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ff7e33;
+        }
+
+        /* ── TIMELINE ── */
+        .ga-pay-delivery-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 126, 51, 0.08);
+            border: 1px solid rgba(255, 126, 51, 0.2);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
+
+        .ga-pay-delivery-info i {
+            color: #ff7e33;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .ga-pay-delivery-info span {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .ga-pay-delivery-info strong { color: #ff7e33; }
+
+        /* ── PAY BUTTON ── */
+        .ga-pay-btn-pay {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8e54e9, #a87ff5);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(142, 84, 233, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ga-pay-btn-pay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0);
+            transition: background 0.2s;
+        }
+
+        .ga-pay-btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(142, 84, 233, 0.5);
+        }
+
+        .ga-pay-btn-pay:hover::before { background: rgba(255, 255, 255, 0.05); }
+
+        .ga-pay-btn-pay:active { transform: translateY(0); }
+
+        .ga-pay-btn-pay:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ga-pay-selected-label {
+            font-size: 11px;
+            color: var(--text-gray);
+            text-align: center;
+            margin-top: 12px;
+            min-height: 16px;
+        }
+
+        .ga-pay-selected-label span {
+            color: #a487ff;
+            font-weight: 600;
+        }
+
+        /* ── SECURITY NOTE ── */
+        .ga-pay-security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .ga-pay-security-note i { color: #5dca7a; font-size: 12px; }
+
+        /* ── SUCCESS MODAL ── */
+        .ga-pay-success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .ga-pay-success-overlay.ga-pay-open {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .ga-pay-success-box {
+            background: #1a1a24;
+            border: 1px solid #252535;
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            animation: popUp 0.35s cubic-bezier(.34,1.56,.64,1);
+        }
+
+        .ga-pay-success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5dca7a, #3aaa58);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #fff;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 24px rgba(93, 202, 122, 0.3);
+        }
+
+        .ga-pay-success-box h2 {
+            font-size: 22px;
+            margin: 0 0 10px;
+        }
+
+        .ga-pay-success-box p {
+            color: var(--text-gray);
+            font-size: 13px;
+            margin: 0 0 28px;
+            line-height: 1.6;
+        }
+
+        .ga-pay-success-box .ga-pay-order-id {
+            font-family: monospace;
+            background: #12121a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #a487ff;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .ga-pay-btn-done {
+            width: 100%;
+            padding: 14px;
+            background: #8e54e9;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ga-pay-btn-done:hover { background: #7a42d1; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .ga-pay-page {
+                grid-template-columns: 1fr;
+            }
+            .ga-pay-order-summary {
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .ga-pay-method-grid { grid-template-columns: repeat(2, 1fr); }
+            .ga-pay-method-grid.ga-pay-two-col { grid-template-columns: repeat(2, 1fr); }
+        }
+
+
+/* ════════════════════════════════════════════════════════════
+   Search Results Page (ga-srch-)
+════════════════════════════════════════════════════════════ */
+
+.ga-srch-page { padding: 30px 5%; }
+
+        /* ---- Search Header ---- */
+        .ga-srch-header { margin-bottom: 28px; }
+        .ga-srch-header h1 { font-size: 22px; margin: 0 0 6px; }
+        .ga-srch-header h1 span { color: var(--accent); }
+        .ga-srch-meta { font-size: 14px; color: var(--text-gray); }
+
+        .ga-srch-bar-large {
+            display: flex; gap: 10px; margin-bottom: 24px;
+        }
+        .ga-srch-bar-large input {
+            flex: 1; padding: 12px 20px; border-radius: 25px;
+            background: #1e1e26; border: 1px solid #3a3a45;
+            color: white; font-family: inherit; font-size: 14px;
+        }
+        .ga-srch-bar-large input:focus { outline: none; border-color: var(--purple); }
+        .ga-srch-btn-go {
+            background: var(--purple); border: none; color: white;
+            padding: 12px 24px; border-radius: 25px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .ga-srch-btn-go:hover { background: #7a42d1; }
+
+        /* ---- Tabs ---- */
+        .ga-srch-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .ga-srch-tab {
+            padding: 8px 18px; border-radius: 20px; font-size: 13px;
+            font-weight: 600; cursor: pointer; border: 1px solid #3a3a45;
+            background: none; color: var(--text-gray); transition: all 0.2s;
+        }
+        .ga-srch-tab:hover { border-color: var(--purple); color: var(--purple); }
+        .ga-srch-tab.ga-srch-active { background: var(--purple); border-color: var(--purple); color: white; }
+
+        /* ---- Filters ---- */
+        .ga-srch-filters {
+            display: flex; gap: 10px; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .ga-srch-filter-label { font-size: 13px; color: var(--text-gray); }
+        .ga-srch-filter-chip {
+            padding: 6px 14px; border-radius: 20px; font-size: 12px;
+            background: #1e1e26; border: 1px solid #3a3a45;
+            color: var(--text-gray); cursor: pointer; transition: all 0.2s;
+        }
+        .ga-srch-filter-chip:hover, .ga-srch-filter-chip.ga-srch-active { background: #2a2a42; border-color: var(--purple); color: white; }
+        .ga-srch-filter-select {
+            padding: 6px 12px; border-radius: 20px; font-size: 12px;
+            background: #1e1e26; border: 1px solid #3a3a45;
+            color: var(--text-gray); cursor: pointer; font-family: inherit;
+        }
+        .ga-srch-filter-select:focus { outline: none; border-color: var(--purple); }
+
+        /* ---- Layout: results + sidebar ---- */
+        .ga-srch-body { display: flex; gap: 28px; align-items: flex-start; }
+        .ga-srch-results-col { flex: 1; min-width: 0; }
+        .ga-srch-sidebar { width: 260px; flex-shrink: 0; }
+
+        /* ---- Art grid (same as rest of site) ---- */
+        .ga-srch-art-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* ---- Artist results list ---- */
+        .ga-srch-artist-result-list { display: flex; flex-direction: column; gap: 14px; }
+        .ga-srch-artist-result-card {
+            background: #1e1e26; border-radius: 14px; padding: 16px;
+            display: flex; gap: 14px; align-items: center;
+            transition: transform 0.2s;
+        }
+        .ga-srch-artist-result-card:hover { transform: translateY(-2px); }
+        .ga-srch-ar-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--purple); flex-shrink: 0; }
+        .ga-srch-ar-body { flex: 1; min-width: 0; }
+        .ga-srch-ar-name { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+        .ga-srch-ar-handle { font-size: 12px; color: var(--purple); margin: 0 0 5px; }
+        .ga-srch-ar-bio { font-size: 12px; color: var(--text-gray); margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ga-srch-ar-stats { font-size: 11px; color: var(--text-gray); }
+        .ga-srch-ar-stats strong { color: white; }
+        .ga-srch-btn-follow {
+            background: none; border: 1px solid var(--purple); color: var(--purple);
+            padding: 7px 16px; border-radius: 20px; font-size: 12px;
+            font-weight: 600; cursor: pointer; white-space: nowrap;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .ga-srch-btn-follow:hover { background: var(--purple); color: white; }
+
+        /* ---- Tag results ---- */
+        .ga-srch-tag-results { display: flex; flex-wrap: wrap; gap: 12px; }
+        .ga-srch-tag-card {
+            background: #1e1e26; border: 1px solid #2a2a42;
+            border-radius: 12px; padding: 14px 20px;
+            cursor: pointer; transition: all 0.2s; min-width: 130px;
+        }
+        .ga-srch-tag-card:hover { border-color: var(--purple); background: #22223a; }
+        .ga-srch-tag-card .ga-srch-tag-name { font-size: 15px; font-weight: 700; color: var(--purple); }
+        .ga-srch-tag-card .ga-srch-tag-count { font-size: 12px; color: var(--text-gray); margin-top: 4px; }
+
+        /* ---- Sidebar widgets ---- */
+        .ga-srch-sidebar-widget {
+            background: #1e1e26; border-radius: 14px;
+            padding: 18px; margin-bottom: 18px;
+        }
+        .ga-srch-sidebar-widget h3 { font-size: 14px; margin: 0 0 14px; }
+        .ga-srch-trending-tag-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 7px 0; border-bottom: 1px solid #2a2a35; font-size: 13px;
+        }
+        .ga-srch-trending-tag-item:last-child { border-bottom: none; }
+        .ga-srch-trending-tag-item span:first-child { color: var(--purple); }
+        .ga-srch-trending-tag-item span:last-child { color: var(--text-gray); font-size: 11px; }
+
+        .ga-srch-suggested-artist { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a35; }
+        .ga-srch-suggested-artist:last-child { border-bottom: none; }
+        .ga-srch-sa-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .ga-srch-sa-info { flex: 1; }
+        .ga-srch-sa-info strong { font-size: 13px; display: block; }
+        .ga-srch-sa-info span { font-size: 11px; color: var(--text-gray); }
+
+        /* ---- No results ---- */
+        .ga-srch-no-results { text-align: center; padding: 50px 20px; color: var(--text-gray); }
+        .ga-srch-no-results i { font-size: 40px; color: #2a2a42; margin-bottom: 12px; display: block; }
+
+        /* ---- Pagination ---- */
+        .ga-srch-pagination { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .ga-srch-page-btn {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            background: #1e1e26; border: 1px solid #3a3a45; color: white;
+            font-size: 13px; cursor: pointer; transition: all 0.2s;
+        }
+        .ga-srch-page-btn.ga-srch-active { background: var(--purple); border-color: var(--purple); }
+        .ga-srch-page-btn:hover:not(.ga-srch-active) { border-color: var(--purple); color: var(--purple); }
+
+        @media (max-width: 900px) {
+            .ga-srch-body { flex-direction: column; }
+            .ga-srch-sidebar { width: 100%; }
+        }
+
+        /* reuse .art-card from style.css */

@@ -9,124 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .cart-page { display: flex; gap: 30px; padding: 30px 5%; align-items: flex-start; }
-
-        /* --- Cart Items Column --- */
-        .cart-items-col { flex: 1; min-width: 0; }
-        .cart-items-col h1 { font-size: 24px; margin-bottom: 5px; }
-        .cart-subtitle { color: var(--text-gray); font-size: 14px; margin-bottom: 25px; }
-
-        .cart-item {
-            background: #1e1e26;
-            border-radius: 15px;
-            padding: 18px;
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            transition: transform 0.2s;
-        }
-        .cart-item:hover { transform: translateY(-2px); }
-
-        .cart-item-img {
-            width: 80px; height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: #2a2a35;
-        }
-
-        .cart-item-body { flex: 1; min-width: 0; }
-        .cart-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .cart-item-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
-        .cart-item-artist { font-size: 13px; color: var(--purple); margin: 0 0 6px; }
-        .cart-item-type { font-size: 12px; color: var(--text-gray); background: #2a2a35; padding: 3px 10px; border-radius: 20px; display: inline-block; }
-
-        .cart-item-price { font-size: 16px; font-weight: 700; color: var(--accent); white-space: nowrap; }
-
-        .cart-item-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-remove {
-            background: none; border: 1px solid #ff4d4d; color: #ff4d4d;
-            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-remove:hover { background: #ff4d4d; color: #fff; }
-        .btn-save-later {
-            background: none; border: 1px solid #444; color: var(--text-gray);
-            padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-save-later:hover { border-color: var(--purple); color: var(--purple); }
-
-        .empty-cart {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-gray);
-        }
-        .empty-cart i { font-size: 48px; color: #333; margin-bottom: 15px; display: block; }
-        .empty-cart p { font-size: 16px; }
-        .empty-cart a { color: var(--accent); text-decoration: none; font-weight: 600; }
-
-        /* --- Summary Column --- */
-        .cart-summary-col { width: 320px; flex-shrink: 0; }
-
-        .summary-box {
-            background: #1e1e26;
-            border-radius: 15px;
-            padding: 24px;
-            position: sticky;
-            top: 90px;
-        }
-        .summary-box h2 { font-size: 18px; margin: 0 0 20px; }
-
-        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; color: var(--text-gray); }
-        .summary-row span:last-child { color: var(--text-white); font-weight: 500; }
-        .summary-divider { border: none; border-top: 1px solid #2a2a35; margin: 16px 0; }
-        .summary-total { display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; }
-        .summary-total span:last-child { color: var(--accent); }
-
-        .btn-checkout {
-            width: 100%;
-            background: var(--purple);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background 0.2s;
-        }
-        .btn-checkout:hover { background: #7a42d1; }
-        .btn-checkout i { margin-right: 8px; }
-
-        .promo-row { margin-top: 16px; display: flex; gap: 8px; }
-        .promo-input {
-            flex: 1; padding: 10px 14px; border-radius: 8px;
-            background: #2a2a35; border: 1px solid #444; color: white;
-            font-family: inherit; font-size: 13px;
-        }
-        .promo-input:focus { outline: none; border-color: var(--purple); }
-        .btn-promo {
-            background: none; border: 1px solid var(--accent); color: var(--accent);
-            padding: 10px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
-            font-weight: 600; transition: all 0.2s; white-space: nowrap;
-        }
-        .btn-promo:hover { background: var(--accent); color: white; }
-
-        .payment-icons { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-        .payment-badge {
-            font-size: 11px; background: #2a2a35; border: 1px solid #3a3a45;
-            color: var(--text-gray); padding: 4px 10px; border-radius: 6px;
-        }
-
-        @media (max-width: 768px) {
-            .cart-page { flex-direction: column; }
-            .cart-summary-col { width: 100%; }
-        }
-    </style>
 </head>
 <body>
     <header class="navbar">
@@ -165,107 +47,107 @@
         </div>
     </header>
 
-    <div class="cart-page">
+    <div class="ga-cart-page">
         <!-- Cart Items -->
-        <div class="cart-items-col">
+        <div class="ga-cart-items-col">
             <h1><i class="fas fa-shopping-cart" style="color:var(--accent);margin-right:10px;"></i>Keranjang</h1>
-            <p class="cart-subtitle" id="cartSubtitle">3 item menunggu checkout</p>
+            <p class="ga-cart-subtitle" id="cartSubtitle">3 item menunggu checkout</p>
 
             <div id="cartList">
                 <!-- Item 1 -->
-                <div class="cart-item" id="item-1">
-                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/8e54e9/ffffff?text=Art" alt="Art">
-                    <div class="cart-item-body">
-                        <div class="cart-item-top">
+                <div class="ga-cart-item" id="item-1">
+                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/8e54e9/ffffff?text=Art" alt="Art">
+                    <div class="ga-cart-item-body">
+                        <div class="ga-cart-item-top">
                             <div>
-                                <p class="cart-item-title">Ilustrasi Karakter Fullbody</p>
-                                <p class="cart-item-artist">@ichigowarano</p>
-                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                                <p class="ga-cart-item-title">Ilustrasi Karakter Fullbody</p>
+                                <p class="ga-cart-item-artist">@ichigowarano</p>
+                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
                             </div>
-                            <span class="cart-item-price">Rp 350.000</span>
+                            <span class="ga-cart-item-price">Rp 350.000</span>
                         </div>
-                        <div class="cart-item-actions">
-                            <button class="btn-remove" onclick="removeItem('item-1')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        <div class="ga-cart-item-actions">
+                            <button class="ga-cart-btn-remove" onclick="removeItem('item-1')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Item 2 -->
-                <div class="cart-item" id="item-2">
-                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/ff7e33/ffffff?text=Art" alt="Art">
-                    <div class="cart-item-body">
-                        <div class="cart-item-top">
+                <div class="ga-cart-item" id="item-2">
+                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/ff7e33/ffffff?text=Art" alt="Art">
+                    <div class="ga-cart-item-body">
+                        <div class="ga-cart-item-top">
                             <div>
-                                <p class="cart-item-title">Desain Chibi VTuber</p>
-                                <p class="cart-item-artist">@jasper_xandros</p>
-                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                                <p class="ga-cart-item-title">Desain Chibi VTuber</p>
+                                <p class="ga-cart-item-artist">@jasper_xandros</p>
+                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
                             </div>
-                            <span class="cart-item-price">Rp 200.000</span>
+                            <span class="ga-cart-item-price">Rp 200.000</span>
                         </div>
-                        <div class="cart-item-actions">
-                            <button class="btn-remove" onclick="removeItem('item-2')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        <div class="ga-cart-item-actions">
+                            <button class="ga-cart-btn-remove" onclick="removeItem('item-2')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Item 3 -->
-                <div class="cart-item" id="item-3">
-                    <img class="cart-item-img" src="https://via.placeholder.com/80x80/68a819/ffffff?text=Art" alt="Art">
-                    <div class="cart-item-body">
-                        <div class="cart-item-top">
+                <div class="ga-cart-item" id="item-3">
+                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/68a819/ffffff?text=Art" alt="Art">
+                    <div class="ga-cart-item-body">
+                        <div class="ga-cart-item-top">
                             <div>
-                                <p class="cart-item-title">Concept Art Environment</p>
-                                <p class="cart-item-artist">@seniman_digital</p>
-                                <span class="cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                                <p class="ga-cart-item-title">Concept Art Environment</p>
+                                <p class="ga-cart-item-artist">@seniman_digital</p>
+                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
                             </div>
-                            <span class="cart-item-price">Rp 500.000</span>
+                            <span class="ga-cart-item-price">Rp 500.000</span>
                         </div>
-                        <div class="cart-item-actions">
-                            <button class="btn-remove" onclick="removeItem('item-3')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        <div class="ga-cart-item-actions">
+                            <button class="ga-cart-btn-remove" onclick="removeItem('item-3')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="empty-cart" id="emptyCart" style="display:none;">
+            <div class="ga-cart-empty" id="emptyCart" style="display:none;">
                 <i class="fas fa-shopping-cart"></i>
                 <p>Keranjangmu kosong.<br><a href="landing.html">Jelajahi karya seni →</a></p>
             </div>
         </div>
 
         <!-- Summary -->
-        <div class="cart-summary-col">
-            <div class="summary-box">
+        <div class="ga-cart-summary-col">
+            <div class="ga-cart-summary-box">
                 <h2>Ringkasan Order</h2>
 
-                <div class="summary-row"><span>Subtotal (3 item)</span><span id="subtotalVal">Rp 1.050.000</span></div>
-                <div class="summary-row"><span>Biaya platform (5%)</span><span id="feeVal">Rp 52.500</span></div>
-                <div class="summary-row"><span>Diskon promo</span><span id="discountVal" style="color:#4caf50;">- Rp 0</span></div>
-                <hr class="summary-divider">
-                <div class="summary-total"><span>Total</span><span id="totalVal">Rp 1.102.500</span></div>
+                <div class="ga-cart-summary-row"><span>Subtotal (3 item)</span><span id="subtotalVal">Rp 1.050.000</span></div>
+                <div class="ga-cart-summary-row"><span>Biaya platform (5%)</span><span id="feeVal">Rp 52.500</span></div>
+                <div class="ga-cart-summary-row"><span>Diskon promo</span><span id="discountVal" style="color:#4caf50;">- Rp 0</span></div>
+                <hr class="ga-cart-summary-divider">
+                <div class="ga-cart-summary-total"><span>Total</span><span id="totalVal">Rp 1.102.500</span></div>
 
-                <div class="promo-row">
-                    <input class="promo-input" type="text" placeholder="Kode promo..." id="promoInput">
-                    <button class="btn-promo" onclick="applyPromo()">Pakai</button>
+                <div class="ga-cart-promo-row">
+                    <input class="ga-cart-promo-input" type="text" placeholder="Kode promo..." id="promoInput">
+                    <button class="ga-cart-btn-promo" onclick="applyPromo()">Pakai</button>
                 </div>
                 <div id="promoMsg" style="font-size:12px;margin-top:6px;color:var(--text-gray);"></div>
 
-                <button class="btn-checkout" onclick="location.href='commission.html'">
+                <button class="ga-cart-btn-checkout" onclick="location.href='commission.html'">
                     <i class="fas fa-lock"></i> Lanjut ke Pembayaran
                 </button>
 
                 <div style="margin-top:16px;">
                     <div style="font-size:12px;color:var(--text-gray);margin-bottom:8px;">Metode pembayaran yang diterima:</div>
-                    <div class="payment-icons">
-                        <span class="payment-badge">GoPay</span>
-                        <span class="payment-badge">DANA</span>
-                        <span class="payment-badge">OVO</span>
-                        <span class="payment-badge">QRIS</span>
-                        <span class="payment-badge">BCA</span>
-                        <span class="payment-badge">BRI</span>
+                    <div class="ga-cart-payment-icons">
+                        <span class="ga-cart-payment-badge">GoPay</span>
+                        <span class="ga-cart-payment-badge">DANA</span>
+                        <span class="ga-cart-payment-badge">OVO</span>
+                        <span class="ga-cart-payment-badge">QRIS</span>
+                        <span class="ga-cart-payment-badge">BCA</span>
+                        <span class="ga-cart-payment-badge">BRI</span>
                     </div>
                 </div>
 

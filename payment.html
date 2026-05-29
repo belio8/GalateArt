@@ -10,530 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* ── PAYMENT PAGE LAYOUT ── */
-        .payment-page {
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 30px;
-            padding: 40px 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* ── SECTION TITLES ── */
-        .section-title {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--text-gray);
-            margin: 0 0 16px 0;
-        }
-
-        /* ── PAYMENT METHODS PANEL ── */
-        .payment-panel {
-            background: #1a1a24;
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid #252530;
-        }
-
-        .payment-panel h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0 0 8px 0;
-        }
-
-        .payment-panel > p {
-            color: var(--text-gray);
-            font-size: 13px;
-            margin: 0 0 30px 0;
-        }
-
-        /* ── METHOD GROUPS ── */
-        .method-group {
-            margin-bottom: 28px;
-        }
-
-        .method-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .method-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .method-grid.two-col {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        /* ── PAYMENT CARD ── */
-        .payment-card {
-            position: relative;
-            background: #12121a;
-            border: 2px solid #252535;
-            border-radius: 14px;
-            padding: 18px 14px;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, transform 0.15s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            text-align: center;
-            user-select: none;
-        }
-
-        .payment-card:hover {
-            border-color: #8e54e9;
-            background: #1a1228;
-            transform: translateY(-2px);
-        }
-
-        .payment-card.selected {
-            border-color: #8e54e9;
-            background: linear-gradient(145deg, #1a1228, #14101f);
-            box-shadow: 0 0 0 1px #8e54e9, 0 8px 24px rgba(142, 84, 233, 0.2);
-        }
-
-        .payment-card input[type="radio"] {
-            display: none;
-        }
-
-        .payment-card .check-mark {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 2px solid #444;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .payment-card.selected .check-mark {
-            background: #8e54e9;
-            border-color: #8e54e9;
-        }
-
-        .payment-card.selected .check-mark::after {
-            content: '';
-            width: 5px;
-            height: 9px;
-            border: 2px solid #fff;
-            border-top: none;
-            border-left: none;
-            transform: rotate(45deg) translate(-1px, -1px);
-            display: block;
-        }
-
-        /* ── PAYMENT LOGO ── */
-        .pay-logo {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            flex-shrink: 0;
-        }
-
-        .pay-logo.gopay  { background: linear-gradient(135deg, #00aed6, #0077aa); color: #fff; }
-        .pay-logo.dana   { background: linear-gradient(135deg, #118ece, #0a5fa0); color: #fff; }
-        .pay-logo.ovo    { background: linear-gradient(135deg, #4c3494, #6a3fa6); color: #fff; }
-        .pay-logo.qris   { background: linear-gradient(135deg, #e02020, #c01010); color: #fff; }
-        .pay-logo.bri    { background: linear-gradient(135deg, #1a5fa8, #003e80); color: #fff; }
-        .pay-logo.bca    { background: linear-gradient(135deg, #0066ae, #004a80); color: #fff; }
-
-        .pay-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .pay-type {
-            font-size: 10px;
-            color: var(--text-gray);
-            font-weight: 400;
-        }
-
-        /* ── PROMO CODE ── */
-        .promo-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 28px;
-        }
-
-        .promo-input {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid #333;
-            background: #12121a;
-            color: #fff;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .promo-input::placeholder { color: #555; }
-        .promo-input:focus { border-color: #8e54e9; }
-
-        .btn-apply {
-            padding: 12px 20px;
-            border-radius: 10px;
-            background: #8e54e9;
-            color: #fff;
-            border: none;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-apply:hover { background: #7a42d1; }
-
-        .promo-msg {
-            font-size: 12px;
-            margin-top: 8px;
-            min-height: 16px;
-            display: none;
-        }
-
-        .promo-msg.success { color: #5dca7a; display: block; }
-        .promo-msg.error   { color: #ff4d4d; display: block; }
-
-        /* ── ORDER SUMMARY ── */
-        .order-summary {
-            position: sticky;
-            top: 80px;
-            align-self: start;
-        }
-
-        .summary-card {
-            background: #1a1a24;
-            border-radius: 20px;
-            padding: 28px;
-            border: 1px solid #252530;
-        }
-
-        .summary-card h2 {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0 0 20px 0;
-        }
-
-        /* ── COMMISSION ITEM ── */
-        .commission-item {
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-            padding: 16px;
-            background: #12121a;
-            border-radius: 14px;
-            border: 1px solid #252535;
-            margin-bottom: 20px;
-        }
-
-        .commission-thumb {
-            width: 70px;
-            height: 70px;
-            border-radius: 10px;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: #2a2a35;
-        }
-
-        .commission-thumb-placeholder {
-            width: 70px;
-            height: 70px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #2a1a4a, #1a2a4a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #8e54e9;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .commission-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .commission-details h4 {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .commission-details .artist-tag {
-            font-size: 12px;
-            color: #8e54e9;
-            margin: 0 0 6px 0;
-        }
-
-        .commission-details .tier-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            background: rgba(142, 84, 233, 0.15);
-            color: #a487ff;
-            border: 1px solid rgba(142, 84, 233, 0.3);
-        }
-
-        /* ── PRICE BREAKDOWN ── */
-        .price-rows {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .price-row .label { color: var(--text-gray); }
-        .price-row .value { font-weight: 500; }
-        .price-row .value.discount { color: #5dca7a; }
-
-        .price-divider {
-            height: 1px;
-            background: #252535;
-            margin: 4px 0;
-        }
-
-        .price-row.total .label {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .price-row.total .value {
-            font-size: 17px;
-            font-weight: 700;
-            color: #ff7e33;
-        }
-
-        /* ── TIMELINE ── */
-        .delivery-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 126, 51, 0.08);
-            border: 1px solid rgba(255, 126, 51, 0.2);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 20px;
-        }
-
-        .delivery-info i {
-            color: #ff7e33;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .delivery-info span {
-            font-size: 12px;
-            color: var(--text-gray);
-            line-height: 1.5;
-        }
-
-        .delivery-info strong { color: #ff7e33; }
-
-        /* ── PAY BUTTON ── */
-        .btn-pay {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #8e54e9, #a87ff5);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 6px 20px rgba(142, 84, 233, 0.35);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-pay::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0);
-            transition: background 0.2s;
-        }
-
-        .btn-pay:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(142, 84, 233, 0.5);
-        }
-
-        .btn-pay:hover::before { background: rgba(255, 255, 255, 0.05); }
-
-        .btn-pay:active { transform: translateY(0); }
-
-        .btn-pay:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .pay-selected-label {
-            font-size: 11px;
-            color: var(--text-gray);
-            text-align: center;
-            margin-top: 12px;
-            min-height: 16px;
-        }
-
-        .pay-selected-label span {
-            color: #a487ff;
-            font-weight: 600;
-        }
-
-        /* ── SECURITY NOTE ── */
-        .security-note {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 14px;
-            font-size: 11px;
-            color: #555;
-        }
-
-        .security-note i { color: #5dca7a; font-size: 12px; }
-
-        /* ── SUCCESS MODAL ── */
-        .success-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-
-        .success-overlay.open {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .success-box {
-            background: #1a1a24;
-            border: 1px solid #252535;
-            border-radius: 24px;
-            padding: 48px 40px;
-            text-align: center;
-            max-width: 380px;
-            width: 90%;
-            animation: popUp 0.35s cubic-bezier(.34,1.56,.64,1);
-        }
-
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #5dca7a, #3aaa58);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: #fff;
-            margin: 0 auto 24px;
-            box-shadow: 0 8px 24px rgba(93, 202, 122, 0.3);
-        }
-
-        .success-box h2 {
-            font-size: 22px;
-            margin: 0 0 10px;
-        }
-
-        .success-box p {
-            color: var(--text-gray);
-            font-size: 13px;
-            margin: 0 0 28px;
-            line-height: 1.6;
-        }
-
-        .success-box .order-id {
-            font-family: monospace;
-            background: #12121a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 13px;
-            color: #a487ff;
-            margin-bottom: 24px;
-            display: block;
-        }
-
-        .btn-done {
-            width: 100%;
-            padding: 14px;
-            background: #8e54e9;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-done:hover { background: #7a42d1; }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-            .payment-page {
-                grid-template-columns: 1fr;
-            }
-            .order-summary {
-                position: static;
-                order: -1;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .method-grid { grid-template-columns: repeat(2, 1fr); }
-            .method-grid.two-col { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
 </head>
 <body>
 
@@ -588,45 +64,45 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="payment-page">
+    <main class="ga-pay-page">
 
         <!-- LEFT: PAYMENT METHODS -->
-        <div class="payment-panel">
+        <div class="ga-pay-panel">
             <h2>Pilih Metode Pembayaran</h2>
             <p>Semua transaksi dienkripsi dan aman. Pilih metode yang paling nyaman untukmu.</p>
 
             <!-- E-Wallet -->
-            <div class="method-group">
-                <p class="section-title">E-Wallet</p>
-                <div class="method-grid">
+            <div class="ga-pay-method-group">
+                <p class="ga-pay-section-title">E-Wallet</p>
+                <div class="ga-pay-method-grid">
 
-                    <label class="payment-card" id="card-gopay" onclick="selectMethod('gopay', 'GoPay')">
-                        <input type="radio" name="payment" value="gopay">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo gopay">G</div>
+                    <label class="ga-pay-card" id="card-gopay" onclick="selectMethod('ga-pay-gopay', 'GoPay')">
+                        <input type="radio" name="payment" value="ga-pay-gopay">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-gopay">G</div>
                         <div>
-                            <div class="pay-name">GoPay</div>
-                            <div class="pay-type">E-Wallet</div>
+                            <div class="ga-pay-name">GoPay</div>
+                            <div class="ga-pay-type">E-Wallet</div>
                         </div>
                     </label>
 
-                    <label class="payment-card" id="card-dana" onclick="selectMethod('dana', 'DANA')">
-                        <input type="radio" name="payment" value="dana">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo dana">D</div>
+                    <label class="ga-pay-card" id="card-dana" onclick="selectMethod('ga-pay-dana', 'DANA')">
+                        <input type="radio" name="payment" value="ga-pay-dana">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-dana">D</div>
                         <div>
-                            <div class="pay-name">DANA</div>
-                            <div class="pay-type">E-Wallet</div>
+                            <div class="ga-pay-name">DANA</div>
+                            <div class="ga-pay-type">E-Wallet</div>
                         </div>
                     </label>
 
-                    <label class="payment-card" id="card-ovo" onclick="selectMethod('ovo', 'OVO')">
-                        <input type="radio" name="payment" value="ovo">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo ovo">O</div>
+                    <label class="ga-pay-card" id="card-ovo" onclick="selectMethod('ga-pay-ovo', 'OVO')">
+                        <input type="radio" name="payment" value="ga-pay-ovo">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-ovo">O</div>
                         <div>
-                            <div class="pay-name">OVO</div>
-                            <div class="pay-type">E-Wallet</div>
+                            <div class="ga-pay-name">OVO</div>
+                            <div class="ga-pay-type">E-Wallet</div>
                         </div>
                     </label>
 
@@ -634,17 +110,17 @@
             </div>
 
             <!-- QRIS -->
-            <div class="method-group">
-                <p class="section-title">QR Code</p>
-                <div class="method-grid two-col">
+            <div class="ga-pay-method-group">
+                <p class="ga-pay-section-title">QR Code</p>
+                <div class="ga-pay-method-grid ga-pay-two-col">
 
-                    <label class="payment-card" id="card-qris" onclick="selectMethod('qris', 'QRIS')">
-                        <input type="radio" name="payment" value="qris">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo qris"><i class="fas fa-qrcode" style="font-size: 20px;"></i></div>
+                    <label class="ga-pay-card" id="card-qris" onclick="selectMethod('ga-pay-qris', 'QRIS')">
+                        <input type="radio" name="payment" value="ga-pay-qris">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-qris"><i class="fas fa-qrcode" style="font-size: 20px;"></i></div>
                         <div>
-                            <div class="pay-name">QRIS</div>
-                            <div class="pay-type">Scan QR · Semua Bank</div>
+                            <div class="ga-pay-name">QRIS</div>
+                            <div class="ga-pay-type">Scan QR · Semua Bank</div>
                         </div>
                     </label>
 
@@ -652,27 +128,27 @@
             </div>
 
             <!-- Bank Transfer -->
-            <div class="method-group">
-                <p class="section-title">Transfer Bank</p>
-                <div class="method-grid two-col">
+            <div class="ga-pay-method-group">
+                <p class="ga-pay-section-title">Transfer Bank</p>
+                <div class="ga-pay-method-grid ga-pay-two-col">
 
-                    <label class="payment-card" id="card-bri" onclick="selectMethod('bri', 'BRI')">
-                        <input type="radio" name="payment" value="bri">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo bri">BRI</div>
+                    <label class="ga-pay-card" id="card-bri" onclick="selectMethod('ga-pay-bri', 'BRI')">
+                        <input type="radio" name="payment" value="ga-pay-bri">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-bri">BRI</div>
                         <div>
-                            <div class="pay-name">BRI</div>
-                            <div class="pay-type">Virtual Account</div>
+                            <div class="ga-pay-name">BRI</div>
+                            <div class="ga-pay-type">Virtual Account</div>
                         </div>
                     </label>
 
-                    <label class="payment-card" id="card-bca" onclick="selectMethod('bca', 'BCA')">
-                        <input type="radio" name="payment" value="bca">
-                        <div class="check-mark"></div>
-                        <div class="pay-logo bca">BCA</div>
+                    <label class="ga-pay-card" id="card-bca" onclick="selectMethod('ga-pay-bca', 'BCA')">
+                        <input type="radio" name="payment" value="ga-pay-bca">
+                        <div class="ga-pay-check-mark"></div>
+                        <div class="ga-pay-logo ga-pay-bca">BCA</div>
                         <div>
-                            <div class="pay-name">BCA</div>
-                            <div class="pay-type">Virtual Account</div>
+                            <div class="ga-pay-name">BCA</div>
+                            <div class="ga-pay-type">Virtual Account</div>
                         </div>
                     </label>
 
@@ -680,69 +156,69 @@
             </div>
 
             <!-- PROMO CODE -->
-            <div class="method-group">
-                <p class="section-title">Kode Promo</p>
-                <div class="promo-row">
-                    <input type="text" class="promo-input" id="promoInput" placeholder="Masukkan kode promo...">
-                    <button class="btn-apply" onclick="applyPromo()">Terapkan</button>
+            <div class="ga-pay-method-group">
+                <p class="ga-pay-section-title">Kode Promo</p>
+                <div class="ga-pay-promo-row">
+                    <input type="text" class="ga-pay-promo-input" id="promoInput" placeholder="Masukkan kode promo...">
+                    <button class="ga-pay-btn-apply" onclick="applyPromo()">Terapkan</button>
                 </div>
-                <p class="promo-msg" id="promoMsg"></p>
+                <p class="ga-pay-promo-msg" id="promoMsg"></p>
             </div>
         </div>
 
         <!-- RIGHT: ORDER SUMMARY -->
-        <div class="order-summary">
-            <div class="summary-card">
+        <div class="ga-pay-order-summary">
+            <div class="ga-pay-summary-card">
                 <h2>Ringkasan Pesanan</h2>
 
                 <!-- Commission item -->
-                <div class="commission-item">
-                    <div class="commission-thumb-placeholder">
+                <div class="ga-pay-commission-item">
+                    <div class="ga-pay-commission-thumb-placeholder">
                         <i class="fas fa-palette"></i>
                     </div>
-                    <div class="commission-details">
+                    <div class="ga-pay-commission-details">
                         <h4>Full Body Illustration</h4>
-                        <p class="artist-tag">@artis_lokal</p>
-                        <span class="tier-badge">⭐ Premium Tier</span>
+                        <p class="ga-pay-artist-tag">@artis_lokal</p>
+                        <span class="ga-pay-tier-badge">⭐ Premium Tier</span>
                     </div>
                 </div>
 
                 <!-- Delivery info -->
-                <div class="delivery-info">
+                <div class="ga-pay-delivery-info">
                     <i class="fas fa-clock"></i>
                     <span>Estimasi pengerjaan: <strong>7–14 hari kerja</strong> setelah pembayaran dikonfirmasi.</span>
                 </div>
 
                 <!-- Price breakdown -->
-                <div class="price-rows">
-                    <div class="price-row">
-                        <span class="label">Harga Komisi</span>
-                        <span class="value">Rp 350.000</span>
+                <div class="ga-pay-price-rows">
+                    <div class="ga-pay-price-row">
+                        <span class="ga-pay-label">Harga Komisi</span>
+                        <span class="ga-pay-value">Rp 350.000</span>
                     </div>
-                    <div class="price-row">
-                        <span class="label">Biaya Platform (5%)</span>
-                        <span class="value">Rp 17.500</span>
+                    <div class="ga-pay-price-row">
+                        <span class="ga-pay-label">Biaya Platform (5%)</span>
+                        <span class="ga-pay-value">Rp 17.500</span>
                     </div>
-                    <div class="price-row" id="discountRow" style="display: none;">
-                        <span class="label">Diskon Promo</span>
-                        <span class="value discount" id="discountValue">- Rp 0</span>
+                    <div class="ga-pay-price-row" id="discountRow" style="display: none;">
+                        <span class="ga-pay-label">Diskon Promo</span>
+                        <span class="ga-pay-value ga-pay-discount" id="discountValue">- Rp 0</span>
                     </div>
-                    <div class="price-divider"></div>
-                    <div class="price-row total">
-                        <span class="label">Total Pembayaran</span>
-                        <span class="value" id="totalValue">Rp 367.500</span>
+                    <div class="ga-pay-price-divider"></div>
+                    <div class="ga-pay-price-row ga-pay-total">
+                        <span class="ga-pay-label">Total Pembayaran</span>
+                        <span class="ga-pay-value" id="totalValue">Rp 367.500</span>
                     </div>
                 </div>
 
                 <!-- Pay button -->
-                <button class="btn-pay" id="btnPay" onclick="confirmPayment()" disabled>
+                <button class="ga-pay-btn-pay" id="btnPay" onclick="confirmPayment()" disabled>
                     <i class="fas fa-lock"></i>
                     <span id="payBtnText">Pilih Metode Dulu</span>
                 </button>
 
-                <p class="pay-selected-label" id="selectedMethodLabel">Belum ada metode yang dipilih</p>
+                <p class="ga-pay-selected-label" id="selectedMethodLabel">Belum ada metode yang dipilih</p>
 
-                <div class="security-note">
+                <div class="ga-pay-security-note">
                     <i class="fas fa-shield-alt"></i>
                     <span>Transaksi diproteksi oleh enkripsi SSL 256-bit</span>
                 </div>
@@ -752,15 +228,15 @@
     </main>
 
     <!-- SUCCESS MODAL -->
-    <div class="success-overlay" id="successOverlay">
-        <div class="success-box">
-            <div class="success-icon">
+    <div class="ga-pay-success-overlay" id="successOverlay">
+        <div class="ga-pay-success-box">
+            <div class="ga-pay-success-icon">
                 <i class="fas fa-check"></i>
             </div>
             <h2>Pembayaran Berhasil!</h2>
             <p>Pesanan komisimu telah dikonfirmasi. Artis akan segera memulai pengerjaannya.</p>
-            <span class="order-id" id="orderIdDisplay">Order #GAL-000000</span>
-            <button class="btn-done" onclick="window.location.href='landing.html'">
+            <span class="ga-pay-order-id" id="orderIdDisplay">Order #GAL-000000</span>
+            <button class="ga-pay-btn-done" onclick="window.location.href='landing.html'">
                 Kembali ke Beranda
             </button>
         </div>
@@ -776,11 +252,11 @@
         let discountAmount = 0;
 
         function selectMethod(id, label) {
-            // Remove selected from all
-            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+            // Remove ga-pay-selected from all
+            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('ga-pay-selected'));
 
-            // Mark selected
-            document.getElementById('card-' + id).classList.add('selected');
+            // Mark ga-pay-selected
+            document.getElementById('card-' + id).classList.add('ga-pay-selected');
             selectedMethod = id;
 
             // Update button
@@ -808,7 +284,7 @@
 
             if (!code) {
                 msg.textContent = 'Masukkan kode promo terlebih dahulu.';
-                msg.className = 'promo-msg error';
+                msg.className = 'ga-pay-promo-msg ga-pay-error';
                 return;
             }
 
@@ -822,11 +298,11 @@
                 total.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
 
                 msg.textContent = `✓ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
-                msg.className = 'promo-msg success';
+                msg.className = 'ga-pay-promo-msg ga-pay-success';
                 promoApplied = true;
             } else {
                 msg.textContent = 'Kode promo tidak valid atau sudah kadaluarsa.';
-                msg.className = 'promo-msg error';
+                msg.className = 'ga-pay-promo-msg ga-pay-error';
                 discountAmount = 0;
                 discountRow.style.display = 'none';
                 total.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
@@ -850,7 +326,7 @@
             setTimeout(() => {
                 const orderId = 'GAL-' + Math.floor(100000 + Math.random() * 900000);
                 document.getElementById('orderIdDisplay').textContent = `Order #${orderId}`;
-                document.getElementById('successOverlay').classList.add('open');
+                document.getElementById('successOverlay').classList.add('ga-pay-open');
             }, 1800);
         }
     </script>

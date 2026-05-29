@@ -9,150 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .search-page { padding: 30px 5%; }
-
-        /* ---- Search Header ---- */
-        .search-header { margin-bottom: 28px; }
-        .search-header h1 { font-size: 22px; margin: 0 0 6px; }
-        .search-header h1 span { color: var(--accent); }
-        .search-meta { font-size: 14px; color: var(--text-gray); }
-
-        .search-bar-large {
-            display: flex; gap: 10px; margin-bottom: 24px;
-        }
-        .search-bar-large input {
-            flex: 1; padding: 12px 20px; border-radius: 25px;
-            background: #1e1e26; border: 1px solid #3a3a45;
-            color: white; font-family: inherit; font-size: 14px;
-        }
-        .search-bar-large input:focus { outline: none; border-color: var(--purple); }
-        .btn-search-go {
-            background: var(--purple); border: none; color: white;
-            padding: 12px 24px; border-radius: 25px; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: background 0.2s;
-        }
-        .btn-search-go:hover { background: #7a42d1; }
-
-        /* ---- Tabs ---- */
-        .search-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-        .search-tab {
-            padding: 8px 18px; border-radius: 20px; font-size: 13px;
-            font-weight: 600; cursor: pointer; border: 1px solid #3a3a45;
-            background: none; color: var(--text-gray); transition: all 0.2s;
-        }
-        .search-tab:hover { border-color: var(--purple); color: var(--purple); }
-        .search-tab.active { background: var(--purple); border-color: var(--purple); color: white; }
-
-        /* ---- Filters ---- */
-        .search-filters {
-            display: flex; gap: 10px; align-items: center;
-            margin-bottom: 20px; flex-wrap: wrap;
-        }
-        .filter-label { font-size: 13px; color: var(--text-gray); }
-        .filter-chip {
-            padding: 6px 14px; border-radius: 20px; font-size: 12px;
-            background: #1e1e26; border: 1px solid #3a3a45;
-            color: var(--text-gray); cursor: pointer; transition: all 0.2s;
-        }
-        .filter-chip:hover, .filter-chip.active { background: #2a2a42; border-color: var(--purple); color: white; }
-        .filter-select {
-            padding: 6px 12px; border-radius: 20px; font-size: 12px;
-            background: #1e1e26; border: 1px solid #3a3a45;
-            color: var(--text-gray); cursor: pointer; font-family: inherit;
-        }
-        .filter-select:focus { outline: none; border-color: var(--purple); }
-
-        /* ---- Layout: results + sidebar ---- */
-        .search-body { display: flex; gap: 28px; align-items: flex-start; }
-        .results-col { flex: 1; min-width: 0; }
-        .search-sidebar { width: 260px; flex-shrink: 0; }
-
-        /* ---- Art grid (same as rest of site) ---- */
-        .search-art-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
-        }
-
-        /* ---- Artist results list ---- */
-        .artist-result-list { display: flex; flex-direction: column; gap: 14px; }
-        .artist-result-card {
-            background: #1e1e26; border-radius: 14px; padding: 16px;
-            display: flex; gap: 14px; align-items: center;
-            transition: transform 0.2s;
-        }
-        .artist-result-card:hover { transform: translateY(-2px); }
-        .ar-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--purple); flex-shrink: 0; }
-        .ar-body { flex: 1; min-width: 0; }
-        .ar-name { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
-        .ar-handle { font-size: 12px; color: var(--purple); margin: 0 0 5px; }
-        .ar-bio { font-size: 12px; color: var(--text-gray); margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ar-stats { font-size: 11px; color: var(--text-gray); }
-        .ar-stats strong { color: white; }
-        .btn-follow-sm {
-            background: none; border: 1px solid var(--purple); color: var(--purple);
-            padding: 7px 16px; border-radius: 20px; font-size: 12px;
-            font-weight: 600; cursor: pointer; white-space: nowrap;
-            transition: all 0.2s; flex-shrink: 0;
-        }
-        .btn-follow-sm:hover { background: var(--purple); color: white; }
-
-        /* ---- Tag results ---- */
-        .tag-results { display: flex; flex-wrap: wrap; gap: 12px; }
-        .tag-card {
-            background: #1e1e26; border: 1px solid #2a2a42;
-            border-radius: 12px; padding: 14px 20px;
-            cursor: pointer; transition: all 0.2s; min-width: 130px;
-        }
-        .tag-card:hover { border-color: var(--purple); background: #22223a; }
-        .tag-card .tag-name { font-size: 15px; font-weight: 700; color: var(--purple); }
-        .tag-card .tag-count { font-size: 12px; color: var(--text-gray); margin-top: 4px; }
-
-        /* ---- Sidebar widgets ---- */
-        .sidebar-widget {
-            background: #1e1e26; border-radius: 14px;
-            padding: 18px; margin-bottom: 18px;
-        }
-        .sidebar-widget h3 { font-size: 14px; margin: 0 0 14px; }
-        .trending-tag-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 7px 0; border-bottom: 1px solid #2a2a35; font-size: 13px;
-        }
-        .trending-tag-item:last-child { border-bottom: none; }
-        .trending-tag-item span:first-child { color: var(--purple); }
-        .trending-tag-item span:last-child { color: var(--text-gray); font-size: 11px; }
-
-        .suggested-artist { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a35; }
-        .suggested-artist:last-child { border-bottom: none; }
-        .sa-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-        .sa-info { flex: 1; }
-        .sa-info strong { font-size: 13px; display: block; }
-        .sa-info span { font-size: 11px; color: var(--text-gray); }
-
-        /* ---- No results ---- */
-        .no-results { text-align: center; padding: 50px 20px; color: var(--text-gray); }
-        .no-results i { font-size: 40px; color: #2a2a42; margin-bottom: 12px; display: block; }
-
-        /* ---- Pagination ---- */
-        .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
-        .page-btn {
-            width: 36px; height: 36px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            background: #1e1e26; border: 1px solid #3a3a45; color: white;
-            font-size: 13px; cursor: pointer; transition: all 0.2s;
-        }
-        .page-btn.active { background: var(--purple); border-color: var(--purple); }
-        .page-btn:hover:not(.active) { border-color: var(--purple); color: var(--purple); }
-
-        @media (max-width: 900px) {
-            .search-body { flex-direction: column; }
-            .search-sidebar { width: 100%; }
-        }
-
-        /* reuse .art-card from style.css */
-    </style>
 </head>
 <body>
     <header class="navbar">
@@ -191,37 +47,37 @@
         </div>
     </header>
 
-    <div class="search-page">
+    <div class="ga-srch-page">
         <!-- Search Bar -->
-        <div class="search-bar-large">
+        <div class="ga-srch-bar-large">
             <input type="text" id="mainSearchInput" placeholder="Cari karya seni, artis, atau tag..." value="vtuber">
-            <button class="btn-search-go" onclick="doSearch(document.getElementById('mainSearchInput').value)">
+            <button class="ga-srch-btn-go" onclick="doSearch(document.getElementById('mainSearchInput').value)">
                 <i class="fas fa-search"></i> Cari
             </button>
         </div>
 
         <!-- Header -->
-        <div class="search-header">
+        <div class="ga-srch-header">
             <h1>Hasil untuk "<span id="queryLabel">vtuber</span>"</h1>
-            <p class="search-meta" id="resultsMeta">Menampilkan 24 hasil · Artwork · Diurutkan: Relevansi</p>
+            <p class="ga-srch-meta" id="resultsMeta">Menampilkan 24 hasil · Artwork · Diurutkan: Relevansi</p>
         </div>
 
         <!-- Tabs -->
-        <div class="search-tabs">
-            <button class="search-tab active" onclick="switchTab(this,'tab-artwork')"><i class="fas fa-image"></i> Artwork</button>
-            <button class="search-tab" onclick="switchTab(this,'tab-artist')"><i class="fas fa-user"></i> Artis</button>
-            <button class="search-tab" onclick="switchTab(this,'tab-tag')"><i class="fas fa-hashtag"></i> Tag</button>
+        <div class="ga-srch-tabs">
+            <button class="ga-srch-tab ga-srch-active" onclick="switchTab(this,'tab-artwork')"><i class="fas fa-image"></i> Artwork</button>
+            <button class="ga-srch-tab" onclick="switchTab(this,'tab-artist')"><i class="fas fa-user"></i> Artis</button>
+            <button class="ga-srch-tab" onclick="switchTab(this,'tab-tag')"><i class="fas fa-hashtag"></i> Tag</button>
         </div>
 
         <!-- Filters -->
-        <div class="search-filters">
-            <span class="filter-label">Filter:</span>
-            <button class="filter-chip active" onclick="toggleChip(this)">Semua</button>
-            <button class="filter-chip" onclick="toggleChip(this)">Commission Open</button>
-            <button class="filter-chip" onclick="toggleChip(this)">Free</button>
-            <button class="filter-chip" onclick="toggleChip(this)">Character</button>
-            <button class="filter-chip" onclick="toggleChip(this)">Fullbody</button>
-            <select class="filter-select" onchange="updateSort(this.value)">
+        <div class="ga-srch-filters">
+            <span class="ga-srch-filter-label">Filter:</span>
+            <button class="ga-srch-filter-chip ga-srch-active" onclick="toggleChip(this)">Semua</button>
+            <button class="ga-srch-filter-chip" onclick="toggleChip(this)">Commission Open</button>
+            <button class="ga-srch-filter-chip" onclick="toggleChip(this)">Free</button>
+            <button class="ga-srch-filter-chip" onclick="toggleChip(this)">Character</button>
+            <button class="ga-srch-filter-chip" onclick="toggleChip(this)">Fullbody</button>
+            <select class="ga-srch-filter-select" onchange="updateSort(this.value)">
                 <option value="relevance">Relevansi</option>
                 <option value="newest">Terbaru</option>
                 <option value="popular">Terpopuler</option>
@@ -229,94 +85,94 @@
             </select>
         </div>
 
-        <div class="search-body">
-            <div class="results-col">
+        <div class="ga-srch-body">
+            <div class="ga-srch-results-col">
 
                 <!-- TAB: Artwork -->
                 <div id="tab-artwork">
-                    <div class="search-art-grid" id="artworkGrid">
+                    <div class="ga-srch-art-grid" id="artworkGrid">
                         <!-- Dynamically generated below -->
                     </div>
-                    <div class="pagination">
-                        <button class="page-btn active">1</button>
-                        <button class="page-btn">2</button>
-                        <button class="page-btn">3</button>
-                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                    <div class="ga-srch-pagination">
+                        <button class="ga-srch-page-btn ga-srch-active">1</button>
+                        <button class="ga-srch-page-btn">2</button>
+                        <button class="ga-srch-page-btn">3</button>
+                        <button class="ga-srch-page-btn"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
                 <!-- TAB: Artist -->
                 <div id="tab-artist" style="display:none;">
-                    <div class="artist-result-list">
-                        <div class="artist-result-card">
-                            <img class="ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
-                            <div class="ar-body">
-                                <p class="ar-name">Ichigowarano</p>
-                                <p class="ar-handle">@ichigowarano</p>
-                                <p class="ar-bio">Spesialis VTuber design & anime illustration. Commission OPEN.</p>
-                                <p class="ar-stats"><strong>3.2K</strong> followers · <strong>180</strong> posts</p>
+                    <div class="ga-srch-artist-result-list">
+                        <div class="ga-srch-artist-result-card">
+                            <img class="ga-srch-ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
+                            <div class="ga-srch-ar-body">
+                                <p class="ga-srch-ar-name">Ichigowarano</p>
+                                <p class="ga-srch-ar-handle">@ichigowarano</p>
+                                <p class="ga-srch-ar-bio">Spesialis VTuber design & anime illustration. Commission OPEN.</p>
+                                <p class="ga-srch-ar-stats"><strong>3.2K</strong> followers · <strong>180</strong> posts</p>
                             </div>
-                            <button class="btn-follow-sm">Follow</button>
+                            <button class="ga-srch-btn-follow">Follow</button>
                         </div>
-                        <div class="artist-result-card">
-                            <img class="ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=jasper" alt="">
-                            <div class="ar-body">
-                                <p class="ar-name">Jasper Xandros</p>
-                                <p class="ar-handle">@jasper_xandros</p>
-                                <p class="ar-bio">Character & VTuber model design. Berbasis di Jakarta.</p>
-                                <p class="ar-stats"><strong>2.1K</strong> followers · <strong>140</strong> posts</p>
+                        <div class="ga-srch-artist-result-card">
+                            <img class="ga-srch-ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=jasper" alt="">
+                            <div class="ga-srch-ar-body">
+                                <p class="ga-srch-ar-name">Jasper Xandros</p>
+                                <p class="ga-srch-ar-handle">@jasper_xandros</p>
+                                <p class="ga-srch-ar-bio">Character & VTuber model design. Berbasis di Jakarta.</p>
+                                <p class="ga-srch-ar-stats"><strong>2.1K</strong> followers · <strong>140</strong> posts</p>
                             </div>
-                            <button class="btn-follow-sm">Follow</button>
+                            <button class="ga-srch-btn-follow">Follow</button>
                         </div>
-                        <div class="artist-result-card">
-                            <img class="ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=artislokal" alt="">
-                            <div class="ar-body">
-                                <p class="ar-name">Artis Lokal</p>
-                                <p class="ar-handle">@artis_lokal</p>
-                                <p class="ar-bio">Ilustrasi VTuber, game asset, dan desain konseptual.</p>
-                                <p class="ar-stats"><strong>2.5K</strong> followers · <strong>150</strong> posts</p>
+                        <div class="ga-srch-artist-result-card">
+                            <img class="ga-srch-ar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=artislokal" alt="">
+                            <div class="ga-srch-ar-body">
+                                <p class="ga-srch-ar-name">Artis Lokal</p>
+                                <p class="ga-srch-ar-handle">@artis_lokal</p>
+                                <p class="ga-srch-ar-bio">Ilustrasi VTuber, game asset, dan desain konseptual.</p>
+                                <p class="ga-srch-ar-stats"><strong>2.5K</strong> followers · <strong>150</strong> posts</p>
                             </div>
-                            <button class="btn-follow-sm">Follow</button>
+                            <button class="ga-srch-btn-follow">Follow</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB: Tag -->
                 <div id="tab-tag" style="display:none;">
-                    <div class="tag-results">
-                        <div class="tag-card"><div class="tag-name">#vtuber</div><div class="tag-count">1.2K postingan</div></div>
-                        <div class="tag-card"><div class="tag-name">#vtuberfanart</div><div class="tag-count">842 postingan</div></div>
-                        <div class="tag-card"><div class="tag-name">#vtuberdesign</div><div class="tag-count">610 postingan</div></div>
-                        <div class="tag-card"><div class="tag-name">#vtuberart</div><div class="tag-count">509 postingan</div></div>
-                        <div class="tag-card"><div class="tag-name">#vtuberlive2d</div><div class="tag-count">312 postingan</div></div>
-                        <div class="tag-card"><div class="tag-name">#vtubercostume</div><div class="tag-count">198 postingan</div></div>
+                    <div class="ga-srch-tag-results">
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtuber</div><div class="ga-srch-tag-count">1.2K postingan</div></div>
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtuberfanart</div><div class="ga-srch-tag-count">842 postingan</div></div>
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtuberdesign</div><div class="ga-srch-tag-count">610 postingan</div></div>
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtuberart</div><div class="ga-srch-tag-count">509 postingan</div></div>
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtuberlive2d</div><div class="ga-srch-tag-count">312 postingan</div></div>
+                        <div class="ga-srch-tag-card"><div class="ga-srch-tag-name">#vtubercostume</div><div class="ga-srch-tag-count">198 postingan</div></div>
                     </div>
                 </div>
 
             </div>
 
             <!-- Sidebar -->
-            <div class="search-sidebar">
-                <div class="sidebar-widget">
+            <div class="ga-srch-sidebar">
+                <div class="ga-srch-sidebar-widget">
                     <h3><i class="fas fa-fire" style="color:var(--accent);margin-right:6px;"></i>Tag Populer</h3>
-                    <div class="trending-tag-item"><span>#vtuber</span><span>1.2K posts</span></div>
-                    <div class="trending-tag-item"><span>#digitalart</span><span>980 posts</span></div>
-                    <div class="trending-tag-item"><span>#characterdesign</span><span>754 posts</span></div>
-                    <div class="trending-tag-item"><span>#anime</span><span>620 posts</span></div>
-                    <div class="trending-tag-item"><span>#illustration</span><span>512 posts</span></div>
+                    <div class="ga-srch-trending-tag-item"><span>#vtuber</span><span>1.2K posts</span></div>
+                    <div class="ga-srch-trending-tag-item"><span>#digitalart</span><span>980 posts</span></div>
+                    <div class="ga-srch-trending-tag-item"><span>#characterdesign</span><span>754 posts</span></div>
+                    <div class="ga-srch-trending-tag-item"><span>#anime</span><span>620 posts</span></div>
+                    <div class="ga-srch-trending-tag-item"><span>#illustration</span><span>512 posts</span></div>
                 </div>
 
-                <div class="sidebar-widget">
+                <div class="ga-srch-sidebar-widget">
                     <h3><i class="fas fa-user-plus" style="color:var(--purple);margin-right:6px;"></i>Artis yang Mungkin Kamu Suka</h3>
-                    <div class="suggested-artist">
-                        <img class="sa-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=keen" alt="">
-                        <div class="sa-info"><strong>Keenbiscuit</strong><span>@keenbiscuit</span></div>
-                        <button class="btn-follow-sm" style="font-size:11px;padding:5px 10px;">+Follow</button>
+                    <div class="ga-srch-suggested-artist">
+                        <img class="ga-srch-sa-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=keen" alt="">
+                        <div class="ga-srch-sa-info"><strong>Keenbiscuit</strong><span>@keenbiscuit</span></div>
+                        <button class="ga-srch-btn-follow" style="font-size:11px;padding:5px 10px;">+Follow</button>
                     </div>
-                    <div class="suggested-artist">
-                        <img class="sa-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=seniman" alt="">
-                        <div class="sa-info"><strong>Seniman Digital</strong><span>@seniman_digital</span></div>
-                        <button class="btn-follow-sm" style="font-size:11px;padding:5px 10px;">+Follow</button>
+                    <div class="ga-srch-suggested-artist">
+                        <img class="ga-srch-sa-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=seniman" alt="">
+                        <div class="ga-srch-sa-info"><strong>Seniman Digital</strong><span>@seniman_digital</span></div>
+                        <button class="ga-srch-btn-follow" style="font-size:11px;padding:5px 10px;">+Follow</button>
                     </div>
                 </div>
             </div>
@@ -352,8 +208,8 @@
         }
 
         function switchTab(btn, tabId) {
-            document.querySelectorAll('.search-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.search-tab').forEach(b => b.classList.remove('ga-srch-active'));
+            btn.classList.add('ga-srch-active');
             ['tab-artwork','tab-artist','tab-tag'].forEach(id => {
                 document.getElementById(id).style.display = id === tabId ? '' : 'none';
             });
@@ -362,8 +218,8 @@
         }
 
         function toggleChip(btn) {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('ga-srch-active'));
+            btn.classList.add('ga-srch-active');
         }
 
         function updateSort(val) {
