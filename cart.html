@@ -51,64 +51,7 @@
             <h1><i class="fas fa-shopping-cart" style="color:var(--accent);margin-right:10px;"></i>Keranjang</h1>
             <p class="ga-cart-subtitle" id="cartSubtitle">3 item menunggu checkout</p>
 
-            <div id="cartList">
-                <!-- Item 1 -->
-                <div class="ga-cart-item" id="item-1">
-                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/8e54e9/ffffff?text=Art" alt="Art">
-                    <div class="ga-cart-item-body">
-                        <div class="ga-cart-item-top">
-                            <div>
-                                <p class="ga-cart-item-title">Ilustrasi Karakter Fullbody</p>
-                                <p class="ga-cart-item-artist">@ichigowarano</p>
-                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
-                            </div>
-                            <span class="ga-cart-item-price">Rp 350.000</span>
-                        </div>
-                        <div class="ga-cart-item-actions">
-                            <button class="ga-cart-btn-remove" onclick="removeItem('item-1')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 2 -->
-                <div class="ga-cart-item" id="item-2">
-                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/ff7e33/ffffff?text=Art" alt="Art">
-                    <div class="ga-cart-item-body">
-                        <div class="ga-cart-item-top">
-                            <div>
-                                <p class="ga-cart-item-title">Desain Chibi VTuber</p>
-                                <p class="ga-cart-item-artist">@jasper_xandros</p>
-                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
-                            </div>
-                            <span class="ga-cart-item-price">Rp 200.000</span>
-                        </div>
-                        <div class="ga-cart-item-actions">
-                            <button class="ga-cart-btn-remove" onclick="removeItem('item-2')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="ga-cart-item" id="item-3">
-                    <img class="ga-cart-item-img" src="https://via.placeholder.com/80x80/68a819/ffffff?text=Art" alt="Art">
-                    <div class="ga-cart-item-body">
-                        <div class="ga-cart-item-top">
-                            <div>
-                                <p class="ga-cart-item-title">Concept Art Environment</p>
-                                <p class="ga-cart-item-artist">@seniman_digital</p>
-                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
-                            </div>
-                            <span class="ga-cart-item-price">Rp 500.000</span>
-                        </div>
-                        <div class="ga-cart-item-actions">
-                            <button class="ga-cart-btn-remove" onclick="removeItem('item-3')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="cartList"></div>
 
             <div class="ga-cart-empty" id="emptyCart" style="display:none;">
                 <i class="fas fa-shopping-cart"></i>
@@ -133,7 +76,7 @@
                 </div>
                 <div id="promoMsg" style="font-size:12px;margin-top:6px;color:var(--text-gray);"></div>
 
-                <button class="ga-cart-btn-checkout" onclick="location.href='commission.html'">
+                <button class="ga-cart-btn-checkout" onclick="location.href='payment.html'">
                     <i class="fas fa-lock"></i> Lanjut ke Pembayaran
                 </button>
 
@@ -160,35 +103,81 @@
     <script src="js/navbar.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        const prices = { 'item-1': 350000, 'item-2': 200000, 'item-3': 500000 };
-        let removed = new Set();
+        const CART_KEY = 'galateart_cart';
 
-        function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+        function fmt(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+
+        function getCartItems() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveCartItems(items) {
+            localStorage.setItem(CART_KEY, JSON.stringify(items));
+        }
+
+        function renderCartItems() {
+            const items = getCartItems();
+            const cartList = document.getElementById('cartList');
+            if (!items.length) {
+                cartList.innerHTML = '';
+                document.getElementById('emptyCart').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('emptyCart').style.display = 'none';
+            cartList.innerHTML = items.map(item => `
+                <div class="ga-cart-item" id="${item.id}">
+                    <img class="ga-cart-item-img" src="Assets/draw2.png" alt="Commission Art">
+                    <div class="ga-cart-item-body">
+                        <div class="ga-cart-item-top">
+                            <div>
+                                <p class="ga-cart-item-title">${item.tierName || 'Commission'}</p>
+                                <p class="ga-cart-item-artist">${item.contact ? '@' + item.contact : '@artis_lokal'}</p>
+                                <span class="ga-cart-item-type"><i class="fas fa-paint-brush" style="margin-right:4px;"></i>Commission</span>
+                            </div>
+                            <span class="ga-cart-item-price">${fmt(item.totalPrice || item.tierPrice || 0)}</span>
+                        </div>
+                        <div class="ga-cart-item-actions">
+                            <button class="ga-cart-btn-remove" onclick="removeItem('${item.id}')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                            <button class="ga-cart-btn-save-later"><i class="far fa-bookmark"></i> Simpan nanti</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
         function recalc() {
-            let sub = 0;
-            for (const [id, price] of Object.entries(prices)) {
-                if (!removed.has(id)) sub += price;
-            }
-            const count = Object.keys(prices).length - removed.size;
+            const items = getCartItems();
+            const sub = items.reduce((sum, item) => sum + Number(item.totalPrice || item.tierPrice || 0), 0);
             const fee = Math.round(sub * 0.05);
             document.getElementById('subtotalVal').textContent = fmt(sub);
             document.getElementById('feeVal').textContent = fmt(fee);
             document.getElementById('totalVal').textContent = fmt(sub + fee);
-            document.getElementById('cartSubtitle').textContent = count + ' item menunggu checkout';
-            if (count === 0) {
+            document.getElementById('cartSubtitle').textContent = items.length + ' item menunggu checkout';
+            if (!items.length) {
                 document.getElementById('emptyCart').style.display = 'block';
-                document.querySelector('.cart-summary-col').style.display = 'none';
+                document.querySelector('.ga-cart-summary-col').style.display = 'none';
+            } else {
+                document.getElementById('emptyCart').style.display = 'none';
+                document.querySelector('.ga-cart-summary-col').style.display = 'block';
             }
         }
 
         function removeItem(id) {
-            const el = document.getElementById(id);
-            el.style.transition = 'opacity 0.3s, transform 0.3s';
-            el.style.opacity = '0';
-            el.style.transform = 'translateX(20px)';
-            setTimeout(() => { el.remove(); removed.add(id); recalc(); }, 300);
+            const items = getCartItems().filter(item => item.id !== id);
+            saveCartItems(items);
+            renderCartItems();
+            recalc();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCartItems();
+            recalc();
+        });
 
         function applyPromo() {
             const code = document.getElementById('promoInput').value.trim().toUpperCase();

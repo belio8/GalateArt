@@ -241,16 +241,17 @@
     <script>
         // ── PAYMENT SELECTION ──
         let selectedMethod = null;
-        const BASE_PRICE = 350000;
-        const PLATFORM_FEE = 17500;
+        let BASE_PRICE = 0;
+        let PLATFORM_FEE = 0;
         let discountAmount = 0;
 
         function selectMethod(id, label) {
-            // Remove ga-pay-selected from all
-            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('ga-pay-selected'));
+            const cardId = id.startsWith('card-') ? id : 'card-' + id.replace('ga-pay-', '');
 
-            // Mark ga-pay-selected
-            document.getElementById('card-' + id).classList.add('ga-pay-selected');
+            document.querySelectorAll('.ga-pay-card').forEach(c => c.classList.remove('ga-pay-selected'));
+            const card = document.getElementById(cardId);
+            if (card) card.classList.add('ga-pay-selected');
+
             selectedMethod = id;
 
             // Update button
@@ -258,6 +259,32 @@
             btn.disabled = false;
             document.getElementById('payBtnText').textContent = `Bayar dengan ${label}`;
             document.getElementById('selectedMethodLabel').innerHTML = `Metode terpilih: <span>${label}</span>`;
+        }
+
+        function populateOrderSummary() {
+            const order = JSON.parse(localStorage.getItem('galateart_pending_order') || 'null');
+            const cart = JSON.parse(localStorage.getItem('galateart_cart') || '[]');
+            const data = order || cart[cart.length - 1] || null;
+
+            if (!data) return;
+
+            const titleEl = document.querySelector('.ga-pay-commission-details h4');
+            const artistEl = document.querySelector('.ga-pay-commission-details .ga-pay-artist-tag');
+            const badgeEl = document.querySelector('.ga-pay-tier-badge');
+            const rows = document.querySelectorAll('.ga-pay-price-rows .ga-pay-price-row');
+            const baseRow = rows[0]?.querySelector('.ga-pay-value');
+            const feeRow = rows[1]?.querySelector('.ga-pay-value');
+            const totalEl = document.getElementById('totalValue');
+
+            BASE_PRICE = Number(data.totalPrice || 0);
+            PLATFORM_FEE = Math.round(BASE_PRICE * 0.05);
+
+            if (titleEl) titleEl.textContent = data.tierName || 'Commission';
+            if (artistEl) artistEl.textContent = data.contact ? `@${data.contact}` : '@artis_lokal';
+            if (badgeEl) badgeEl.textContent = data.addons?.length ? `⭐ ${data.addons.length} add-on` : '⭐ Paket terpilih';
+            if (baseRow) baseRow.textContent = `Rp ${BASE_PRICE.toLocaleString('id-ID')}`;
+            if (feeRow) feeRow.textContent = `Rp ${PLATFORM_FEE.toLocaleString('id-ID')}`;
+            if (totalEl) totalEl.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
         }
 
         // ── PROMO CODE ──
@@ -284,8 +311,9 @@
 
             if (VALID_PROMOS[code]) {
                 const pct = VALID_PROMOS[code];
-                discountAmount = Math.round((BASE_PRICE + PLATFORM_FEE) * (pct / 100));
-                const finalTotal = BASE_PRICE + PLATFORM_FEE - discountAmount;
+                const subtotal = BASE_PRICE + PLATFORM_FEE;
+                discountAmount = Math.round(subtotal * (pct / 100));
+                const finalTotal = subtotal - discountAmount;
 
                 discountRow.style.display = 'flex';
                 discountVal.textContent = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
@@ -302,6 +330,8 @@
                 total.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
             }
         }
+
+        populateOrderSummary();
 
         // Allow Enter key on promo input
         document.getElementById('promoInput').addEventListener('keydown', function(e) {

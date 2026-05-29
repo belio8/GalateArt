@@ -239,10 +239,13 @@
         <div class="ga-com-success-box">
             <div class="ga-com-success-icon"><i class="fas fa-check"></i></div>
             <h3>Order Terkirim! 🎉</h3>
-            <p>Commission request kamu berhasil dikirim ke <strong>@artis_lokal</strong>. Artis akan menghubungi kamu dalam 1×24 jam untuk konfirmasi dan detail pembayaran.</p>
-            <button class="ga-com-btn-back" onclick="document.getElementById('successOverlay').classList.remove('ga-com-open')">
-                Kembali ke Halaman
-            </button>
+            <p>Commission request kamu berhasil dikirim ke <strong>@artis_lokal</strong>. Pilih aksi berikut setelah ini.</p>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+                <button class="ga-com-btn-back" onclick="closeOrderSuccess()">Kembali ke Halaman</button>
+                <button class="ga-com-btn-order-submit" onclick="addOrderToCart()" style="justify-content:center; width:100%;">
+                    <i class="fas fa-shopping-cart"></i> Tambah ke Cart
+                </button>
+            </div>
         </div>
     </div>
     <script src="js/utils.js"></script>
@@ -255,14 +258,67 @@
 
         let selectedTierPrice = 0;
         let addonTotal = 0;
+        const CART_KEY = 'galateart_cart';
+        const ORDER_KEY = 'galateart_pending_order';
+
+        function getCartItems() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveCartItems(items) {
+            localStorage.setItem(CART_KEY, JSON.stringify(items));
+        }
+
+        function closeOrderSuccess() {
+            document.getElementById('successOverlay').classList.remove('ga-com-open');
+        }
+
+        function buildOrderData() {
+            const selectedCard = document.querySelector('.ga-com-tier-card.ga-com-selected');
+            const tierName = selectedCard ? selectedCard.querySelector('.ga-com-tier-name')?.textContent.trim() : 'Paket Commission';
+            const tierPrice = selectedTierPrice;
+            const addonLabels = [...document.querySelectorAll('.addon-chip input[type="checkbox"]:checked')].map(cb => ({
+                label: cb.getAttribute('data-label') || 'Addon',
+                value: parseInt(cb.value, 10) || 0
+            }));
+            const referenceFile = document.getElementById('refImgInput').files[0]?.name || '';
+
+            return {
+                id: 'GAL-' + Date.now(),
+                tierName,
+                tierPrice,
+                addons: addonLabels,
+                addonTotal,
+                totalPrice: tierPrice + addonTotal,
+                contact: document.getElementById('contactInput').value.trim(),
+                description: document.getElementById('descInput').value.trim(),
+                notes: document.getElementById('notesInput').value.trim(),
+                referenceFile,
+                createdAt: new Date().toISOString(),
+            };
+        }
+
+        function addOrderToCart() {
+            const order = buildOrderData();
+            const cart = getCartItems();
+            cart.push(order);
+            saveCartItems(cart);
+            localStorage.setItem(ORDER_KEY, JSON.stringify(order));
+            closeOrderSuccess();
+            alert('Order berhasil ditambahkan ke keranjang.');
+        }
 
         // Highlight ga-com-selected tier
         function selectTier(card) {
-            document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('ga-com-selected'));
+            document.querySelectorAll('.ga-com-tier-card').forEach(c => c.classList.remove('ga-com-selected'));
             card.classList.add('ga-com-selected');
 
-            const price = parseInt(card.dataset.price);
-            const name = card.querySelector('.tier-name').innerText;
+            const price = parseInt(card.dataset.price, 10);
+            const name = card.querySelector('.ga-com-tier-name')?.textContent.trim() || 'Paket dipilih';
             selectedTierPrice = price;
 
             document.getElementById('summaryTierName').innerText = name;
@@ -330,7 +386,7 @@
 
         // Submit validation
         function submitOrder() {
-            if (!document.querySelector('.tier-card.selected')) {
+            if (!document.querySelector('.ga-com-tier-card.ga-com-selected')) {
                 alert('Silakan pilih paket commission terlebih dahulu.');
                 return;
             }
@@ -344,6 +400,9 @@
                 alert('Harap isi deskripsi karakter Anda.');
                 return;
             }
+
+            const order = buildOrderData();
+            localStorage.setItem(ORDER_KEY, JSON.stringify(order));
             document.getElementById('successOverlay').classList.add('ga-com-open');
         }
 
