@@ -1,0 +1,62 @@
+<?php
+require_once __DIR__ . '/bootstrap.php';
+
+$user = current_user();
+$home = active_user_home();
+?>
+<header class="navbar">
+    <div class="nav-left">
+        <div class="menu-container">
+            <i class="fas fa-bars menu-icon" id="menuToggle"></i>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <ul>
+                    <li><a href="tagline.php"><i class="fas fa-quote-left"></i> Tagline</a></li>
+                    <li><a href="top-artists.php"><i class="fas fa-star"></i> Top Artist</a></li>
+                    <li><a href="trending.php"><i class="fas fa-fire"></i> Trending</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="logo"><a href="<?= e($home) ?>" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
+    </div>
+
+    <div class="nav-center">
+        <div class="search-bar">
+            <input type="text" placeholder="Cari karya seni...">
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <?php if (!$user): ?>
+            <button class="btn-artist" id="btnArtist" type="button">Saya seorang artis</button>
+            <button class="btn-login" id="btnLogin" type="button">Masuk</button>
+            <button class="btn-signup" id="btnSignup" type="button">Daftar</button>
+        <?php endif; ?>
+
+        <?php if ($user): ?>
+            <div class="nav-icons">
+                <a href="messages.php" aria-label="Pesan"><i class="far fa-comment"></i></a>
+
+                <div class="notification-container">
+                    <i class="far fa-bell" id="notifToggle"></i>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">Notifikasi</div>
+                        <div class="notif-body" id="notifBody"></div>
+                    </div>
+                </div>
+
+                <a href="cart.php" aria-label="Keranjang"><i class="fas fa-shopping-cart"></i></a>
+
+                <a href="profile.php" id="userProfileLink" class="profile-icon-link" title="<?= e($user['username']) ?>">
+                    <img src="Assets/draw2.png" alt="Profil">
+                </a>
+
+                <form action="api/auth.php" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="logout">
+                    <button class="btn-login" id="btnLogout" type="submit">Keluar</button>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
+</header>
+<?php include __DIR__ . '/auth-modals.php'; ?>

@@ -1,3 +1,7 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+require_login();
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,39 +15,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo"><a href="landing.html" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
-        </div>
-
-        <div class="nav-right" style="gap:20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background:#2a2a35;">
-            </div>
-            <div class="nav-icons" style="display:flex;gap:15px;align-items:center;">
-                <i class="far fa-comment" style="cursor:pointer;padding:8px;border:1px solid var(--accent);border-radius:50%;color:var(--accent);"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <i class="fas fa-shopping-cart" style="cursor:pointer;padding:8px;border:1px solid #444;border-radius:50%;"></i>
-                <img src="Assets/draw2.png" alt="User" style="width:35px;height:35px;border-radius:50%;cursor:pointer;">
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <div class="ga-msg-page">
         <!-- Sidebar Conversations -->
@@ -57,7 +29,7 @@
                     <img class="ga-msg-conv-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="Ichigo">
                     <div class="ga-msg-conv-body">
                         <p class="ga-msg-conv-name">Ichigowarano</p>
-                        <p class="ga-msg-conv-preview" id="preview-ichigo">Siap! Saya akan mulai sketsa besok ya 😊</p>
+                        <p class="ga-msg-conv-preview" id="preview-ichigo">Siap! Saya akan mulai sketsa besok ya ðŸ˜Š</p>
                     </div>
                     <div class="ga-msg-conv-meta">
                         <span class="ga-msg-conv-time">14:32</span>
@@ -111,7 +83,7 @@
                         <div class="ga-msg-commission-card">
                             <div class="ga-msg-cc-label"><i class="fas fa-file-contract"></i> REQUEST COMMISSION</div>
                             <div class="ga-msg-cc-title">Ilustrasi Karakter Fullbody</div>
-                            <div class="ga-msg-cc-detail">Karakter original · Fullbody · Warna penuh</div>
+                            <div class="ga-msg-cc-detail">Karakter original Â· Fullbody Â· Warna penuh</div>
                             <div class="ga-msg-cc-price">Rp 350.000</div>
                             <button class="ga-msg-btn-cc-action">Lihat Detail Order</button>
                         </div>
@@ -122,7 +94,7 @@
                 <div class="ga-msg-bubble-row">
                     <img class="ga-msg-bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
                     <div>
-                        <div class="ga-msg-bubble ga-msg-them">Halo! Terima kasih sudah memesan. Bisa ceritakan lebih lanjut karakter yang ingin digambar? 😊</div>
+                        <div class="ga-msg-bubble ga-msg-them">Halo! Terima kasih sudah memesan. Bisa ceritakan lebih lanjut karakter yang ingin digambar? ðŸ˜Š</div>
                         <div class="ga-msg-bubble-time">09:03</div>
                     </div>
                 </div>
@@ -146,7 +118,7 @@
                 <div class="ga-msg-bubble-row">
                     <img class="ga-msg-bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
                     <div>
-                        <div class="ga-msg-bubble ga-msg-them">Wah, keren banget referensinya! Nanti saya buat sketsa dulu ya, sekitar 2-3 hari. Nanti saya kabari via chat ini kalau sudah siap untuk review. 🎨</div>
+                        <div class="ga-msg-bubble ga-msg-them">Wah, keren banget referensinya! Nanti saya buat sketsa dulu ya, sekitar 2-3 hari. Nanti saya kabari via chat ini kalau sudah siap untuk review. ðŸŽ¨</div>
                         <div class="ga-msg-bubble-time">09:30</div>
                     </div>
                 </div>
@@ -156,7 +128,7 @@
                 <div class="ga-msg-bubble-row">
                     <img class="ga-msg-bubble-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=ichigo" alt="">
                     <div>
-                        <div class="ga-msg-bubble ga-msg-them">Siap! Saya akan mulai sketsa besok ya 😊</div>
+                        <div class="ga-msg-bubble ga-msg-them">Siap! Saya akan mulai sketsa besok ya ðŸ˜Š</div>
                         <div class="ga-msg-bubble-time">14:32</div>
                     </div>
                 </div>

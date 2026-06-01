@@ -1,9 +1,13 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+require_login('admin');
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel – GalateArt</title>
+  <title>Admin Panel â€“ GalateArt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -43,7 +47,7 @@
 
   <div class="ga-adm-content">
 
-    <!-- ── DASHBOARD ── -->
+    <!-- â”€â”€ DASHBOARD â”€â”€ -->
     <section class="ga-adm-page-section active" id="page-dashboard">
       <div class="ga-adm-stat-grid">
         <div class="ga-adm-stat-card warn">
@@ -85,7 +89,7 @@
       </div>
     </section>
 
-    <!-- ── REPORTS ── -->
+    <!-- â”€â”€ REPORTS â”€â”€ -->
     <section class="ga-adm-page-section" id="page-reports">
       <div class="ga-adm-section-header">
         <h2>Semua Laporan</h2>
@@ -108,7 +112,7 @@
       </div>
     </section>
 
-    <!-- ── POSTS ── -->
+    <!-- â”€â”€ POSTS â”€â”€ -->
     <section class="ga-adm-page-section" id="page-posts">
       <div class="ga-adm-section-header">
         <h2>Manajemen Postingan</h2>
@@ -126,7 +130,7 @@
       </div>
     </section>
 
-    <!-- ── ACCOUNTS ── -->
+    <!-- â”€â”€ ACCOUNTS â”€â”€ -->
     <section class="ga-adm-page-section" id="page-accounts">
       <div class="ga-adm-section-header">
         <h2>Manajemen Akun</h2>
@@ -162,22 +166,22 @@
 <script src="js/utils.js"></script>
 <script src="js/auth.js"></script>
 <script>
-/* ═══════════════════════════════════════════════
-   AUTH GUARD — redirect ke login jika belum auth
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   AUTH GUARD â€” redirect ke login jika belum auth
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 (function() {
   const role = Store.get('userRole');
   if (role !== 'admin') {
     // Non-admin kembali ke homepage
     alert('Anda tidak memiliki akses ke halaman admin.');
-    location.href = 'landing.html';
+    location.href = 'landing.php';
   }
   // Jika admin, biarkan lanjut
 })();
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SEED DATA
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const REASON_LABELS = {
   sensitive: 'Unmarked sensitive ga-adm-content',
   hashtag:   'Misused hashtags / category',
@@ -224,9 +228,9 @@ seedReports();
 function getReports() { return JSON.parse(localStorage.getItem('galateart_reports') || '[]'); }
 function saveReports(arr) { localStorage.setItem('galateart_reports', JSON.stringify(arr)); }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    NAVIGATION
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PAGE_TITLES = { dashboard:'Dashboard', reports:'Laporan', posts:'Postingan', accounts:'Akun' };
 
 function showPage(name) {
@@ -243,9 +247,9 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.page));
 });
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RENDER HELPERS
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function timeAgo(iso) {
   const d = (Date.now() - new Date(iso)) / 1000;
   if (d < 60)    return `${~~d}d lalu`;
@@ -259,9 +263,9 @@ function badgeStatus(s) {
   return `<span class="ga-adm-badge-status ${s}">${map[s]||s}</span>`;
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    REPORTS
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 let reportFilter = 'all';
 
 function filterReports(btn) {
@@ -339,9 +343,9 @@ function viewReport(id) {
   openDrawer();
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    POSTS
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 let posts = JSON.parse(localStorage.getItem('ga_posts') || 'null') || MOCK_POSTS;
 function savePosts() { localStorage.setItem('ga_posts', JSON.stringify(posts)); }
 
@@ -366,7 +370,7 @@ function renderPosts(filter='') {
 function deletePost(id) {
   if (!confirm('Hapus postingan ini?')) return;
   posts = posts.filter(p => p.id !== id);
-  savePosts(); renderAll(); toast('🗑 Postingan dihapus');
+  savePosts(); renderAll(); toast('ðŸ—‘ Postingan dihapus');
 }
 
 function viewPost(id) {
@@ -387,9 +391,9 @@ function viewPost(id) {
   openDrawer();
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ACCOUNTS
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 let accounts = JSON.parse(localStorage.getItem('ga_accounts') || 'null') || MOCK_ACCOUNTS;
 function saveAccounts() { localStorage.setItem('ga_accounts', JSON.stringify(accounts)); }
 
@@ -449,9 +453,9 @@ function viewAccount(id) {
   openDrawer();
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    STATS
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderStats() {
   const reports = getReports();
   document.getElementById('ga-adm-stat-pending').textContent  = reports.filter(r=>r.status==='pending').length;
@@ -461,26 +465,26 @@ function renderStats() {
   document.getElementById('ga-adm-report-badge').textContent  = reports.filter(r=>r.status==='pending').length;
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    FILTER TABLE (search)
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function filterTable(val, tbodyId) {
   if (tbodyId === 'ga-adm-post-tbody')    renderPosts(val);
   if (tbodyId === 'ga-adm-account-tbody') renderAccounts(val);
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DRAWER
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function openDrawer() { document.getElementById('ga-adm-drawer-overlay').classList.add('open'); }
 function closeDrawer() { document.getElementById('ga-adm-drawer-overlay').classList.remove('open'); }
 document.getElementById('ga-adm-drawer-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('ga-adm-drawer-overlay')) closeDrawer();
 });
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TOAST
-═══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function toast(msg) {
   const el = document.getElementById('ga-adm-toast');
   el.textContent = msg; el.style.display = 'block';
@@ -488,9 +492,9 @@ function toast(msg) {
   toast._t = setTimeout(() => { el.style.display='none'; }, 2500);
 }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RENDER ALL
-═════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderAll() {
   renderStats();
   renderDashReports();

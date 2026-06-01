@@ -1,20 +1,56 @@
 <?php
 
-// Izinkan request dari halaman HTML di folder yang sama (CORS lokal)
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit(0);
-
 // -- Koneksi database --
 require_once __DIR__ . '/../config/Db.php';
 
 // -- Session --
 session_start();
 
-// -- Ambil body JSON --
-$body   = json_decode(file_get_contents('php://input'), true) ?? [];
+$is_json = strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false;
+$body = $is_json ? (json_decode(file_get_contents('php://input'), true) ?? []) : $_POST;
 $action = trim($body['action'] ?? $_GET['action'] ?? '');
+
+function wants_json(): bool
+{
+    return strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false
+        || strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+}
+
+function auth_redirect_for_role(string $role): string
+{
+    if ($role === 'admin') {
+        return '../admin.php';
+    }
+    if ($role === 'artist') {
+        return '../landing-artist.php';
+    }
+    if ($role === 'regular') {
+        return '../landing-reguler.php';
+    }
+
+    return '../landing.php';
+}
+
+function auth_success(array $payload, int $code = 200): void
+{
+    if (wants_json()) {
+        json_response($payload, $code);
+    }
+
+    $role = $payload['user']['role'] ?? ($_SESSION['role'] ?? '');
+    header('Location: ' . auth_redirect_for_role($role));
+    exit;
+}
+
+function auth_error(string $message, int $code = 400): void
+{
+    if (wants_json()) {
+        json_response(['status' => 'error', 'message' => $message], $code);
+    }
+
+    header('Location: ../landing.php?auth=login&error=' . urlencode($message));
+    exit;
+}
 
 // ── Router ──────────────────────────────────────────────────
 switch ($action) {
@@ -24,7 +60,7 @@ switch ($action) {
     case 'logout':          handle_logout();                       break;
     case 'me':              handle_me($conn);                      break;
     default:
-        json_response(['status' => 'error', 'message' => 'Action tidak dikenal.'], 400);
+        auth_error('Action tidak dikenal.', 400);
 }
 
 // ============================================================
@@ -38,13 +74,13 @@ function handle_register(mysqli $conn, array $body): void
 
     // Validasi input
     if (!$username || !$email || !$password) {
-        json_response(['status' => 'error', 'message' => 'Username, email, dan password wajib diisi.'], 422);
+        auth_error('Username, email, dan password wajib diisi.', 422);
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        json_response(['status' => 'error', 'message' => 'Format email tidak valid.'], 422);
+        auth_error('Format email tidak valid.', 422);
     }
     if (strlen($password) < 6) {
-        json_response(['status' => 'error', 'message' => 'Password minimal 6 karakter.'], 422);
+        auth_error('Password minimal 6 karakter.', 422);
     }
 
     // Cek apakah username atau email sudah ada
@@ -53,7 +89,7 @@ function handle_register(mysqli $conn, array $body): void
         "ss", [$username, $email]
     );
     if ($existing) {
-        json_response(['status' => 'error', 'message' => 'Username atau email sudah terdaftar.'], 409);
+        auth_error('Username atau email sudah terdaftar.', 409);
     }
 
     // Simpan ke database
@@ -67,7 +103,7 @@ function handle_register(mysqli $conn, array $body): void
     );
 
     if ($affected < 1) {
-        json_response(['status' => 'error', 'message' => 'Gagal menyimpan akun. Coba lagi.'], 500);
+        auth_error('Gagal menyimpan akun. Coba lagi.', 500);
     }
 
     // Langsung login setelah register
@@ -75,7 +111,7 @@ function handle_register(mysqli $conn, array $body): void
     $_SESSION['username']  = $username;
     $_SESSION['role']      = 'regular';
 
-    json_response([
+    auth_success([
         'status'   => 'ok',
         'message'  => 'Akun berhasil dibuat!',
         'user'     => ['id' => $id, 'username' => $username, 'role' => 'regular'],
@@ -93,13 +129,13 @@ function handle_register_artist(mysqli $conn, array $body): void
     $portfolio_url  = trim($body['portfolio_url'] ?? '');
 
     if (!$username || !$email || !$password) {
-        json_response(['status' => 'error', 'message' => 'Username, email, dan password wajib diisi.'], 422);
+        auth_error('Username, email, dan password wajib diisi.', 422);
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        json_response(['status' => 'error', 'message' => 'Format email tidak valid.'], 422);
+        auth_error('Format email tidak valid.', 422);
     }
     if (strlen($password) < 6) {
-        json_response(['status' => 'error', 'message' => 'Password minimal 6 karakter.'], 422);
+        auth_error('Password minimal 6 karakter.', 422);
     }
 
     // Cek duplikat
@@ -108,7 +144,7 @@ function handle_register_artist(mysqli $conn, array $body): void
         "ss", [$username, $email]
     );
     if ($existing) {
-        json_response(['status' => 'error', 'message' => 'Username atau email sudah terdaftar.'], 409);
+        auth_error('Username atau email sudah terdaftar.', 409);
     }
 
     // Buat user dulu
@@ -134,7 +170,7 @@ function handle_register_artist(mysqli $conn, array $body): void
     $_SESSION['username'] = $username;
     $_SESSION['role']     = 'artist';
 
-    json_response([
+    auth_success([
         'status'  => 'ok',
         'message' => 'Akun artis berhasil dibuat!',
         'user'    => ['id' => $user_id, 'username' => $username, 'role' => 'artist'],
@@ -150,7 +186,7 @@ function handle_login(mysqli $conn, array $body): void
     $password = $body['password'] ?? '';
 
     if (!$username || !$password) {
-        json_response(['status' => 'error', 'message' => 'Username dan password wajib diisi.'], 422);
+        auth_error('Username dan password wajib diisi.', 422);
     }
 
     // Cari user berdasarkan username ATAU email
@@ -163,15 +199,15 @@ function handle_login(mysqli $conn, array $body): void
     );
 
     if (!$user) {
-        json_response(['status' => 'error', 'message' => 'Username atau password salah.'], 401);
+        auth_error('Username atau password salah.', 401);
     }
 
     if (!password_verify($password, $user['password_hash'])) {
-        json_response(['status' => 'error', 'message' => 'Username atau password salah.'], 401);
+        auth_error('Username atau password salah.', 401);
     }
 
     if ($user['is_banned']) {
-        json_response(['status' => 'error', 'message' => 'Akun ini telah dinonaktifkan. Hubungi admin.'], 403);
+        auth_error('Akun ini telah dinonaktifkan. Hubungi admin.', 403);
     }
 
     // Simpan session
@@ -179,7 +215,7 @@ function handle_login(mysqli $conn, array $body): void
     $_SESSION['username'] = $user['username'];
     $_SESSION['role']     = $user['role'];
 
-    json_response([
+    auth_success([
         'status'  => 'ok',
         'message' => 'Login berhasil!',
         'user'    => [
@@ -198,6 +234,10 @@ function handle_logout(): void
 {
     session_unset();
     session_destroy();
+    if (!wants_json()) {
+        header('Location: ../landing.php');
+        exit;
+    }
     json_response(['status' => 'ok', 'message' => 'Berhasil keluar.']);
 }
 

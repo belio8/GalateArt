@@ -71,7 +71,7 @@ function renderNotifications() {
 (function initCartIcon() {
     $$('.nav-icons .fa-shopping-cart').forEach(icon => {
         icon.addEventListener('click', () => {
-            window.location.href = 'cart.html';
+            window.location.href = 'cart.php';
         });
     });
 })();
@@ -81,7 +81,7 @@ function renderNotifications() {
 (function initMessageIcon() {
     $$('.nav-icons .fa-comment').forEach(icon => {
         icon.addEventListener('click', () => {
-            window.location.href = 'messages.html';
+            window.location.href = 'messages.php';
         });
     });
 })();
@@ -93,7 +93,7 @@ function renderNotifications() {
         input.addEventListener('keydown', e => {
             if (e.key !== 'Enter') return;
             const q = input.value.trim();
-            if (q) window.location.href = `search-results.html?q=${encodeURIComponent(q)}`;
+            if (q) window.location.href = `search-results.php?q=${encodeURIComponent(q)}`;
         });
     });
 })();

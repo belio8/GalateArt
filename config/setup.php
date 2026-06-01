@@ -1,9 +1,4 @@
 <?php
-// ============================================================
-//  GalateArt — config/setup.php
-//  Jalankan SEKALI via browser: localhost/galateart/config/setup.php
-//  Membuat database + 18 tabel + data demo awal.
-// ============================================================
 
 // ── Koneksi awal (tanpa pilih DB dulu) ──────────────────────
 $conn = mysqli_connect('localhost', 'root', '');

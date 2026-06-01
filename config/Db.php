@@ -1,9 +1,4 @@
 <?php
-// ============================================================
-//  GalateArt — config/db.php
-//  File koneksi database. Di-require di setiap halaman PHP.
-//  Jangan dijalankan langsung — gunakan setup.php untuk init.
-// ============================================================
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
@@ -39,11 +34,31 @@ mysqli_set_charset($conn, DB_CHARSET);
  * @param array   $params Nilai parameter
  * @return array          Array of associative arrays (rows)
  */
-function db_query(mysqli $conn, string $sql, string $types = '', array $params = []): array
+function db_query($conn_or_sql, $sql = '', string $types = '', array $params = []): array
 {
-    $stmt = $conn->prepare($sql);
+    global $conn;
+
+    if ($conn_or_sql instanceof mysqli) {
+        $db = $conn_or_sql;
+    } else {
+        $db = $conn;
+        $params = is_array($sql) ? $sql : [];
+        $types = '';
+        foreach ($params as $param) {
+            if (is_int($param)) {
+                $types .= 'i';
+            } elseif (is_float($param)) {
+                $types .= 'd';
+            } else {
+                $types .= 's';
+            }
+        }
+        $sql = $conn_or_sql;
+    }
+
+    $stmt = $db->prepare($sql);
     if (!$stmt) {
-        error_log('db_query prepare error: ' . $conn->error . ' | SQL: ' . $sql);
+        error_log('db_query prepare error: ' . $db->error . ' | SQL: ' . $sql);
         return [];
     }
     if ($types && $params) {

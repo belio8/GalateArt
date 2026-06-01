@@ -1,8 +1,4 @@
-/**
- * GalateArt - Report System
- * Inject tombol report dan modal laporan ke semua halaman.
- * Tambahkan <script src="report-modal.js"></script> sebelum </body>.
- */
+
 
 (function () {
   /* ───────── MODAL HTML ───────── */

@@ -1,3 +1,7 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+require_login('artist');
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -17,7 +21,7 @@
     <i class="fas fa-plus"></i>
 </button>
 
-<!-- ── MODAL BUAT POSTINGAN ─────────────────────────────────── -->
+
 <div id="postModal" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
     <div class="pm-box">
 
@@ -37,7 +41,7 @@
                 <i class="fas fa-cloud-upload-alt pm-upload-icon" id="pmUploadIcon"></i>
                 <p class="pm-upload-label" id="pmUploadText">
                     <span>Pilih gambar</span> atau seret & lepas di sini<br>
-                    <small style="color:#555566;">PNG, JPG, WEBP — maks. 10 MB</small>
+                    <small style="color:#555566;">PNG, JPG, WEBP â€” maks. 10 MB</small>
                 </p>
                 <img class="pm-preview-img" id="pmPreviewImg" alt="Preview">
                 <p class="pm-preview-info" id="pmPreviewInfo"></p>
@@ -47,7 +51,7 @@
         <!-- Judul -->
         <div class="pm-field">
             <label for="pmTitle">Judul Karya <span class="pm-required">*</span></label>
-            <input type="text" id="pmTitle" placeholder="Contoh: Character Design — Sakura Spirit" maxlength="80">
+            <input type="text" id="pmTitle" placeholder="Contoh: Character Design â€” Sakura Spirit" maxlength="80">
         </div>
 
         <!-- Deskripsi -->
@@ -99,7 +103,7 @@
     </div>
 </div>
 
-<!-- ── TOAST NOTIFIKASI ──────────────────────────────────────── -->
+
 <div id="pmToast" role="alert" aria-live="polite">
     <i class="fas fa-check-circle"></i>
     <span id="pmToastMsg">Postingan berhasil diunggah!</span>
@@ -107,55 +111,7 @@
 
 
 
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                        <li><a href="#" onclick="document.getElementById('fabPostBtn').click();return false;"><i class="fas fa-upload"></i> Upload Karya</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="logo">Galate<span>Art</span></div>
-        </div>
-
-        <div class="nav-center">
-            <div class="search-bar">
-                <input type="text" placeholder="Cari karya seni...">
-            </div>
-            
-        </div>
-
-        <div class="nav-right">
-            <button class="btn-artist" id="btnArtist" style="display:none;">Saya seorang artis</button>
-            <button class="btn-login" id="btnLogin" style="display:none;">Masuk</button>
-            <button class="btn-signup" id="btnSignup" style="display:none;">Daftar</button>
-            
-            <div class="nav-icons" style="display:flex;">
-                <i class="far fa-comment"></i>
-                
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-
-                <i class="fas fa-shopping-cart"></i>
-
-                <a href="profile.html" id="userProfileLink" class="profile-icon-link">
-                    <img src="Assets/draw2.png" alt="Profil">
-                </a>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <main class="container">
                 <section class="hero-grid">
@@ -199,80 +155,6 @@
             </div>
             </section>
 
-            <div class="modal-overlay" id="registerModal">
-                <div class="modal-content">
-                    <span class="close-btn" id="closeModal">&times;</span>
-                    <h2>Daftar ke GalateArt</h2>
-                    <form action="#" method="POST" class="register-form">
-                        <div class="input-group">
-                            <label for="username">Nama Pengguna</label>
-                            <input type="text" id="username" placeholder="Pilih nama pengguna..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" placeholder="Masukkan alamat email..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="password">Kata Sandi</label>
-                            <input type="password" id="password" placeholder="Buat kata sandi yang kuat..." required>
-                        </div>
-                        <button type="submit" class="btn-submit">Buat Akun</button>
-                    </form>
-                    <p class="login-link">Sudah punya akun? <a href="#">Masuk di sini</a></p>
-                </div>
-            </div>
-            <div class="modal-overlay" id="artistModal">
-                <div class="modal-content">
-                    <span class="close-btn" id="closeArtistModal">&times;</span>
-                    <h2>Daftar sebagai Artis</h2>
-                    <form action="#" method="POST" class="register-form">
-                        <div class="input-group">
-                            <label for="artistName">Username</label>
-                            <input type="text" id="artistName" placeholder="Masukkan username Anda..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="artistEmail">Email</label>
-                            <input type="email" id="artistEmail" placeholder="Masukkan alamat email..." required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="portfolioLink">Link Portofolio (ArtStation, Behance, dll)</label>
-                            <input type="url" id="portfolioLink" placeholder="https://..." required>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="portfolioFile">Atau Unggah Karya/CV (PDF/ZIP)</label>
-                            <input type="file" id="portfolioFile" accept=".pdf,.zip,.rar,.png,.jpg">
-                        </div>
-
-                        <div class="input-group">
-                            <label for="artistPassword">Kata Sandi</label>
-                            <input type="password" id="artistPassword" placeholder="Buat kata sandi yang kuat..." required>
-                        </div>
-                        <button type="submit" class="btn-submit">Daftar Menjadi Artis</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="modal-overlay" id="loginModal">
-                <div class="modal-content">
-                    <span class="close-btn" id="closeLoginModal">&times;</span>
-                    <h2>Masuk ke GalateArt</h2>
-                    <form action="#" method="POST" class="register-form" id="loginForm">
-                        <div class="input-group">
-                            <label for="loginUsername">Username</label>
-                            <input type="text" id="loginUsername" placeholder="Masukkan username Anda..." required>
-                        </div>
-                        <div class="input-group">
-                            <label for="loginPassword">Kata Sandi</label>
-                            <input type="password" id="loginPassword" placeholder="Masukkan kata sandi..." required>
-                        </div>
-                        <button type="submit" class="btn-submit">Masuk</button>
-                    </form>
-                    <p class="login-link">Belum punya akun? <a href="#" id="switchToSignup">Daftar di sini</a></p>
-                </div>
-            </div>
-
             <div class="modal-bg" id="modalBg">
                 <div class="modal-box" id="modalBox">
                     <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
@@ -288,7 +170,7 @@
                                 <strong id="phName">@artist_name</strong>
                                 <span id="phSpec">Karya Seni</span>
                             </div>
-                            <button class="order-btn" id="orderBtn" onclick="location.href='commission.html'"><i class="fas fa-shopping-cart"></i> Order</button>
+                            <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'"><i class="fas fa-shopping-cart"></i> Order</button>
                             <button class="follow-btn" id="followBtn">Follow</button>
                         </div>
                         
@@ -318,7 +200,7 @@
                             </div>
                         </div>
                         
-                        <!-- ✅ Like & Save action bar -->
+                        <!-- âœ… Like & Save action bar -->
                         <div class="like-action-bar" id="likeActionBar">
                             <div class="like-action-left">
                                 <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">

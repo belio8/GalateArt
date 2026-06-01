@@ -1,3 +1,6 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -15,43 +18,7 @@
 <body>
 
     <!-- ==================== NAVBAR ==================== -->
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo">
-                <a href="landing.html" style="color:inherit; text-decoration:none;">Galate<span>Art</span></a>
-            </div>
-        </div>
-
-        <div class="nav-right" style="gap:20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background:#2a2a35;">
-            </div>
-            <div class="nav-icons" style="display:flex; gap:15px; align-items:center;">
-                <i class="far fa-comment" style="cursor:pointer; padding:8px; border:1px solid #444; border-radius:50%;"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <i class="fas fa-shopping-cart" style="cursor:pointer; padding:8px; border:1px solid #444; border-radius:50%;"></i>
-                <a href="profile.html" class="profile-icon-link" id="userProfileLink">
-                    <img src="Assets/draw2.png" alt="User">
-                </a>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <!-- ==================== MAIN ==================== -->
     <main class="ga-com-page">
@@ -60,8 +27,8 @@
         <div class="ga-com-banner">
             <img src="Assets/draw2.png" alt="Artist Avatar">
             <div class="ga-com-banner-info">
-                <h2>@artis_lokal <span style="font-size:14px; font-weight:400; color:var(--text-gray);">— Commission Page</span></h2>
-                <p>Artis lokal spesialis ilustrasi karakter, VTuber sheet, dan desain konseptual. Turnaround time 7–14 hari kerja.</p>
+                <h2>@artis_lokal <span style="font-size:14px; font-weight:400; color:var(--text-gray);">â€” Commission Page</span></h2>
+                <p>Artis lokal spesialis ilustrasi karakter, VTuber sheet, dan desain konseptual. Turnaround time 7â€“14 hari kerja.</p>
                 <div class="ga-com-status-badge" id="statusBadge">
                     <span class="ga-com-dot"></span> Open for Commission
                 </div>
@@ -89,7 +56,7 @@
                             <li><i class="fas fa-check"></i> 1 karakter</li>
                             <li><i class="fas fa-check"></i> Background polos / transparan</li>
                             <li><i class="fas fa-check"></i> 1x revisi minor</li>
-                            <li><i class="fas fa-check"></i> File PNG 2000×2000px</li>
+                            <li><i class="fas fa-check"></i> File PNG 2000Ã—2000px</li>
                         </ul>
                     </div>
 
@@ -163,12 +130,12 @@
                 <!-- Terms of Service -->
                 <p class="ga-com-section-title"><i class="fas fa-file-contract"></i> Terms of Service</p>
                 <div class="ga-com-tos-block">
-                    <p>✅ <strong>Will draw:</strong> OC, Fanart, VTuber, Semi-realistic, Chibi, kemono/furry, light romance.</p>
-                    <p>❌ <strong>Won't draw:</strong> NSFW, content yang mengandung ujaran kebencian, karya yang sudah ada hak ciptanya (fan art komersial tanpa izin), atau permintaan yang melanggar ToS platform.</p>
-                    <p>💳 <strong>Pembayaran:</strong> Pembayaran 50% di muka sebelum pengerjaan dimulai, 50% sisanya setelah WIP final disetujui. Metode: GoPay / DANA / BCA.</p>
-                    <p>🔄 <strong>Revisi:</strong> Jumlah revisi disesuaikan dengan paket yang dipilih. Revisi mayor di luar paket dikenakan biaya tambahan.</p>
-                    <p>⏱️ <strong>Turnaround:</strong> 7–14 hari kerja tergantung antrian. Anda akan mendapat estimasi waktu setelah order dikonfirmasi.</p>
-                    <p>🖼️ <strong>Hak Cipta:</strong> Karya tetap menjadi milik artis. Klien mendapat hak penggunaan personal. Hak komersial tersedia di paket Premium.</p>
+                    <p>âœ… <strong>Will draw:</strong> OC, Fanart, VTuber, Semi-realistic, Chibi, kemono/furry, light romance.</p>
+                    <p>âŒ <strong>Won't draw:</strong> NSFW, content yang mengandung ujaran kebencian, karya yang sudah ada hak ciptanya (fan art komersial tanpa izin), atau permintaan yang melanggar ToS platform.</p>
+                    <p>ðŸ’³ <strong>Pembayaran:</strong> Pembayaran 50% di muka sebelum pengerjaan dimulai, 50% sisanya setelah WIP final disetujui. Metode: GoPay / DANA / BCA.</p>
+                    <p>ðŸ”„ <strong>Revisi:</strong> Jumlah revisi disesuaikan dengan paket yang dipilih. Revisi mayor di luar paket dikenakan biaya tambahan.</p>
+                    <p>â±ï¸ <strong>Turnaround:</strong> 7â€“14 hari kerja tergantung antrian. Anda akan mendapat estimasi waktu setelah order dikonfirmasi.</p>
+                    <p>ðŸ–¼ï¸ <strong>Hak Cipta:</strong> Karya tetap menjadi milik artis. Klien mendapat hak penggunaan personal. Hak komersial tersedia di paket Premium.</p>
                 </div>
 
             </div>
@@ -228,7 +195,7 @@
                 <button class="ga-com-btn-order-submit" onclick="submitOrder()">
                     <i class="fas fa-paper-plane"></i> Kirim Order
                 </button>
-                <p class="ga-com-order-note">Order akan dikonfirmasi artis dalam 1×24 jam</p>
+                <p class="ga-com-order-note">Order akan dikonfirmasi artis dalam 1Ã—24 jam</p>
             </div>
 
         </div>
@@ -238,7 +205,7 @@
     <div class="ga-com-success-overlay" id="successOverlay">
         <div class="ga-com-success-box">
             <div class="ga-com-success-icon"><i class="fas fa-check"></i></div>
-            <h3>Order Terkirim! 🎉</h3>
+            <h3>Order Terkirim! ðŸŽ‰</h3>
             <p>Commission request kamu berhasil dikirim ke <strong>@artis_lokal</strong>. Pilih aksi berikut setelah ini.</p>
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
                 <button class="ga-com-btn-back" onclick="closeOrderSuccess()">Kembali ke Halaman</button>
@@ -377,7 +344,7 @@
         function handleFileUpload(input) {
             const label = document.getElementById('refImgText');
             if (input.files && input.files[0]) {
-                label.innerText = '✅ ' + input.files[0].name;
+                label.innerText = 'âœ… ' + input.files[0].name;
             }
         }
 

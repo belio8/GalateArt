@@ -1,3 +1,7 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+require_login();
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -14,45 +18,11 @@
 <body>
 
     <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo">
-                <a href="landing.html" style="color: inherit; text-decoration: none;">Galate<span>Art</span></a>
-            </div>
-        </div>
-
-        <div class="nav-right" style="gap: 20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background: #2a2a35;">
-            </div>
-            <div class="nav-icons" style="display: flex; gap: 15px; align-items: center;">
-                <i class="far fa-comment" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <a href="cart.html"><i class="fas fa-shopping-cart" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i></a>
-                <img src="Assets/draw2.png" alt="User" style="width: 35px; height: 35px; border-radius: 50%; cursor: pointer;">
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <!-- BREADCRUMB -->
     <div style="padding: 18px 5%; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-gray);">
-        <a href="commission.html" style="color: var(--text-gray); text-decoration: none;">Commission</a>
+        <a href="commission.php" style="color: var(--text-gray); text-decoration: none;">Commission</a>
         <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
         <span style="color: #fff; font-weight: 500;">Payment</span>
     </div>
@@ -114,7 +84,7 @@
                         <div class="ga-pay-logo ga-pay-qris"><i class="fas fa-qrcode" style="font-size: 20px;"></i></div>
                         <div>
                             <div class="ga-pay-name">QRIS</div>
-                            <div class="ga-pay-type">Scan QR · Semua Bank</div>
+                            <div class="ga-pay-type">Scan QR Â· Semua Bank</div>
                         </div>
                     </label>
 
@@ -173,14 +143,14 @@
                     <div class="ga-pay-commission-details">
                         <h4>Full Body Illustration</h4>
                         <p class="ga-pay-artist-tag">@artis_lokal</p>
-                        <span class="ga-pay-tier-badge">⭐ Premium Tier</span>
+                        <span class="ga-pay-tier-badge">â­ Premium Tier</span>
                     </div>
                 </div>
 
                 <!-- Delivery info -->
                 <div class="ga-pay-delivery-info">
                     <i class="fas fa-clock"></i>
-                    <span>Estimasi pengerjaan: <strong>7–14 hari kerja</strong> setelah pembayaran dikonfirmasi.</span>
+                    <span>Estimasi pengerjaan: <strong>7â€“14 hari kerja</strong> setelah pembayaran dikonfirmasi.</span>
                 </div>
 
                 <!-- Price breakdown -->
@@ -230,7 +200,7 @@
             <h2>Pembayaran Berhasil!</h2>
             <p>Pesanan komisimu telah dikonfirmasi. Artis akan segera memulai pengerjaannya.</p>
             <span class="ga-pay-order-id" id="orderIdDisplay">Order #GAL-000000</span>
-            <button class="ga-pay-btn-done" onclick="window.location.href='landing.html'">
+            <button class="ga-pay-btn-done" onclick="window.location.href='landing.php'">
                 Kembali ke Beranda
             </button>
         </div>
@@ -239,7 +209,7 @@
     <script src="js/navbar.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // ── PAYMENT SELECTION ──
+        // â”€â”€ PAYMENT SELECTION â”€â”€
         let selectedMethod = null;
         let BASE_PRICE = 0;
         let PLATFORM_FEE = 0;
@@ -281,13 +251,13 @@
 
             if (titleEl) titleEl.textContent = data.tierName || 'Commission';
             if (artistEl) artistEl.textContent = data.contact ? `@${data.contact}` : '@artis_lokal';
-            if (badgeEl) badgeEl.textContent = data.addons?.length ? `⭐ ${data.addons.length} add-on` : '⭐ Paket terpilih';
+            if (badgeEl) badgeEl.textContent = data.addons?.length ? `â­ ${data.addons.length} add-on` : 'â­ Paket terpilih';
             if (baseRow) baseRow.textContent = `Rp ${BASE_PRICE.toLocaleString('id-ID')}`;
             if (feeRow) feeRow.textContent = `Rp ${PLATFORM_FEE.toLocaleString('id-ID')}`;
             if (totalEl) totalEl.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
         }
 
-        // ── PROMO CODE ──
+        // â”€â”€ PROMO CODE â”€â”€
         const VALID_PROMOS = {
             'GALATE10': 10,
             'NEWUSER20': 20,
@@ -319,7 +289,7 @@
                 discountVal.textContent = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
                 total.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
 
-                msg.textContent = `✓ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
+                msg.textContent = `âœ“ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
                 msg.className = 'ga-pay-promo-msg ga-pay-success';
                 promoApplied = true;
             } else {
@@ -338,7 +308,7 @@
             if (e.key === 'Enter') applyPromo();
         });
 
-        // ── CONFIRM PAYMENT ──
+        // â”€â”€ CONFIRM PAYMENT â”€â”€
         function confirmPayment() {
             if (!selectedMethod) return;
 

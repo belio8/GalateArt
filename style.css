@@ -59,9 +59,8 @@ input, button {
 .btn-artist { background: var(--accent2); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600;}
 .btn-signup { background: var(--purple); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600;}
 .btn-login { background: var(--accent); border: none; padding: 8px 15px; border-radius: 20px; color: white; cursor: pointer; font-weight: 600; }
-/* Sembunyikan ikon navigasi secara default */
 .nav-icons {
-    display: none; /* Akan diubah menjadi 'flex' lewat JS saat login */
+    display: flex;
     align-items: center;
     gap: 15px;
     font-size: 18px;
@@ -937,7 +936,7 @@ STYLE UNTUK HALAMAN TRENDING
 
 /* --- Styling Ikon Profil Navbar --- */
 .profile-icon-link {
-    display: none; /* Disembunyikan sebelum login */
+    display: flex;
     align-items: center;
     margin-left: 10px;
     text-decoration: none;

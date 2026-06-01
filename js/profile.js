@@ -1,10 +1,3 @@
-/* ============================================================
-   GalateArt — profile.js
-   Fungsionalitas halaman profil (profile.html):
-     - Tab switcher (Bio / Posts / Saved / Liked)
-     - Badge role (Artist Account / Regular Account)
-   Dependensi: utils.js, auth.js
-   ============================================================ */
 
 'use strict';
 

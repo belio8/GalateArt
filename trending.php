@@ -1,3 +1,6 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -13,42 +16,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo"><a href="landing.html" style="color: inherit; text-decoration: none;">Galate<span>Art</span></a></div>
-        </div>
-
-        <div class="nav-right" style="gap: 20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background: #2a2a35;">
-            </div>
-            <div class="nav-icons">
-                <i class="far fa-comment" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <i class="fas fa-shopping-cart" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
-                <a href="profile.html" id="userProfileLink" class="profile-icon-link">
-                    <img src="Assets/draw2.png" alt="User" style="width: 35px; height: 35px; border-radius: 50%; cursor: pointer;">
-                </a>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <main class="container">
         <section class="trending-posts">
@@ -108,7 +76,7 @@
             </div>
         </section>
 
-        <!-- ✅ Modal dipindahkan ke luar post-card agar event bubbling tidak menyebabkan glitch -->
+        <!-- âœ… Modal dipindahkan ke luar post-card agar event bubbling tidak menyebabkan glitch -->
         <div class="modal-bg" id="modalBg">
             <div class="modal-box" id="modalBox">
                 <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
@@ -124,7 +92,7 @@
                             <strong id="phName">@artist_name</strong>
                             <span id="phSpec">Trending Artist</span>
                         </div>
-                        <button class="order-btn" id="orderBtn" onclick="location.href='commission.html'"><i class="fas fa-shopping-cart"></i> Order</button>
+                        <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'"><i class="fas fa-shopping-cart"></i> Order</button>
                         <button class="follow-btn" id="followBtn">Follow</button>
                     </div>
                     
@@ -153,7 +121,7 @@
                         </div>
                     </div>
 
-                    <!-- ✅ Like & Save action bar -->
+                    <!-- âœ… Like & Save action bar -->
                     <div class="like-action-bar" id="likeActionBar">
                         <div class="like-action-left">
                             <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">

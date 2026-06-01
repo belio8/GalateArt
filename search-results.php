@@ -1,3 +1,6 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,39 +14,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo"><a href="landing.html" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
-        </div>
-
-        <div class="nav-right" style="gap:20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background:#2a2a35;" id="navSearchInput" onkeydown="if(event.key==='Enter') doSearch(this.value)">
-            </div>
-            <div class="nav-icons" style="display:flex;gap:15px;align-items:center;">
-                <i class="far fa-comment" style="cursor:pointer;padding:8px;border:1px solid #444;border-radius:50%;"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <i class="fas fa-shopping-cart" style="cursor:pointer;padding:8px;border:1px solid #444;border-radius:50%;"></i>
-                <img src="Assets/draw2.png" alt="User" style="width:35px;height:35px;border-radius:50%;cursor:pointer;">
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <div class="ga-srch-page">
         <!-- Search Bar -->
@@ -57,7 +28,7 @@
         <!-- Header -->
         <div class="ga-srch-header">
             <h1>Hasil untuk "<span id="queryLabel">vtuber</span>"</h1>
-            <p class="ga-srch-meta" id="resultsMeta">Menampilkan 24 hasil · Artwork · Diurutkan: Relevansi</p>
+            <p class="ga-srch-meta" id="resultsMeta">Menampilkan 24 hasil Â· Artwork Â· Diurutkan: Relevansi</p>
         </div>
 
         <!-- Tabs -->
@@ -108,7 +79,7 @@
                                 <p class="ga-srch-ar-name">Ichigowarano</p>
                                 <p class="ga-srch-ar-handle">@ichigowarano</p>
                                 <p class="ga-srch-ar-bio">Spesialis VTuber design & anime illustration. Commission OPEN.</p>
-                                <p class="ga-srch-ar-stats"><strong>3.2K</strong> followers · <strong>180</strong> posts</p>
+                                <p class="ga-srch-ar-stats"><strong>3.2K</strong> followers Â· <strong>180</strong> posts</p>
                             </div>
                             <button class="ga-srch-btn-follow">Follow</button>
                         </div>
@@ -118,7 +89,7 @@
                                 <p class="ga-srch-ar-name">Jasper Xandros</p>
                                 <p class="ga-srch-ar-handle">@jasper_xandros</p>
                                 <p class="ga-srch-ar-bio">Character & VTuber model design. Berbasis di Jakarta.</p>
-                                <p class="ga-srch-ar-stats"><strong>2.1K</strong> followers · <strong>140</strong> posts</p>
+                                <p class="ga-srch-ar-stats"><strong>2.1K</strong> followers Â· <strong>140</strong> posts</p>
                             </div>
                             <button class="ga-srch-btn-follow">Follow</button>
                         </div>
@@ -128,7 +99,7 @@
                                 <p class="ga-srch-ar-name">Artis Lokal</p>
                                 <p class="ga-srch-ar-handle">@artis_lokal</p>
                                 <p class="ga-srch-ar-bio">Ilustrasi VTuber, game asset, dan desain konseptual.</p>
-                                <p class="ga-srch-ar-stats"><strong>2.5K</strong> followers · <strong>150</strong> posts</p>
+                                <p class="ga-srch-ar-stats"><strong>2.5K</strong> followers Â· <strong>150</strong> posts</p>
                             </div>
                             <button class="ga-srch-btn-follow">Follow</button>
                         </div>
@@ -212,7 +183,7 @@
                 document.getElementById(id).style.display = id === tabId ? '' : 'none';
             });
             const counts = { 'tab-artwork': '24 hasil', 'tab-artist': '3 artis', 'tab-tag': '6 tag' };
-            document.getElementById('resultsMeta').textContent = `Menampilkan ${counts[tabId]} · "${document.getElementById('queryLabel').textContent}"`;
+            document.getElementById('resultsMeta').textContent = `Menampilkan ${counts[tabId]} Â· "${document.getElementById('queryLabel').textContent}"`;
         }
 
         function toggleChip(btn) {
@@ -229,7 +200,7 @@
             if (!q.trim()) return;
             document.getElementById('queryLabel').textContent = q;
             document.getElementById('mainSearchInput').value = q;
-            document.getElementById('resultsMeta').textContent = `Menampilkan 24 hasil · Artwork · Diurutkan: Relevansi`;
+            document.getElementById('resultsMeta').textContent = `Menampilkan 24 hasil Â· Artwork Â· Diurutkan: Relevansi`;
             buildArtGrid();
         }
 

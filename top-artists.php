@@ -1,3 +1,6 @@
+﻿<?php
+require_once __DIR__ . '/components/bootstrap.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -13,42 +16,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="menu-container">
-                <i class="fas fa-bars menu-icon" id="menuToggle"></i>
-                
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <ul>
-                        <li><a href="tagline.html"><i class="fas fa-quote-left"></i> Tagline</a></li>
-                        <li><a href="top-artists.html"><i class="fas fa-star"></i> Top Artist</a></li>
-                        <li><a href="trending.html"><i class="fas fa-fire"></i> Trending</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="logo"><a href="landing.html" style="color: inherit; text-decoration: none;">Galate<span>Art</span></a></div>
-        </div>
-
-        <div class="nav-right" style="gap: 20px;">
-            <div class="search-bar">
-                <input type="text" placeholder="Search..." style="background: #2a2a35;">
-            </div>
-            <div class="nav-icons">
-                <i class="far fa-comment" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
-                <div class="notification-container">
-                    <i class="far fa-bell" id="notifToggle"></i>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">Notifikasi</div>
-                        <div class="notif-body" id="notifBody"></div>
-                    </div>
-                </div>
-                <i class="fas fa-shopping-cart" style="cursor: pointer; padding: 8px; border: 1px solid #444; border-radius: 50%;"></i>
-                <a href="profile.html" id="userProfileLink" class="profile-icon-link">
-                    <img src="Assets/draw2.png" alt="User" style="width: 35px; height: 35px; border-radius: 50%; cursor: pointer;">
-                </a>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <main class="container">
         <section class="top-artists">
