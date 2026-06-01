@@ -55,3 +55,18 @@ function active_user_home(): string
 
     return 'landing.php';
 }
+function active_user_profile(): string
+{
+    $role = $_SESSION['role'] ?? null;
+    if ($role === 'artist') {
+        return 'artist-profile.php';
+    }
+    if ($role === 'regular') {
+        return 'profile.php';
+    }
+    if ($role === 'admin') {
+        return 'admin.php';
+    }
+
+    return 'profile.php';
+}

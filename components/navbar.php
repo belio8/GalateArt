@@ -3,6 +3,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 $user = current_user();
 $home = active_user_home();
+$profile = active_user_profile();
 ?>
 <header class="navbar">
     <div class="nav-left">
@@ -47,13 +48,17 @@ $home = active_user_home();
 
                 <a href="cart.php" aria-label="Keranjang"><i class="fas fa-shopping-cart"></i></a>
 
-                <a href="profile.php" id="userProfileLink" class="profile-icon-link" title="<?= e($user['username']) ?>">
+                <a href="<?= e($profile) ?>" id="userProfileLink" class="profile-icon-link" title="<?= e($user['username']) ?>">
                     <img src="Assets/draw2.png" alt="Profil">
                 </a>
 
                 <form action="api/auth.php" method="post" style="display:inline;">
                     <input type="hidden" name="action" value="logout">
-                    <button class="btn-login" id="btnLogout" type="submit">Keluar</button>
+                    <div class="logout-container">
+                        <button id="btnLogout" class="btn-logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
                 </form>
             </div>
         <?php endif; ?>

@@ -1,5 +1,47 @@
 ﻿<?php
 require_once __DIR__ . '/components/bootstrap.php';
+require_login('artist');
+require_once __DIR__ . '/config/Db.php';
+
+$user = current_user();
+$userId = $user['id'];
+
+$postRow = db_row(
+    $conn,
+    "SELECT COUNT(*) AS cnt FROM posts WHERE artist_id = ? AND status = 'active'",
+    "s",
+    [$userId]
+);
+$postCount = (int) ($postRow['cnt'] ?? 0);
+
+$followingRow = db_row(
+    $conn,
+    "SELECT COUNT(*) AS cnt FROM follows WHERE follower_id = ?",
+    "s",
+    [$userId]
+);
+$followingCount = (int) ($followingRow['cnt'] ?? 0);
+
+$followersRow = db_row(
+    $conn,
+    "SELECT COUNT(*) AS cnt FROM follows WHERE following_id = ?",
+    "s",
+    [$userId]
+);
+$followersCount = (int) ($followersRow['cnt'] ?? 0);
+
+$postRows = db_query(
+    $conn,
+    "SELECT p.id, p.image_url, p.like_count, p.title, p.description,
+            COALESCE(GROUP_CONCAT(pt.tag ORDER BY pt.id SEPARATOR ' '), '') AS tags
+     FROM posts p
+     LEFT JOIN post_tags pt ON pt.post_id = p.id
+     WHERE p.artist_id = ? AND p.status = 'active'
+     GROUP BY p.id
+     ORDER BY p.created_at DESC",
+    "s",
+    [$userId]
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -18,46 +60,50 @@ require_once __DIR__ . '/components/bootstrap.php';
 <body>
     <?php include __DIR__ . '/components/navbar.php'; ?>
 
-    <main class="container">
+    <main class="container is-artist">
         <section class="artist-profile">
             <div class="profile-header">
                 <img src="Assets/draw2.png" alt="Artist Avatar" class="artist-avatar">
                 <div class="artist-info">
-                    <h1>@artis_lokal</h1>
-                    <p class="artist-bio">Artis lokal yang menciptakan karya seni digital untuk VTuber, game, dan aset kreatif. Spesialis dalam ilustrasi karakter dan desain konseptual.</p>
+                    <h1><?php echo htmlspecialchars($user['username']); ?></h1>
+                    <p class="artist-bio"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></p>
                     <div class="artist-stats">
-                        <span><strong>150</strong> Postingan</span>
-                        <span><strong>2.5K</strong> Followers</span>
-                        <span><strong>500</strong> Following</span>
+                        <span><strong><?php echo number_format($postCount, 0, ',', '.'); ?></strong> Postingan</span>
+                        <span><strong><?php echo number_format($followersCount, 0, ',', '.'); ?></strong> Followers</span>
+                        <span><strong><?php echo number_format($followingCount, 0, ',', '.'); ?></strong> Following</span>
                     </div>
-                    <button class="btn-follow">Follow</button>
+                    <div class="commission-status">
+                        <label>Set commission status</label>
+                        <select>
+                            <option>Open</option>
+                            <option>Closed</option>
+                            <option>Waitlist</option>
+                        </select>
+                    </div>
+                    
+                    
                 </div>
             </div>
 
             <div class="artist-posts">
                 <div class="post-grid">
-                    <div class="post-card">
-                        <img src="Assets/draw2.png" alt="Post 1">
-                        <div class="post-info">
-                            <p class="hashtags">#original #illustration #character</p>
-                            <p class="likes"><i class="fas fa-heart"></i> 120 likes</p>
+                    <?php if (empty($postRows)): ?>
+                        <div class="post-card empty-state">
+                            <div class="post-info">
+                                <p>Tidak ada postingan.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="post-card">
-                        <img src="Assets/draw2.png" alt="Post 2">
-                        <div class="post-info">
-                            <p class="hashtags">#digitalart #vtuber #design</p>
-                            <p class="likes"><i class="fas fa-heart"></i> 85 likes</p>
-                        </div>
-                    </div>
-                    <div class="post-card">
-                        <img src="Assets/draw2.png" alt="Post 3">
-                        <div class="post-info">
-                            <p class="hashtags">#fantasy #conceptart</p>
-                            <p class="likes"><i class="fas fa-heart"></i> 200 likes</p>
-                        </div>
-                    </div>
-                    <!-- Tambahkan lebih banyak post-card sesuai kebutuhan -->
+                    <?php else: ?>
+                        <?php foreach ($postRows as $post): ?>
+                            <div class="post-card">
+                                <img src="<?php echo htmlspecialchars($post['image_url'] ?: 'Assets/draw2.png'); ?>" alt="<?php echo htmlspecialchars($post['title'] ?: 'Postingan'); ?>">
+                                <div class="post-info">
+                                    <p class="hashtags"><?php echo htmlspecialchars($post['tags'] ?: '#digitalart'); ?></p>
+                                    <p class="likes"><i class="fas fa-heart"></i> <?php echo number_format((int) $post['like_count'], 0, ',', '.'); ?> likes</p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>

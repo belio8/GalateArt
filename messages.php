@@ -135,8 +135,6 @@ require_login();
             </div>
 
             <div class="ga-msg-chat-input-bar">
-                <i class="fas fa-paperclip" title="Lampirkan file"></i>
-                <i class="fas fa-image" title="Kirim gambar"></i>
                 <input class="ga-msg-chat-text-input" type="text" id="chatInput" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter') sendMessage()">
                 <button class="ga-msg-btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>

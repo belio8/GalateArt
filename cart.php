@@ -73,7 +73,7 @@ function rupiah(float $amount): string
 
             <div class="ga-cart-empty" id="emptyCart" style="<?= $cartItems ? 'display:none;' : '' ?>">
                 <i class="fas fa-shopping-cart"></i>
-                <p>Keranjangmu kosong.<br><a href="landing.php">Jelajahi karya seni â†’</a></p>
+                <p>Keranjangmu kosong.<br><a href="landing.php">Jelajahi karya seni’</a></p>
             </div>
         </div>
 

@@ -30,9 +30,7 @@ $posts = db_query(
 </head>
 <body>
     <?php include __DIR__ . '/components/navbar.php'; ?>
-
     <main class="container">
-                </div>
         <section class="hero-grid">
             <div class="hero-card main-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
                 <div class="hero-text">

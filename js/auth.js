@@ -57,7 +57,6 @@
         '#savePostBtn',
         '#postBtn',
         '#orderBtn',
-        '#fabPostBtn',
     ];
 
     protectedSelectors.forEach((selector) => {

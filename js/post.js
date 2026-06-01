@@ -1,5 +1,4 @@
 'use strict';
-
 (function initPostModal() {
 
     /* ── ELEMEN ───────────────────────────────────────────────── */
@@ -27,20 +26,12 @@
 
     if (!fabBtn || !postModal) return; // halaman tanpa modal ini
 
-    /* ── TAMPILKAN FAB HANYA UNTUK ARTIST ────────────────────── */
+    /* ── TAMPILKAN FAB (halaman artist ini sudah hanya untuk artist) ────────────────────── */
     function checkArtistRole() {
-        const role = Store.get('userRole');
-        if (role === 'artist') {
-            fabBtn.style.display = 'flex';
-        } else {
-            fabBtn.style.display = 'none';
-        }
+        fabBtn.style.display = 'flex';
     }
 
     checkArtistRole();
-
-    // Re-check setiap kali storage berubah (login/logout di tab lain)
-    window.addEventListener('storage', checkArtistRole);
 
     // Hook ke applyLoginState jika ada (dari auth.js)
     const _origApply = window.applyLoginState;
@@ -259,33 +250,54 @@
         pmNsfw.checked = false;
     }
 
-    /* ── SUBMIT POSTINGAN ─────────────────────────────────────── */
-    pmSubmitBtn.addEventListener('click', () => {
+    /* ── SUBMIT POSTINGAN KE SERVER ───────────────────────────── */
+    pmSubmitBtn.addEventListener('click', async () => {
         if (!validateForm()) return;
 
         pmSubmitBtn.disabled = true;
         pmSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
 
-        // Simulasi upload (delay 900ms, lalu tampilkan kartu)
-        setTimeout(() => {
+        try {
+            const formData = new FormData();
+            formData.append('image', _selectedFile);
+            formData.append('title', pmTitle.value.trim());
+            formData.append('description', pmDesc.value.trim());
+            formData.append('tags', pmTags.value.trim());
+            formData.append('price', pmPrice.value || 0);
+            formData.append('is_free', pmFreeCheck.checked ? 1 : 0);
+            formData.append('is_nsfw', pmNsfw.checked ? 1 : 0);
+
+            const response = await fetch('api/create-post.php', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (!response.ok || result.status !== 'success') {
+                throw new Error(result.message || 'Gagal mengunggah postingan.');
+            }
+
             const postData = {
-                imageSrc : _previewDataUrl,
-                title    : pmTitle.value.trim(),
-                desc     : pmDesc.value.trim(),
-                tags     : normalizeHashtags(pmTags.value),
-                price    : formatPrice(pmPrice.value),
-                isNsfw   : pmNsfw.checked,
+                imageSrc : result.data.image_url,
+                title    : result.data.title,
+                desc     : result.data.description,
+                tags     : result.data.tags.map(tag => '#' + tag).join(' '),
+                price    : result.data.is_free ? 'Gratis' : formatPrice(result.data.price),
+                isNsfw   : result.data.is_nsfw,
             };
 
             createPostCard(postData);
             closePostModal();
             resetForm();
 
+            showToast(result.message || 'Postingan berhasil diunggah!', false);
+        } catch (error) {
+            console.error('create-post error', error);
+            showToast(error.message || 'Gagal mengunggah postingan.', true);
+        } finally {
             pmSubmitBtn.disabled = false;
             pmSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Sekarang';
-
-            showToast('Postingan berhasil diunggah!', false);
-        }, 900);
+        }
     });
 
     /* ── TOAST HELPER ─────────────────────────────────────────── */
