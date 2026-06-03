@@ -1,6 +1,19 @@
 ﻿<?php
 require_once __DIR__ . '/components/bootstrap.php';
+require_once __DIR__ . '/config/Db.php';
 require_login('artist');
+
+$posts = db_query(
+    "SELECT p.id, p.title, p.image_url, u.username, GROUP_CONCAT(pt.tag ORDER BY pt.tag SEPARATOR ' ') AS tags
+     FROM posts p
+     JOIN users u ON u.id = p.artist_id
+     LEFT JOIN post_tags pt ON pt.post_id = p.id
+     WHERE p.status = ?
+     GROUP BY p.id, p.title, p.image_url, u.username
+     ORDER BY p.created_at DESC
+     LIMIT 12",
+    ['active']
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -139,21 +152,21 @@ require_login('artist');
         </section>
 
         <section class="art-grid">
-            <div class="art-card">
-                <img src="Assets/draw2.png" alt="Art">
-                <div class="art-info">
-                    <p class="hashtags">#original #illustration</p>
-                    <p class="artist-name">@artis_lokal</p>
+            <?php foreach ($posts as $post): ?>
+                <?php
+                    $image = $post['image_url'] ?: 'Assets/draw2.png';
+                    $tags = trim((string) ($post['tags'] ?? ''));
+                    $hashtags = $tags ? '#' . str_replace(' ', ' #', $tags) : '#original #illustration';
+                ?>
+                <div class="art-card">
+                    <img src="<?= e($image) ?>" alt="<?= e($post['title']) ?>">
+                    <div class="art-info">
+                        <p class="hashtags"><?= e($hashtags) ?></p>
+                        <p class="artist-name">@<?= e($post['username']) ?></p>
+                    </div>
                 </div>
-            </div>
-            <div class="art-card">
-                <img src="Assets/draw2.png" alt="Art">
-                <div class="art-info">
-                    <p class="hashtags">#fantasy #character</p>
-                    <p class="artist-name">@seniman_digital</p>
-                </div>
-            </div>
-            </section>
+            <?php endforeach; ?>
+        </section>
 
             <div class="modal-bg" id="modalBg">
                 <div class="modal-box" id="modalBox">

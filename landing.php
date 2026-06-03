@@ -132,13 +132,6 @@ $posts = db_query(
                             <span id="likeCountText"><strong>0</strong> <span>orang menyukai ini</span></span>
                         </div>
 
-                        <div class="input-area">
-                            <img class="input-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
-                            <div class="input-wrap">
-                                <input type="text" class="comment-input" id="commentInput" placeholder="Tambahkan komentar..." autocomplete="off">
-                            </div>
-                            <button class="post-btn" id="postBtn">Kirim</button>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -31,8 +31,14 @@ require_login('admin');
     <button class="ga-adm-nav-item" onclick="alert('Fitur log aktivitas akan segera hadir.')"><i class="fas fa-history"></i> Log Aktivitas</button>
   </nav>
   <div class="ga-adm-sidebar-footer">
-    <button class="ga-adm-nav-item" id="ga-adm-logout-btn" style="color:var(--ga-adm-danger)"><i class="fas fa-sign-out-alt"></i> Keluar</button>
-  </div>
+    <form action="api/auth.php" method="post" style="display:inline;">
+        <input type="hidden" name="action" value="logout">
+        <div class="logout-container">
+            <button id="btnLogout" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </form>
 </aside>
 
 <!-- MAIN -->
@@ -169,15 +175,7 @@ require_login('admin');
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AUTH GUARD â€” redirect ke login jika belum auth
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-(function() {
-  const role = Store.get('userRole');
-  if (role !== 'admin') {
-    // Non-admin kembali ke homepage
-    alert('Anda tidak memiliki akses ke halaman admin.');
-    location.href = 'landing.php';
-  }
-  // Jika admin, biarkan lanjut
-})();
+
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SEED DATA

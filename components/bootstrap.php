@@ -68,5 +68,5 @@ function active_user_profile(): string
         return 'admin.php';
     }
 
-    return 'profile.php';
+    return 'landing.php';
 }
