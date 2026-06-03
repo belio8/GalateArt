@@ -295,6 +295,65 @@ input, button {
 
 .login-link a:hover { text-decoration: underline; }
 
+/* --- Google Sign-In Button --- */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: #444;
+}
+
+.auth-divider span {
+    font-size: 13px;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-google {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 13px 20px;
+    border-radius: 50px;
+    border: 1px solid #555;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.btn-google:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+}
+
+.btn-google:active {
+    transform: scale(0.98);
+}
+
+.btn-google svg {
+    flex-shrink: 0;
+}
+
+
+
 /* Container untuk posisi relatif */
 .notification-container {
     position: relative;
