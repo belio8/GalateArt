@@ -41,6 +41,7 @@ $tables['users'] = "CREATE TABLE IF NOT EXISTS users (
     username      VARCHAR(50)  UNIQUE NOT NULL,
     email         VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    google_id     VARCHAR(255) UNIQUE DEFAULT NULL,
     role          ENUM('regular','artist','admin') NOT NULL DEFAULT 'regular',
     avatar_url    VARCHAR(255) DEFAULT NULL,
     bio           TEXT         DEFAULT NULL,
