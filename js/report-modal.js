@@ -57,18 +57,25 @@
   let selectedReason = null;
 
   /* ───────── HELPERS ───────── */
-  function saveReport(target, reason) {
-    const reports = JSON.parse(localStorage.getItem('galateart_reports') || '[]');
-    reports.push({
-      id: Date.now(),
-      type: target.type,
-      targetId: target.id,
-      targetTitle: target.title,
-      reason,
-      status: 'pending', // pending | approved | rejected
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('galateart_reports', JSON.stringify(reports));
+  async function saveReport(target, reason) {
+    try {
+      const res = await fetch('api/reports.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target_type: target.type,
+          target_id: target.id,
+          target_title: target.title,
+          reason: reason
+        })
+      });
+      const data = await res.json();
+      if (data.status !== 'ok') {
+        console.error('Report failed:', data.message);
+      }
+    } catch (err) {
+      console.error('Network error during report:', err);
+    }
   }
 
   function openReportModal(target) {

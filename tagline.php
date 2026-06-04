@@ -1,5 +1,18 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
+require_once __DIR__ . '/config/Db.php';
+
+// Ambil tag yang paling sering digunakan pada postingan aktif
+$trending_tags = db_query(
+    $conn,
+    "SELECT pt.tag, COUNT(DISTINCT pt.post_id) AS tag_count
+     FROM post_tags pt
+     JOIN posts p ON p.id = pt.post_id
+     WHERE p.status = 'active'
+     GROUP BY pt.tag
+     ORDER BY tag_count DESC
+     LIMIT 10"
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -13,7 +26,7 @@ require_once __DIR__ . '/components/bootstrap.php';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -61,34 +74,16 @@ require_once __DIR__ . '/components/bootstrap.php';
             <!-- Trending tags -->
             <div class="ga-tag-widget">
                 <h3><i class="fas fa-fire" style="color:var(--accent);margin-right:6px;"></i>Tag Trending</h3>
-                <div class="ga-tag-trend-item" data-tag="#vtuber">
-                    <span class="ga-tag-trend-name">#vtuber</span>
-                    <span class="ga-tag-trend-count">1.2k karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#chibi">
-                    <span class="ga-tag-trend-name">#chibi</span>
-                    <span class="ga-tag-trend-count">874 karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#fanart">
-                    <span class="ga-tag-trend-name">#fanart</span>
-                    <span class="ga-tag-trend-count">641 karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#illustration">
-                    <span class="ga-tag-trend-name">#illustration</span>
-                    <span class="ga-tag-trend-count">589 karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#character">
-                    <span class="ga-tag-trend-name">#character</span>
-                    <span class="ga-tag-trend-count">502 karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#original">
-                    <span class="ga-tag-trend-name">#original</span>
-                    <span class="ga-tag-trend-count">448 karya</span>
-                </div>
-                <div class="ga-tag-trend-item" data-tag="#emoji">
-                    <span class="ga-tag-trend-name">#emoji</span>
-                    <span class="ga-tag-trend-count">317 karya</span>
-                </div>
+                <?php if (empty($trending_tags)): ?>
+                    <p style="color:#888; font-size:13px; text-align:center;">Belum ada tag trending.</p>
+                <?php else: ?>
+                    <?php foreach ($trending_tags as $tag): ?>
+                        <div class="ga-tag-trend-item" data-tag="#<?= e(ltrim($tag['tag'], '#')) ?>">
+                            <span class="ga-tag-trend-name">#<?= e(ltrim($tag['tag'], '#')) ?></span>
+                            <span class="ga-tag-trend-count"><?= number_format((int)$tag['tag_count'], 0, ',', '.') ?> karya</span>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
         </aside>
@@ -145,74 +140,14 @@ require_once __DIR__ . '/components/bootstrap.php';
         </main>
     </div>
 
-    <!-- â•â• ART MODAL (popup detail karya - sama dengan landing.php) â•â• -->
-    <div class="modal-bg" id="modalBg">
-        <div class="modal-box" id="modalBox">
-            <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
+        <?php include __DIR__ . '/components/art-modal.php'; ?>
 
-            <div class="modal-img" id="modalImgWrap">
-                <img src="" alt="Art Image" id="modalImageDisplay">
-            </div>
-
-            <div class="modal-panel">
-                <div class="post-header">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="Avatar" class="post-av" id="phAv">
-                    <div class="post-author">
-                        <strong id="phName">@artist_name</strong>
-                        <span id="phSpec">Karya Seni</span>
-                    </div>
-                    <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'">
-                        <i class="fas fa-shopping-cart"></i> Order
-                    </button>
-                    <button class="follow-btn" id="followBtn">Follow</button>
-                </div>
-
-                <div class="comment-feed" id="commentFeed">
-                    <div class="caption-block">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="" class="c-av" id="capAv">
-                        <div class="c-body">
-                            <strong id="captionName">@artist_name</strong>
-                            <span>Menampilkan karya seni terbaru saya!</span>
-                            <div class="tags" id="captionTags">#digitalart</div>
-                            <span class="c-time">Beberapa jam yang lalu</span>
-                        </div>
-                    </div>
-                    <div class="feed-divider"></div>
-                    <div class="comment-count">0 Komentar</div>
-                </div>
-
-                <div class="like-action-bar" id="likeActionBar">
-                    <div class="like-action-left">
-                        <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    <button class="save-post-btn" id="savePostBtn" onclick="toggleSavePost()">
-                        <i class="far fa-bookmark"></i>
-                    </button>
-                </div>
-                <div class="like-count-bar" id="likeCountBar">
-                    <span id="likeCountText"><strong>0</strong> <span>orang menyukai ini</span></span>
-                </div>
-
-                <div class="input-area">
-                    <img class="input-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
-                    <div class="input-wrap">
-                        <input type="text" class="comment-input" id="commentInput"
-                               placeholder="Tambahkan komentar..." autocomplete="off">
-                    </div>
-                    <button class="post-btn" id="postBtn">Kirim</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- â•â• SCRIPTS â•â• -->
+    <!-- â• â•  SCRIPTS â• â•  -->
     <script src="js/utils.js"></script>
-    <script src="js/navbar.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/art-modal.js"></script>
-    <script src="js/report-modal.js"></script>
-    <script src="js/tagline.js"></script>
+    <script src="js/navbar.js?v=<?= time() ?>"></script>
+    <script src="js/auth.js?v=<?= time() ?>"></script>
+    <script src="js/tagline.js?v=<?= time() ?>"></script>
+    <script src="js/art-modal.js?v=<?= time() ?>"></script>
+    <script src="js/report-modal.js?v=<?= time() ?>"></script>
 </body>
 </html>

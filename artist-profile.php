@@ -124,16 +124,27 @@ $postRows = db_query(
                             </div>
                         <?php else: ?>
                             <?php foreach ($postRows as $post): ?>
-                                <div class="art-card">
+                                <?php
+                                    $tags = trim((string) ($post['tags'] ?? ''));
+                                    $hashtags = $tags ? '#' . str_replace(' ', ' #', $tags) : '#digitalart';
+                                ?>
+                                <div class="art-card" style="cursor: pointer;"
+                                     data-post-id="<?= e($post['id']) ?>"
+                                     data-img="<?= e($post['image_url'] ?: 'Assets/draw2.png') ?>"
+                                     data-artist="@<?= e($user['username']) ?>"
+                                     data-avatar-url="<?= e($user['avatar_url'] ?: 'Assets/galateart_icon.png') ?>"
+                                     data-tags="<?= e($hashtags) ?>"
+                                     data-likes="<?= (int)$post['like_count'] ?>">
                                     <img src="<?php echo htmlspecialchars($post['image_url'] ?: 'Assets/draw2.png'); ?>" alt="<?php echo htmlspecialchars($post['title'] ?: 'Postingan'); ?>">
                                     <div class="art-info">
-                                        <p class="hashtags"><?php echo htmlspecialchars($post['tags'] ?: '#digitalart'); ?></p>
+                                        <p class="hashtags"><?php echo htmlspecialchars($hashtags); ?></p>
                                         <p class="likes"><i class="fas fa-heart"></i> <?php echo number_format((int) $post['like_count'], 0, ',', '.'); ?> likes</p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+                    <?php include __DIR__ . '/components/art-modal.php'; ?>
                 </div>
 
                 <div class="tab-content" id="content-saved">
@@ -169,12 +180,11 @@ $postRows = db_query(
             </div>
         </div>
     </main>
-    <script src="js/utils.js"></script>
-    <script src="js/navbar.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/profile.js"></script>
-    <script src="script.js"></script>
-    <script src="report-modal.js"></script>
-    <script src="js/art-modal.js"></script>
+    <script src="js/utils.js?v=<?= time() ?>"></script>
+    <script src="js/navbar.js?v=<?= time() ?>"></script>
+    <script src="js/auth.js?v=<?= time() ?>"></script>
+    <script src="js/profile.js?v=<?= time() ?>"></script>
+    <script src="js/report-modal.js?v=<?= time() ?>"></script>
+    <script src="js/art-modal.js?v=<?= time() ?>"></script>
 </body>
 </html>

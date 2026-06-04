@@ -3,12 +3,14 @@ require_once __DIR__ . '/components/bootstrap.php';
 require_once __DIR__ . '/config/Db.php';
 
 $posts = db_query(
-    "SELECT p.id, p.title, p.image_url, u.username, GROUP_CONCAT(pt.tag ORDER BY pt.tag SEPARATOR ' ') AS tags
+    "SELECT p.id, p.title, p.image_url, p.like_count, u.username,
+     COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+     COALESCE(GROUP_CONCAT(DISTINCT pt.tag ORDER BY pt.tag SEPARATOR ' '), '') AS tags
      FROM posts p
      JOIN users u ON u.id = p.artist_id
      LEFT JOIN post_tags pt ON pt.post_id = p.id
      WHERE p.status = ?
-     GROUP BY p.id, p.title, p.image_url, u.username
+     GROUP BY p.id, p.title, p.image_url, u.username, u.avatar_url
      ORDER BY p.created_at DESC
      LIMIT 12",
     ['active']
@@ -25,7 +27,7 @@ $posts = db_query(
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= time() ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -62,7 +64,13 @@ $posts = db_query(
                     $tags = trim((string) ($post['tags'] ?? ''));
                     $hashtags = $tags ? '#' . str_replace(' ', ' #', $tags) : '#original #illustration';
                 ?>
-                <div class="art-card">
+                <div class="art-card" style="cursor: pointer;"
+                     data-post-id="<?= e($post['id']) ?>"
+                     data-img="<?= e($image) ?>"
+                     data-artist="@<?= e($post['username']) ?>"
+                     data-avatar-url="<?= e($post['avatar_url']) ?>"
+                     data-tags="<?= e($hashtags) ?>"
+                     data-likes="<?= (int)$post['like_count'] ?>">
                     <img src="<?= e($image) ?>" alt="<?= e($post['title']) ?>">
                     <div class="art-info">
                         <p class="hashtags"><?= e($hashtags) ?></p>
@@ -72,69 +80,7 @@ $posts = db_query(
             <?php endforeach; ?>
         </section>
 
-            <div class="modal-bg" id="modalBg">
-                <div class="modal-box" id="modalBox">
-                    <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
-                    
-                    <div class="modal-img" id="modalImgWrap">
-                        <img src="" alt="Art Image" id="modalImageDisplay">
-                    </div>
-                    
-                    <div class="modal-panel">
-                        <div class="post-header">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="Avatar" class="post-av" id="phAv">
-                            <div class="post-author">
-                                <strong id="phName">@artist_name</strong>
-                                <span id="phSpec">Karya Seni</span>
-                            </div>
-                            <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'"><i class="fas fa-shopping-cart"></i> Order</button>
-                            <button class="follow-btn" id="followBtn">Follow</button>
-                        </div>
-                        
-                        <div class="comment-feed" id="commentFeed">
-                            <div class="caption-block">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="" class="c-av" id="capAv">
-                                <div class="c-body">
-                                    <strong id="captionName">@artist_name</strong>
-                                    <span>Menampilkan karya seni terbaru saya!</span>
-                                    <div class="tags" id="captionTags">#digitalart</div>
-                                    <span class="c-time">Beberapa jam yang lalu</span>
-                                </div>
-                            </div>
-                            <div class="feed-divider"></div>
-                            <div class="comment-count">1 Komentar</div>
-                            
-                            <div class="comment-item">
-                                <img class="c-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="">
-                                <div class="c-body">
-                                    <div class="c-top">
-                                        <strong>@user_galateart</strong> <span class="c-text">Wah, warnanya sangat bagus! Lighting-nya juga keren kak.</span>
-                                    </div>
-                                    <div class="c-bottom">
-                                        <span class="c-time">10m</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- ✓ Like & Save action bar -->
-                        <div class="like-action-bar" id="likeActionBar">
-                            <div class="like-action-left">
-                                <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <button class="save-post-btn" id="savePostBtn" onclick="toggleSavePost()">
-                                <i class="far fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <div class="like-count-bar" id="likeCountBar">
-                            <span id="likeCountText"><strong>0</strong> <span>orang menyukai ini</span></span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+        <?php include __DIR__ . '/components/art-modal.php'; ?>
 
     </main>
     <!-- Core utilities (wajib dimuat pertama) -->
@@ -144,7 +90,7 @@ $posts = db_query(
     <!-- Autentikasi: login state, modal daftar/masuk/artis -->
     <script src="js/auth.js?v=<?= time() ?>"></script>
     <!-- Modal popup karya seni + follow button -->
-    <script src="js/art-modal.js"></script>
-    <script src="js/report-modal.js"></script>
+    <script src="js/art-modal.js?v=<?= time() ?>"></script>
+    <script src="js/report-modal.js?v=<?= time() ?>"></script>
 </body>
 </html>

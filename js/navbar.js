@@ -21,28 +21,45 @@
 
 
 // ── 2. NOTIFIKASI DROPDOWN ─────────────────────────────────────
-const NOTIFICATIONS = [
-    { text: '<strong>@artis_lokal</strong> mengunggah karya baru!', time: '2 menit lalu' },
-    { text: 'Pesanan aset digital kamu telah selesai.',              time: '1 jam lalu'  },
-    { text: 'Seseorang menyukai karya Anda.',                        time: '3 jam lalu'  },
-];
-
-function renderNotifications() {
+async function fetchAndRenderNotifications() {
     const body = $('#notifBody');
     if (!body) return;
 
-    if (!NOTIFICATIONS.length) {
+    try {
+        const res  = await fetch('api/notifications.php');
+        const data = await res.json();
+
+        if (data.status !== 'ok' || !data.notifications || data.notifications.length === 0) {
+            body.innerHTML = `
+                <div style="padding:30px;text-align:center;color:#b3b3b3;">
+                    <i class="far fa-bell-slash" style="font-size:24px;display:block;margin-bottom:10px;"></i>
+                    <p>Tidak ada notifikasi</p>
+                </div>`;
+            return;
+        }
+
+        body.innerHTML = data.notifications.map(n =>
+            `<div class="notif-item"><p>${n.text}</p><span>${escapeHtml(n.time)}</span></div>`
+        ).join('');
+
+        // Update badge unread count jika ada
+        const badge = $('#notifBadge');
+        if (badge) {
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count;
+                badge.style.display = '';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    } catch (err) {
+        console.error('Gagal memuat notifikasi:', err);
         body.innerHTML = `
             <div style="padding:30px;text-align:center;color:#b3b3b3;">
                 <i class="far fa-bell-slash" style="font-size:24px;display:block;margin-bottom:10px;"></i>
                 <p>Tidak ada notifikasi</p>
             </div>`;
-        return;
     }
-
-    body.innerHTML = NOTIFICATIONS.map(n =>
-        `<div class="notif-item"><p>${n.text}</p><span>${n.time}</span></div>`
-    ).join('');
 }
 
 (function initNotifDropdown() {
@@ -63,7 +80,7 @@ function renderNotifications() {
         }
     });
 
-    renderNotifications();
+    fetchAndRenderNotifications();
 })();
 
 

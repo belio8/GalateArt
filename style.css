@@ -1319,6 +1319,7 @@ STYLE UNTUK HALAMAN TRENDING
 
 .comment-feed {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 14px 16px;
     display: flex;
@@ -1378,6 +1379,7 @@ STYLE UNTUK HALAMAN TRENDING
     background: #15151e;
     width: 100%;
     box-sizing: border-box;
+    flex-shrink: 0;
     /* Memastikan padding tidak merusak lebar */
 }
 
@@ -1520,6 +1522,7 @@ STYLE UNTUK HALAMAN TRENDING
     justify-content: space-between;
     /* Menjaga Like di kiri dan Save di kanan */
     padding: 10px 16px;
+    flex-shrink: 0;
 }
 
 .like-action-left {

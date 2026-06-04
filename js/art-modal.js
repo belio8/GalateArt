@@ -62,6 +62,9 @@ function _resetModalState(initialLikes) {
     _updateLikeUI();
 }
 
+// ── GLOBAL VARIABLE UNTUK CURRENT POST ─────────────────────────
+let _currentPostId = null;
+
 
 // ── INISIALISASI MODAL ─────────────────────────────────────────
 (function initArtModal() {
@@ -78,25 +81,125 @@ function _resetModalState(initialLikes) {
 
     if (!modalBg) return;
 
-    // Buka modal dengan data kartu yang diklik
-    function openModal(card) {
-        const imgEl   = card.querySelector('img');
-        const nameEl  = card.querySelector('.artist-name');
-        const tagsEl  = card.querySelector('.hashtags');
-        const likesEl = card.querySelector('.likes');
+    // Buka modal dengan data
+    async function openModal(data) {
+        // Handle input as an HTMLElement (card) or object (from dynamic render)
+        let img = data.img || (data.dataset ? data.dataset.img : '');
+        let artist = data.artist || (data.dataset ? data.dataset.artist : '');
+        let tags = data.tags || (data.dataset ? data.dataset.tags : '');
+        let likes = data.likes !== undefined ? parseInt(data.likes) : (data.dataset ? parseInt(data.dataset.likes || '0') : 0);
+        let avatarUrl = data.avatar_url || (data.dataset ? data.dataset.avatarUrl : '');
+        let postId = data.postId || (data.dataset ? data.dataset.postId : null);
 
-        if (modalImg && imgEl)  modalImg.src     = imgEl.src;
-        if (phName  && nameEl)  phName.innerText  = nameEl.innerText;
-        if (capName && nameEl)  capName.innerText = nameEl.innerText;
-        if (capTags && tagsEl)  capTags.innerText = tagsEl.innerText;
+        // Fallback fallback
+        if (!img && data.querySelector) {
+            img = data.querySelector('img')?.src || '';
+            artist = data.querySelector('.artist-name')?.innerText || '';
+            tags = data.querySelector('.hashtags')?.innerText || '';
+            let likesText = data.querySelector('.likes')?.innerText || '';
+            likes = parseInt(likesText.replace(/\D/g, '')) || 0;
+        }
 
-        const initialLikes = likesEl
-            ? parseInt(likesEl.innerText.replace(/\D/g, '')) || 0
-            : 0;
+        _currentPostId = postId;
 
-        _resetModalState(initialLikes);
+        if (modalImg)  modalImg.src     = img;
+        if (phName)    phName.innerText  = artist;
+        if (capName)   capName.innerText = artist;
+        if (capTags)   capTags.innerText = tags;
+        
+        const phAv = $('#phAv');
+        const capAv = $('#capAv');
+        if (avatarUrl) {
+            if (phAv) phAv.src = avatarUrl;
+            if (capAv) capAv.src = avatarUrl;
+        } else {
+            const defaultAv = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + artist.replace('@', '');
+            if (phAv) phAv.src = defaultAv;
+            if (capAv) capAv.src = defaultAv;
+        }
+
+        _resetModalState(likes);
+        
+        // Render initial skeleton for comments
+        if (commentFeed) {
+            commentFeed.innerHTML = `
+                <div class="caption-block">
+                    <img src="${capAv ? capAv.src : ''}" alt="" class="c-av">
+                    <div class="c-body">
+                        <strong>${escapeHtml(artist)}</strong>
+                        <span>Menampilkan karya seni terbaru!</span>
+                        <div class="tags">${escapeHtml(tags)}</div>
+                        <span class="c-time">Baru saja</span>
+                    </div>
+                </div>
+                <div class="feed-divider"></div>
+                <div class="comment-count">Memuat komentar...</div>
+            `;
+        }
+
         modalBg.classList.add('open');
         document.body.style.overflow = 'hidden';
+
+        // Load comments if postId exists
+        if (postId && commentFeed) {
+            try {
+                const res = await fetch('api/comments.php?post_id=' + postId);
+                const result = await res.json();
+                
+                if (result.status === 'ok') {
+                    renderComments(result.comments, artist, tags, capAv ? capAv.src : '');
+                } else {
+                    updateCommentCount(0);
+                }
+            } catch (e) {
+                console.error("Gagal memuat komentar:", e);
+                updateCommentCount(0);
+            }
+        }
+    }
+    
+    // Global expose
+    window.openArtModal = openModal;
+    
+    function renderComments(comments, artist, tags, avatarUrl) {
+        if (!commentFeed) return;
+        
+        let html = `
+            <div class="caption-block">
+                <img src="${escapeHtml(avatarUrl)}" alt="" class="c-av">
+                <div class="c-body">
+                    <strong>${escapeHtml(artist)}</strong>
+                    <span>Menampilkan karya seni terbaru!</span>
+                    <div class="tags">${escapeHtml(tags)}</div>
+                    <span class="c-time">Baru saja</span>
+                </div>
+            </div>
+            <div class="feed-divider"></div>
+            <div class="comment-count">${comments.length} Komentar</div>
+        `;
+        
+        comments.forEach(c => {
+            html += `
+                <div class="comment-item">
+                    <img class="c-av" src="${escapeHtml(c.avatar_url)}" alt="">
+                    <div class="c-body">
+                        <div class="c-top">
+                            <strong>${escapeHtml(c.author)}</strong> <span class="c-text">${escapeHtml(c.content)}</span>
+                        </div>
+                        <div class="c-bottom">
+                            <span class="c-time">${escapeHtml(c.time)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        commentFeed.innerHTML = html;
+    }
+    
+    function updateCommentCount(count) {
+        const countEl = commentFeed.querySelector('.comment-count');
+        if (countEl) countEl.innerText = count + ' Komentar';
     }
 
     function closeArtModal() {
@@ -129,50 +232,59 @@ function _resetModalState(initialLikes) {
 
 
     // ── KIRIM KOMENTAR ─────────────────────────────────────────
-    function submitComment() {
-        if (!commentInput || !commentFeed) return;
+    async function submitComment() {
+        if (!commentInput || !commentFeed || !_currentPostId) return;
         const text = commentInput.value.trim();
         if (!text) return;
- 
-        const item  = document.createElement('div');
-        item.className = 'comment-item';
- 
-        const img = document.createElement('img');
-        img.className = 'c-av';
-        img.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=me';
-        img.alt = '';
- 
-        const body    = document.createElement('div');
-        body.className = 'c-body';
- 
-        const top     = document.createElement('div');
-        top.className  = 'c-top';
- 
-        const strong  = document.createElement('strong');
-        strong.textContent = '@saya';
- 
-        const textSpan = document.createElement('span');
-        textSpan.className   = 'c-text';
-        textSpan.textContent = text;      // textContent — tidak mungkin XSS
- 
-        const bottom  = document.createElement('div');
-        bottom.className = 'c-bottom';
- 
-        const time    = document.createElement('span');
-        time.className   = 'c-time';
-        time.textContent = 'Baru saja';
- 
-        top.appendChild(strong);
-        top.appendChild(textSpan);
-        bottom.appendChild(time);
-        body.appendChild(top);
-        body.appendChild(bottom);
-        item.appendChild(img);
-        item.appendChild(body);
- 
-        commentFeed.appendChild(item);
-        commentFeed.scrollTop = commentFeed.scrollHeight;
+        
+        commentInput.disabled = true;
+        
+        try {
+            const res = await fetch('api/comments.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    post_id: _currentPostId,
+                    content: text
+                })
+            });
+            const data = await res.json();
+            
+            if (data.status === 'ok') {
+                const c = data.comment;
+                const html = `
+                    <div class="comment-item">
+                        <img class="c-av" src="${escapeHtml(c.avatar_url)}" alt="">
+                        <div class="c-body">
+                            <div class="c-top">
+                                <strong>${escapeHtml(c.author)}</strong> <span class="c-text">${escapeHtml(c.content)}</span>
+                            </div>
+                            <div class="c-bottom">
+                                <span class="c-time">${escapeHtml(c.time)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                commentFeed.insertAdjacentHTML('beforeend', html);
+                commentFeed.scrollTop = commentFeed.scrollHeight;
+                
+                // Update comment count
+                const countEl = commentFeed.querySelector('.comment-count');
+                if (countEl) {
+                    const currentCount = parseInt(countEl.innerText) || 0;
+                    countEl.innerText = (currentCount + 1) + ' Komentar';
+                }
+            } else {
+                alert(data.message || 'Gagal mengirim komentar.');
+            }
+        } catch (err) {
+            console.error('Submit comment error:', err);
+            alert('Gagal mengirim komentar (Network Error).');
+        }
+        
+        commentInput.disabled = false;
         commentInput.value = '';
+        commentInput.focus();
     }
  
     postBtn      && postBtn.addEventListener('click', submitComment);

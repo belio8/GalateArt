@@ -1,5 +1,19 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
+require_once __DIR__ . '/config/Db.php';
+
+// Ambil top artist berdasarkan follower terbanyak
+$top_artists = db_query(
+    $conn,
+    "SELECT u.id, u.username, u.bio, 
+            COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+            (SELECT COUNT(*) FROM follows f WHERE f.following_id = u.id) AS follower_count,
+            (SELECT COUNT(*) FROM posts p WHERE p.artist_id = u.id AND p.status = 'active') AS post_count
+     FROM users u
+     WHERE u.role = 'artist' AND u.is_banned = 0
+     ORDER BY follower_count DESC, post_count DESC
+     LIMIT 12"
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -24,67 +38,24 @@ require_once __DIR__ . '/components/bootstrap.php';
             <p>Temukan artis terbaik di GalateArt dengan karya seni berkualitas tinggi.</p>
             
             <div class="artists-grid">
-                <div class="artist-card">
-                    <img src="Assets/draw2.png" alt="Artist 1" class="artist-avatar">
-                    <div class="artist-details">
-                        <h3>@artis_lokal</h3>
-                        <p>Spesialis ilustrasi karakter dan desain VTuber. Telah menciptakan lebih dari 200 karya seni digital.</p>
-                        <div class="artist-stats">
-                            <span><strong>2.5K</strong> Followers</span>
-                            <span><strong>150</strong> Posts</span>
+                <?php if (empty($top_artists)): ?>
+                    <p style="text-align: center; color: #888; grid-column: 1 / -1;">Belum ada artis yang tersedia.</p>
+                <?php else: ?>
+                    <?php foreach ($top_artists as $artist): ?>
+                        <div class="artist-card">
+                            <img src="<?= e($artist['avatar_url']) ?>" alt="<?= e($artist['username']) ?>" class="artist-avatar" loading="lazy">
+                            <div class="artist-details">
+                                <h3>@<?= e($artist['username']) ?></h3>
+                                <p><?= e($artist['bio'] ?: 'Artis lokal aktif yang membuat karya luar biasa.') ?></p>
+                                <div class="artist-stats">
+                                    <span><strong><?= number_format((int)$artist['follower_count'], 0, ',', '.') ?></strong> Followers</span>
+                                    <span><strong><?= number_format((int)$artist['post_count'], 0, ',', '.') ?></strong> Posts</span>
+                                </div>
+                                <button class="btn-follow" data-artist-id="<?= e($artist['id']) ?>">Follow</button>
+                            </div>
                         </div>
-                        <button class="btn-follow">Follow</button>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <img src="Assets/draw2.png" alt="Artist 2" class="artist-avatar">
-                    <div class="artist-details">
-                        <h3>@seniman_digital</h3>
-                        <p>Artis fantasy dan concept art. Ahli dalam menciptakan dunia imajiner yang menakjubkan.</p>
-                        <div class="artist-stats">
-                            <span><strong>1.8K</strong> Followers</span>
-                            <span><strong>120</strong> Posts</span>
-                        </div>
-                        <button class="btn-follow">Follow</button>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <img src="Assets/draw2.png" alt="Artist 3" class="artist-avatar">
-                    <div class="artist-details">
-                        <h3>@ichigowarano</h3>
-                        <p>Pembuat karya seni anime dan manga style. Fokus pada ekspresi karakter yang mendalam.</p>
-                        <div class="artist-stats">
-                            <span><strong>3.2K</strong> Followers</span>
-                            <span><strong>180</strong> Posts</span>
-                        </div>
-                        <button class="btn-follow">Follow</button>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <img src="Assets/draw2.png" alt="Artist 4" class="artist-avatar">
-                    <div class="artist-details">
-                        <h3>@keenbiscuit</h3>
-                        <p>Artis landscape dan nature art. Mengabadikan keindahan alam dalam gaya digital yang unik.</p>
-                        <div class="artist-stats">
-                            <span><strong>1.5K</strong> Followers</span>
-                            <span><strong>95</strong> Posts</span>
-                        </div>
-                        <button class="btn-follow">Follow</button>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <img src="Assets/draw2.png" alt="Artist 5" class="artist-avatar">
-                    <div class="artist-details">
-                        <h3>@jasper_xandros</h3>
-                        <p>Spesialis portrait dan character design. Telah bekerja dengan berbagai klien internasional.</p>
-                        <div class="artist-stats">
-                            <span><strong>2.1K</strong> Followers</span>
-                            <span><strong>140</strong> Posts</span>
-                        </div>
-                        <button class="btn-follow">Follow</button>
-                    </div>
-                </div>
-                <!-- Tambahkan lebih banyak artist-card sesuai kebutuhan -->
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
     </main>

@@ -1,32 +1,7 @@
 (function () {
   'use strict';
 
-  /* ── Mock data artwork ──────────────────────────────────────────────────── */
-  const ARTWORKS = [
-    { id: 1,  img: 'Assets/draw2.png', tags: ['#original', '#illustration', '#character'],   artist: '@rini_draws',    likes: 342,  type: 'Illustration' },
-    { id: 2,  img: 'Assets/draw2.png', tags: ['#fantasy', '#character', '#digitalart'],      artist: '@seniman_ark',   likes: 210,  type: 'Character' },
-    { id: 3,  img: 'Assets/draw2.png', tags: ['#vtuber', '#chibi', '#fanart'],               artist: '@chibi_studio',  likes: 891,  type: 'Chibi' },
-    { id: 4,  img: 'Assets/draw2.png', tags: ['#landscape', '#environment', '#concept'],     artist: '@env_art',       likes: 134,  type: 'Background' },
-    { id: 5,  img: 'Assets/draw2.png', tags: ['#portrait', '#realistic', '#original'],       artist: '@realis_art',    likes: 567,  type: 'Portrait' },
-    { id: 6,  img: 'Assets/draw2.png', tags: ['#chibi', '#cute', '#vtuber'],                 artist: '@kawaii_works',  likes: 729,  type: 'Chibi' },
-    { id: 7,  img: 'Assets/draw2.png', tags: ['#fanart', '#anime', '#character'],            artist: '@anime_hub',     likes: 445,  type: 'Fanart' },
-    { id: 8,  img: 'Assets/draw2.png', tags: ['#concept', '#scifi', '#environment'],         artist: '@sci_concept',   likes: 198,  type: 'Concept' },
-    { id: 9,  img: 'Assets/draw2.png', tags: ['#illustration', '#cute', '#sticker'],         artist: '@sticker_pop',   likes: 312,  type: 'Illustration' },
-    { id: 10, img: 'Assets/draw2.png', tags: ['#portrait', '#character', '#fantasy'],        artist: '@myth_artist',   likes: 653,  type: 'Portrait' },
-    { id: 11, img: 'Assets/draw2.png', tags: ['#original', '#webtoon', '#comic'],            artist: '@toon_collab',   likes: 88,   type: 'Webtoon' },
-    { id: 12, img: 'Assets/draw2.png', tags: ['#vtuber', '#rigging', '#live2d'],             artist: '@rig_studio',    likes: 417,  type: 'Live2D' },
-    { id: 13, img: 'Assets/draw2.png', tags: ['#emoji', '#sticker', '#cute'],                artist: '@emote_lab',     likes: 995,  type: 'Emote' },
-    { id: 14, img: 'Assets/draw2.png', tags: ['#landscape', '#fantasy', '#painting'],       artist: '@paint_dreams',  likes: 274,  type: 'Painting' },
-    { id: 15, img: 'Assets/draw2.png', tags: ['#anime', '#fanart', '#illustration'],        artist: '@sakura_art',    likes: 502,  type: 'Illustration' },
-    { id: 16, img: 'Assets/draw2.png', tags: ['#concept', '#character', '#originalart'],    artist: '@oc_workshop',   likes: 361,  type: 'Character' },
-  ];
-
   const PAGE_SIZE   = 8;
-  const SORT_FUNCS  = {
-    newest:  (a, b) => b.id - a.id,
-    popular: (a, b) => b.likes - a.likes,
-    oldest:  (a, b) => a.id - b.id,
-  };
 
   /* ── State ──────────────────────────────────────────────────────────────── */
   let state = {
@@ -35,7 +10,8 @@
     activeType: '',   // filter tipe ('', 'Illustration', ...)
     sort:       'newest',
     page:       1,
-    filtered:   [],
+    total:      0,
+    posts:      [],   // data dari server
   };
 
   /* ── DOM refs ───────────────────────────────────────────────────────────── */
@@ -53,42 +29,59 @@
   const chips           = document.querySelectorAll('.ga-tag-chip');
   const trendItems      = document.querySelectorAll('.ga-tag-trend-item');
 
-  /* ── Core filter & render ───────────────────────────────────────────────── */
-  function filterArtworks() {
-    const q   = state.query.toLowerCase().trim();
-    const tag = state.activeTag.toLowerCase();
+  /* ── Fetch dari API ─────────────────────────────────────────────────────── */
+  async function fetchArtworks(append) {
+    const params = new URLSearchParams();
+    params.set('sort', state.sort);
+    params.set('page', state.page);
+    params.set('limit', PAGE_SIZE);
 
-    state.filtered = ARTWORKS.filter(art => {
-      const tagMatch  = !tag || art.tags.some(t => t.toLowerCase() === tag);
-      const typeMatch = !state.activeType || art.type === state.activeType;
-      const qMatch    = !q || art.tags.some(t => t.toLowerCase().includes(q))
-                            || art.artist.toLowerCase().includes(q)
-                            || art.type.toLowerCase().includes(q);
-      return tagMatch && typeMatch && qMatch;
-    });
+    if (state.activeTag) {
+      params.set('tag', state.activeTag);
+    }
+    if (state.activeType) {
+      params.set('type', state.activeType);
+    }
+    if (state.query) {
+      params.set('q', state.query);
+    }
 
-    state.filtered.sort(SORT_FUNCS[state.sort] || SORT_FUNCS.newest);
-    state.page = 1;
-    renderGrid(true);
+    try {
+      const res = await fetch('api/posts.php?' + params.toString());
+      const data = await res.json();
+
+      if (data.status === 'ok') {
+        if (append) {
+          state.posts = state.posts.concat(data.posts);
+        } else {
+          state.posts = data.posts;
+        }
+        state.total = data.total;
+      }
+    } catch (err) {
+      console.error('Gagal memuat karya:', err);
+    }
+
+    renderGrid(!append);
     updateHeading();
     updateActiveBanner();
   }
 
+  /* ── Core render ────────────────────────────────────────────────────────── */
   function renderGrid(reset) {
-    const slice = state.filtered.slice(0, state.page * PAGE_SIZE);
-
     if (reset) grid.innerHTML = '';
 
-    if (state.filtered.length === 0) {
+    if (state.posts.length === 0) {
       emptyState.style.display = 'block';
       btnLoadMore.style.display = 'none';
       return;
     }
     emptyState.style.display = 'none';
 
-    // Only render newly visible cards (avoid full re-render on load-more)
-    const start = reset ? 0 : (state.page - 1) * PAGE_SIZE;
-    slice.slice(start).forEach(art => {
+    // On reset, render all current posts; on load-more, render only the new batch
+    const toRender = reset ? state.posts : state.posts.slice((state.page - 1) * PAGE_SIZE);
+
+    toRender.forEach(art => {
       grid.insertAdjacentHTML('beforeend', buildCard(art));
     });
 
@@ -97,16 +90,12 @@
       card.dataset.bound = '1';
       card.addEventListener('click', () => {
         if (typeof openArtModal === 'function') {
-          openArtModal({
-            img:    card.dataset.img,
-            artist: card.dataset.artist,
-            tags:   card.dataset.tags,
-          });
+          openArtModal(card);
         }
       });
     });
 
-    const hasMore = slice.length < state.filtered.length;
+    const hasMore = state.posts.length < state.total;
     btnLoadMore.style.display = hasMore ? 'inline-block' : 'none';
   }
 
@@ -114,31 +103,34 @@
     const tagsHtml = art.tags.join(' ');
     return `
       <div class="art-card"
-           data-img="${art.img}"
-           data-artist="${art.artist}"
-           data-tags="${tagsHtml}"
+           data-post-id="${escapeHtml(art.id)}"
+           data-img="${escapeHtml(art.img)}"
+           data-artist="${escapeHtml(art.artist)}"
+           data-avatar-url="${escapeHtml(art.artist_avatar)}"
+           data-tags="${escapeHtml(tagsHtml)}"
+           data-likes="${art.likes}"
            style="cursor:pointer;">
-        <img src="${art.img}" alt="Artwork by ${art.artist}" loading="lazy">
+        <img src="${escapeHtml(art.img)}" alt="Artwork by ${escapeHtml(art.artist)}" loading="lazy">
         <div class="art-info">
-          <p class="hashtags">${art.tags.join(' ')}</p>
-          <p class="artist-name">${art.artist}</p>
+          <p class="hashtags">${escapeHtml(tagsHtml)}</p>
+          <p class="artist-name">${escapeHtml(art.artist)}</p>
         </div>
       </div>`;
   }
 
   function updateHeading() {
-    const total = state.filtered.length;
+    const total = state.total;
     const label = state.activeTag
-      ? `untuk <span>${state.activeTag}</span>`
+      ? `untuk <span>${escapeHtml(state.activeTag)}</span>`
       : state.query
-        ? `untuk <span>"${state.query}"</span>`
+        ? `untuk <span>"${escapeHtml(state.query)}"</span>`
         : 'semua karya';
     resultsHeading.innerHTML = `${total} karya ditemukan ${label}`;
   }
 
   function updateActiveBanner() {
     if (state.activeTag) {
-      activeBannerTxt.innerHTML = `Menampilkan karya dengan tag <strong>${state.activeTag}</strong>`;
+      activeBannerTxt.innerHTML = `Menampilkan karya dengan tag <strong>${escapeHtml(state.activeTag)}</strong>`;
       activeBanner.classList.add('ga-tag-visible');
     } else {
       activeBanner.classList.remove('ga-tag-visible');
@@ -152,17 +144,17 @@
 
   function init() {
     showSkeletons(8);
-    setTimeout(() => {
-      filterArtworks();
-    }, 600);
+    state.page = 1;
+    fetchArtworks(false);
   }
 
   /* ── Event: search input & button ───────────────────────────────────────── */
   function doSearch() {
     state.query     = searchInput.value.trim();
     state.activeTag = '';           // texto search bersihkan tag aktif
+    state.page      = 1;
     syncChips();
-    filterArtworks();
+    fetchArtworks(false);
   }
 
   btnSearch.addEventListener('click', doSearch);
@@ -174,9 +166,10 @@
       const tag = chip.dataset.tag;
       state.activeTag = state.activeTag === tag ? '' : tag;
       state.query     = '';
+      state.page      = 1;
       searchInput.value = '';
       syncChips();
-      filterArtworks();
+      fetchArtworks(false);
     });
   });
 
@@ -192,9 +185,10 @@
       const tag = item.dataset.tag;
       state.activeTag   = tag;
       state.query       = '';
+      state.page        = 1;
       searchInput.value = '';
       syncChips();
-      filterArtworks();
+      fetchArtworks(false);
       // Scroll to results on mobile
       grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -204,9 +198,10 @@
   btnClearTag.addEventListener('click', () => {
     state.activeTag = '';
     state.query     = '';
+    state.page      = 1;
     searchInput.value = '';
     syncChips();
-    filterArtworks();
+    fetchArtworks(false);
   });
 
   /* ── Event: type filter buttons ─────────────────────────────────────────── */
@@ -214,24 +209,26 @@
     btn.addEventListener('click', () => {
       const type = btn.dataset.type || '';
       state.activeType = state.activeType === type ? '' : type;
+      state.page = 1;
       filterBtns.forEach(b => b.classList.toggle(
         'ga-tag-filter-active',
         (b.dataset.type || '') === state.activeType
       ));
-      filterArtworks();
+      fetchArtworks(false);
     });
   });
 
   /* ── Event: sort select ─────────────────────────────────────────────────── */
   sortSelect.addEventListener('change', () => {
     state.sort = sortSelect.value;
-    filterArtworks();
+    state.page = 1;
+    fetchArtworks(false);
   });
 
   /* ── Event: load more ───────────────────────────────────────────────────── */
   btnLoadMore.addEventListener('click', () => {
     state.page++;
-    renderGrid(false);
+    fetchArtworks(true);
   });
 
   /* ── Boot ───────────────────────────────────────────────────────────────── */
