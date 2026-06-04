@@ -6,6 +6,8 @@ define('DB_PASS', '');
 define('DB_NAME', 'galateart');
 define('DB_CHARSET', 'utf8mb4');
 
+date_default_timezone_set('Asia/Jakarta');
+
 // Buat koneksi
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 

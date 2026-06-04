@@ -6,7 +6,7 @@ require_once __DIR__ . '/config/Db.php';
 $trending_posts = db_query(
     $conn,
     "SELECT p.id, p.title, p.image_url, p.like_count, u.username,
-            COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+            COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
             COALESCE(GROUP_CONCAT(DISTINCT pt.tag ORDER BY pt.tag SEPARATOR ' '), '') AS tags
      FROM posts p
      JOIN users u ON u.id = p.artist_id

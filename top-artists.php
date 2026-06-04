@@ -6,7 +6,7 @@ require_once __DIR__ . '/config/Db.php';
 $top_artists = db_query(
     $conn,
     "SELECT u.id, u.username, u.bio, 
-            COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+            COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
             (SELECT COUNT(*) FROM follows f WHERE f.following_id = u.id) AS follower_count,
             (SELECT COUNT(*) FROM posts p WHERE p.artist_id = u.id AND p.status = 'active') AS post_count
      FROM users u

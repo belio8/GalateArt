@@ -125,6 +125,8 @@ button {
 .nav-icons i,
 .nav-icons a {
     cursor: pointer;
+    color: inherit;
+    text-decoration: none;
 }
 
 .nav-icons i:hover {
@@ -1088,10 +1090,17 @@ STYLE UNTUK HALAMAN TOP ARTISTS
     border: 3px solid var(--accent);
 }
 
+.artist-details {
+    min-width: 0;
+}
+
 .artist-details h3 {
     margin: 0 0 8px 0;
     font-size: 18px;
     color: var(--text-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .artist-details p {
@@ -1099,6 +1108,11 @@ STYLE UNTUK HALAMAN TOP ARTISTS
     color: var(--text-gray);
     font-size: 14px;
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .artist-stats {
@@ -1288,17 +1302,25 @@ STYLE UNTUK HALAMAN TRENDING
 
 .post-author {
     flex: 1;
+    min-width: 0;
 }
 
 .post-author strong {
     font-size: 14px;
     display: block;
     color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post-author span {
     font-size: 12px;
     color: #9898b8;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .follow-btn {
@@ -1310,6 +1332,7 @@ STYLE UNTUK HALAMAN TRENDING
     padding: 5px 12px;
     border-radius: 20px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .follow-btn:hover {
@@ -5782,15 +5805,6 @@ body.ga-adm-page .ga-adm-empty-table i {
     }
 }
 
-/* Tombol aksi — tersembunyi by default, muncul setelah login via JS */
-.ga-rpt-trigger-btn,
-.input-area,
-.btn-follow,
-.follow-btn,
-#likePostBtn,
-#savePostBtn {
-    display: none;
-}
 
 /* ════════════════════════════════════════════════════════════
    MESSAGING UI EXTENSIONS
@@ -5807,7 +5821,7 @@ body.ga-adm-page .ga-adm-empty-table i {
     padding: 20px;
 }
 
-.ga-msg-empty-state i {
+.ga-msg-empty-state > i {
     font-size: 48px;
     color: #2a2a42;
     margin-bottom: 16px;
@@ -5830,6 +5844,11 @@ body.ga-adm-page .ga-adm-empty-table i {
     font-weight: 600;
     margin-top: 16px;
     transition: background 0.2s;
+}
+
+.ga-msg-start-chat-btn i,
+.ga-msg-new-chat-btn i {
+    margin-right: 6px;
 }
 
 .ga-msg-new-chat-btn {

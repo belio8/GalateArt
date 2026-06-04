@@ -25,22 +25,55 @@ function _updateLikeUI() {
 }
 
 /** Toggle like — dipanggil dari atribut onclick di HTML. */
-function toggleLikePost() {
-    _postLiked  = !_postLiked;
-    _postLikes += _postLiked ? 1 : -1;
-    _updateLikeUI();
+async function toggleLikePost() {
+    if (!_currentPostId) return;
+    const btn = $('#likePostBtn');
+    if (btn) btn.disabled = true;
+    try {
+        const res = await fetch('api/like.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id: _currentPostId })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            _postLiked = data.liked;
+            _postLikes = data.likes_count;
+            _updateLikeUI();
+        } else if (data.message === 'Belum login.') {
+            // Let auth.js handle it or show alert
+        }
+    } catch (e) {
+        console.error('Error liking post:', e);
+    }
+    if (btn) btn.disabled = false;
 }
 
 /** Toggle save — dipanggil dari atribut onclick di HTML. */
-function toggleSavePost() {
-    _postSaved = !_postSaved;
+async function toggleSavePost() {
+    if (!_currentPostId) return;
     const btn = $('#savePostBtn');
-    if (btn) {
-        btn.innerHTML = _postSaved
-            ? '<i class="fas fa-bookmark"></i>'
-            : '<i class="far fa-bookmark"></i>';
-        btn.classList.toggle('saved', _postSaved);
+    if (btn) btn.disabled = true;
+    try {
+        const res = await fetch('api/save.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id: _currentPostId })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            _postSaved = data.saved;
+            if (btn) {
+                btn.innerHTML = _postSaved
+                    ? '<i class="fas fa-bookmark"></i>'
+                    : '<i class="far fa-bookmark"></i>';
+                btn.classList.toggle('saved', _postSaved);
+            }
+        }
+    } catch (e) {
+        console.error('Error saving post:', e);
     }
+    if (btn) btn.disabled = false;
 }
 
 /** Fokus ke input komentar modal — dipanggil dari ikon komentar. */
@@ -109,27 +142,28 @@ let _currentPostId = null;
         
         const phAv = $('#phAv');
         const capAv = $('#capAv');
-        if (avatarUrl) {
-            if (phAv) phAv.src = avatarUrl;
-            if (capAv) capAv.src = avatarUrl;
-        } else {
-            const defaultAv = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + artist.replace('@', '');
-            if (phAv) phAv.src = defaultAv;
-            if (capAv) capAv.src = defaultAv;
-        }
+        
+        const setAvatar = (el) => {
+            if (!el) return;
+            el.src = avatarUrl || 'Assets/galateart_icon.png';
+            el.onerror = function() {
+                this.onerror = null;
+                this.src = 'Assets/galateart_icon.png';
+            };
+        };
+        
+        setAvatar(phAv);
+        setAvatar(capAv);
 
         _resetModalState(likes);
         
         // Render initial skeleton for comments
         if (commentFeed) {
             commentFeed.innerHTML = `
-                <div class="caption-block">
-                    <img src="${capAv ? capAv.src : ''}" alt="" class="c-av">
-                    <div class="c-body">
-                        <strong>${escapeHtml(artist)}</strong>
-                        <span>Menampilkan karya seni terbaru!</span>
-                        <div class="tags">${escapeHtml(tags)}</div>
-                        <span class="c-time">Baru saja</span>
+                <div class="caption-block" style="padding-top: 10px;">
+                    <div class="c-body" style="margin-left: 0;">
+                        <span style="font-weight: 500; font-size: 0.95rem;">Menampilkan karya seni terbaru!</span>
+                        <div class="tags" style="margin-top: 4px;">${escapeHtml(tags)}</div>
                     </div>
                 </div>
                 <div class="feed-divider"></div>
@@ -140,19 +174,52 @@ let _currentPostId = null;
         modalBg.classList.add('open');
         document.body.style.overflow = 'hidden';
 
-        // Load comments if postId exists
-        if (postId && commentFeed) {
+        // Load comments and post status if postId exists
+        if (postId) {
             try {
-                const res = await fetch('api/comments.php?post_id=' + postId);
-                const result = await res.json();
+                const [resStatus, resComments] = await Promise.all([
+                    fetch('api/post-status.php?post_id=' + postId),
+                    fetch('api/comments.php?post_id=' + postId)
+                ]);
+                
+                const data = await resStatus.json();
+                const result = await resComments.json();
+                
+                let descText = "Menampilkan karya seni terbaru!";
+                if (data.status === 'ok') {
+                    _postLiked = data.liked;
+                    _postSaved = data.saved;
+                    _postLikes = data.likes_count;
+                    
+                    const saveBtn = $('#savePostBtn');
+                    if (saveBtn) {
+                        saveBtn.innerHTML = _postSaved
+                            ? '<i class="fas fa-bookmark"></i>'
+                            : '<i class="far fa-bookmark"></i>';
+                        saveBtn.classList.toggle('saved', _postSaved);
+                    }
+                    _updateLikeUI();
+                    
+                    // Update Follow button
+                    const followBtn = $('#followBtn');
+                    if (followBtn && data.artist_id) {
+                        followBtn.dataset.artistId = data.artist_id;
+                        followBtn.dataset.following = data.is_following ? 'true' : 'false';
+                        followBtn.textContent = data.is_following ? 'Following' : 'Follow';
+                    }
+                    
+                    if (data.description) {
+                        descText = data.description;
+                    }
+                }
                 
                 if (result.status === 'ok') {
-                    renderComments(result.comments, artist, tags, capAv ? capAv.src : '');
+                    renderComments(result.comments, artist, tags, capAv ? capAv.src : '', descText);
                 } else {
                     updateCommentCount(0);
                 }
             } catch (e) {
-                console.error("Gagal memuat komentar:", e);
+                console.error("Gagal memuat status post atau komentar:", e);
                 updateCommentCount(0);
             }
         }
@@ -161,17 +228,14 @@ let _currentPostId = null;
     // Global expose
     window.openArtModal = openModal;
     
-    function renderComments(comments, artist, tags, avatarUrl) {
+    function renderComments(comments, artist, tags, avatarUrl, descText = "Menampilkan karya seni terbaru!") {
         if (!commentFeed) return;
         
         let html = `
-            <div class="caption-block">
-                <img src="${escapeHtml(avatarUrl)}" alt="" class="c-av">
-                <div class="c-body">
-                    <strong>${escapeHtml(artist)}</strong>
-                    <span>Menampilkan karya seni terbaru!</span>
-                    <div class="tags">${escapeHtml(tags)}</div>
-                    <span class="c-time">Baru saja</span>
+            <div class="caption-block" style="padding-top: 10px;">
+                <div class="c-body" style="margin-left: 0;">
+                    <span style="font-weight: 500; font-size: 0.95rem;">${escapeHtml(descText)}</span>
+                    <div class="tags" style="margin-top: 4px;">${escapeHtml(tags)}</div>
                 </div>
             </div>
             <div class="feed-divider"></div>
@@ -181,14 +245,13 @@ let _currentPostId = null;
         comments.forEach(c => {
             html += `
                 <div class="comment-item">
-                    <img class="c-av" src="${escapeHtml(c.avatar_url)}" alt="">
+                    <img class="c-av" src="${escapeHtml(c.avatar_url)}" alt="" referrerpolicy="no-referrer">
                     <div class="c-body">
-                        <div class="c-top">
-                            <strong>${escapeHtml(c.author)}</strong> <span class="c-text">${escapeHtml(c.content)}</span>
+                        <div class="c-top" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <strong style="color: #fff; font-size: 14px;">${escapeHtml(c.author)}</strong>
+                            <span class="c-time" style="color: #888; font-size: 11px;">${escapeHtml(c.time)}</span>
                         </div>
-                        <div class="c-bottom">
-                            <span class="c-time">${escapeHtml(c.time)}</span>
-                        </div>
+                        <div class="c-text" style="color: #d1d1d1; font-size: 14px; line-height: 1.4;">${escapeHtml(c.content)}</div>
                     </div>
                 </div>
             `;
@@ -227,8 +290,7 @@ let _currentPostId = null;
         if (e.target === modalBg) closeArtModal();
     });
 
-    // Cegah klik di dalam modal menutup modal
-    modalBox && modalBox.addEventListener('click', e => e.stopPropagation());
+    // (Removed stopPropagation to allow delegated follow buttons to work)
 
 
     // ── KIRIM KOMENTAR ─────────────────────────────────────────
@@ -297,12 +359,38 @@ let _currentPostId = null;
 
 // ── FOLLOW BUTTON (delegasi, semua halaman) ───────────────────
 (function initFollowButtons() {
-    document.addEventListener('click', e => {
+    document.addEventListener('click', async e => {
         const btn = e.target.closest('.btn-follow, .follow-btn');
         if (!btn) return;
 
-        const isFollowing = btn.dataset.following === 'true';
-        btn.dataset.following = String(!isFollowing);
-        btn.textContent = isFollowing ? 'Follow' : 'Following';
+        const artistId = btn.dataset.artistId;
+        if (!artistId) return;
+
+        const allArtistBtns = document.querySelectorAll(`.btn-follow[data-artist-id="${artistId}"], .follow-btn[data-artist-id="${artistId}"]`);
+        
+        allArtistBtns.forEach(b => b.disabled = true);
+        try {
+            const res = await fetch('api/follow.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ artist_id: artistId })
+            });
+            const data = await res.json();
+            if (data.status === 'ok') {
+                const followingStr = String(data.following);
+                allArtistBtns.forEach(b => {
+                    b.dataset.following = followingStr;
+                    // Preserve '+Follow' styling if present on unfollow
+                    b.textContent = data.following ? 'Following' : (b.textContent.includes('+') ? '+Follow' : 'Follow');
+                });
+            } else if (data.message) {
+                alert(data.message);
+                console.warn('Follow error:', data.message);
+            }
+        } catch (err) {
+            alert('Terjadi kesalahan jaringan.');
+            console.error('Follow error:', err);
+        }
+        allArtistBtns.forEach(b => b.disabled = false);
     });
 })();

@@ -8,7 +8,7 @@
         
         <div class="modal-panel">
             <div class="post-header">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=artis" alt="Avatar" class="post-av" id="phAv">
+                <img src="Assets/galateart_icon.png" alt="Avatar" class="post-av" id="phAv" referrerpolicy="no-referrer">
                 <div class="post-author">
                     <strong id="phName">@artist_name</strong>
                     <span id="phSpec">Karya Seni</span>
@@ -22,6 +22,7 @@
             </div>
             
             <!-- ✓ Like & Save action bar -->
+            <?php if (isset($_SESSION['user_id'])): ?>
             <div class="like-action-bar" id="likeActionBar" style="flex-shrink: 0; min-height: 40px; display: flex;">
                 <div class="like-action-left">
                     <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">
@@ -32,25 +33,24 @@
                     <i class="far fa-bookmark"></i>
                 </button>
             </div>
+            <?php endif; ?>
             <div class="like-count-bar" id="likeCountBar">
                 <span id="likeCountText"><strong>0</strong> <span>orang menyukai ini</span></span>
             </div>
 
             <!-- Area Input Komentar -->
+            <?php if (isset($_SESSION['user_id'])): ?>
             <div class="input-area" style="flex-shrink: 0; min-height: 60px; display: flex;">
                 <?php
-                    $me_av = 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest';
-                    if (isset($_SESSION['user_id'])) {
-                        // Jika ada session data avatar, bisa digunakan
-                        $me_av = $_SESSION['avatar_url'] ?? ('https://api.dicebear.com/7.x/avataaars/svg?seed=' . ($_SESSION['username'] ?? 'me'));
-                    }
+                    $me_av = !empty($_SESSION['avatar_url']) ? $_SESSION['avatar_url'] : 'Assets/galateart_icon.png';
                 ?>
-                <img class="input-av" src="<?= e($me_av) ?>" alt="">
+                <img class="input-av" src="<?= e($me_av) ?>" alt="" referrerpolicy="no-referrer">
                 <div class="input-wrap">
                     <input type="text" class="comment-input" id="commentInput" placeholder="Tambahkan komentar..." autocomplete="off">
                 </div>
                 <button class="post-btn" id="postBtn">Kirim</button>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

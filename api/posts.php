@@ -90,7 +90,7 @@ $result = [];
 foreach ($posts as $post) {
     $tagList = array_filter(explode(',', $post['tags_csv']));
     $tagsFormatted = array_map(fn($t) => '#' . ltrim($t, '#'), $tagList);
-    $avatar = $post['artist_avatar'] ?: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . $post['artist'];
+    $avatar = $post['artist_avatar'] ?: 'Assets/galateart_icon.png';
 
     $result[] = [
         'id'       => $post['id'],

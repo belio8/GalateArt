@@ -46,6 +46,28 @@ $postRows = db_query(
     "s",
     [$userId]
 );
+
+$savedPostsSql = "
+    SELECT p.id as post_id, p.image_url, p.title, p.like_count, u.username as artist_name, u.avatar_url,
+           (SELECT GROUP_CONCAT(tag SEPARATOR ',') FROM post_tags WHERE post_id = p.id) as tags
+    FROM saves s
+    JOIN posts p ON s.post_id = p.id
+    JOIN users u ON p.artist_id = u.id
+    WHERE s.user_id = ?
+    ORDER BY s.created_at DESC
+";
+$savedPosts = db_query($conn, $savedPostsSql, "s", [$userId]);
+
+$likedPostsSql = "
+    SELECT p.id as post_id, p.image_url, p.title, p.like_count, u.username as artist_name, u.avatar_url,
+           (SELECT GROUP_CONCAT(tag SEPARATOR ',') FROM post_tags WHERE post_id = p.id) as tags
+    FROM likes l
+    JOIN posts p ON l.post_id = p.id
+    JOIN users u ON p.artist_id = u.id
+    WHERE l.user_id = ?
+    ORDER BY l.created_at DESC
+";
+$likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -149,32 +171,63 @@ $postRows = db_query(
 
                 <div class="tab-content" id="content-saved">
                     <div class="profile-art-grid">
-                        <div class="art-card">
-                            <img src="https://via.placeholder.com/300x400/b3b3b3/ffffff?text=Kobo" alt="Art">
-                            <div class="art-info">
-                                <p class="hashtags">#kobokanaeru #hololive #holoid</p>
-                                <p class="artist-name">@jasper_xandros</p>
-                            </div>
-                        </div>
-                        <div class="art-card">
-                            <img src="https://via.placeholder.com/300x400/ff7e33/ffffff?text=Exusiai" alt="Art">
-                            <div class="art-info">
-                                <p class="hashtags">#exusiai #arknight #exiaalter</p>
-                                <p class="artist-name">@artist_3</p>
-                            </div>
-                        </div>
+                        <?php if (empty($savedPosts)): ?>
+                            <p style="color:var(--text-gray);text-align:center;grid-column:1/-1;">Belum ada karya yang disimpan.</p>
+                        <?php else: ?>
+                            <?php foreach ($savedPosts as $post): ?>
+                                <?php
+                                $img = htmlspecialchars($post['image_url']);
+                                $artist = '@' . htmlspecialchars($post['artist_name']);
+                                $likes = (int)($post['like_count'] ?? 0);
+                                $tagsStr = '';
+                                if (!empty($post['tags'])) {
+                                    $tagsArr = explode(',', $post['tags']);
+                                    foreach ($tagsArr as $t) {
+                                        $tagsStr .= '#' . trim($t) . ' ';
+                                    }
+                                }
+                                $tagsFormatted = htmlspecialchars(trim($tagsStr));
+                                ?>
+                                <div class="art-card" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>" data-avatar-url="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>">
+                                    <img src="<?= $img ?>" alt="Art">
+                                    <div class="art-info">
+                                        <p class="hashtags"><?= $tagsFormatted ?></p>
+                                        <p class="artist-name"><?= $artist ?></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="tab-content" id="content-liked"> 
                     <div class="profile-art-grid">
-                        <div class="art-card">
-                            <img src="https://via.placeholder.com/300x400/8e54e9/ffffff?text=Liked+Art" alt="Art">
-                            <div class="art-info">
-                                <p class="hashtags">#illustration #digitalart</p>
-                                <p class="artist-name">@ichigowarano</p>
-                            </div>
-                        </div>
+                        <?php if (empty($likedPosts)): ?>
+                            <p style="color:var(--text-gray);text-align:center;grid-column:1/-1;">Belum ada karya yang disukai.</p>
+                        <?php else: ?>
+                            <?php foreach ($likedPosts as $post): ?>
+                                <?php
+                                $img = htmlspecialchars($post['image_url']);
+                                $artist = '@' . htmlspecialchars($post['artist_name']);
+                                $likes = (int)($post['like_count'] ?? 0);
+                                $tagsStr = '';
+                                if (!empty($post['tags'])) {
+                                    $tagsArr = explode(',', $post['tags']);
+                                    foreach ($tagsArr as $t) {
+                                        $tagsStr .= '#' . trim($t) . ' ';
+                                    }
+                                }
+                                $tagsFormatted = htmlspecialchars(trim($tagsStr));
+                                ?>
+                                <div class="art-card" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>" data-avatar-url="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>">
+                                    <img src="<?= $img ?>" alt="Art">
+                                    <div class="art-info">
+                                        <p class="hashtags"><?= $tagsFormatted ?></p>
+                                        <p class="artist-name"><?= $artist ?></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

@@ -17,7 +17,7 @@ if ($method === 'GET') {
     }
 
     $sql = "SELECT c.id, c.content, c.created_at, u.username, 
-                   COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url
+                   COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url
             FROM comments c
             JOIN users u ON u.id = c.user_id
             WHERE c.post_id = ?
@@ -63,7 +63,7 @@ elseif ($method === 'POST') {
     
     if ($res >= 0) {
         // Ambil data user
-        $u = db_row($conn, "SELECT username, COALESCE(NULLIF(avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', username)) AS avatar_url FROM users WHERE id = ?", "s", [$user_id]);
+        $u = db_row($conn, "SELECT username, COALESCE(NULLIF(avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url FROM users WHERE id = ?", "s", [$user_id]);
         
         echo json_encode([
             'status' => 'ok', 
@@ -72,7 +72,7 @@ elseif ($method === 'POST') {
                 'author' => '@' . $u['username'],
                 'avatar_url' => $u['avatar_url'],
                 'content' => $content,
-                'time' => 'Baru saja'
+                'time' => 'baru saja'
             ]
         ]);
     } else {
@@ -85,7 +85,7 @@ elseif ($method === 'POST') {
 function format_time_ago($datetime) {
     $ts = strtotime($datetime);
     $diff = time() - $ts;
-    if ($diff < 60) return 'Baru saja';
+    if ($diff < 60) return 'baru saja';
     if ($diff < 3600) return floor($diff / 60) . 'm';
     if ($diff < 86400) return floor($diff / 3600) . 'j';
     return floor($diff / 86400) . 'h';

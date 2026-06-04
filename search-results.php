@@ -14,8 +14,8 @@ $tagSearch = ltrim($q, '#');
 if ($q === '') {
     $artworks = db_query(
         $conn,
-        "SELECT p.id, p.title, p.description, p.image_url, p.price, p.is_free, p.is_nsfw,
-                u.username AS artist,
+        "SELECT p.id, p.title, p.description, p.image_url, p.price, p.is_free, p.is_nsfw, p.like_count,
+                u.username AS artist, u.avatar_url,
                 COALESCE(GROUP_CONCAT(DISTINCT pt.tag ORDER BY pt.id SEPARATOR ' '), '') AS tags
          FROM posts p
          JOIN users u ON p.artist_id = u.id
@@ -28,7 +28,7 @@ if ($q === '') {
 
     $artists = db_query(
         $conn,
-        "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+        "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
                 COALESCE(u.bio, '') AS bio,
                 COUNT(DISTINCT p.id) AS post_count,
                 COUNT(DISTINCT f.id) AS follower_count
@@ -53,8 +53,8 @@ if ($q === '') {
 } else {
     $artworks = db_query(
         $conn,
-        "SELECT p.id, p.title, p.description, p.image_url, p.price, p.is_free, p.is_nsfw,
-                u.username AS artist,
+        "SELECT p.id, p.title, p.description, p.image_url, p.price, p.is_free, p.is_nsfw, p.like_count,
+                u.username AS artist, u.avatar_url,
                 COALESCE(GROUP_CONCAT(DISTINCT pt.tag ORDER BY pt.id SEPARATOR ' '), '') AS tags
          FROM posts p
          JOIN users u ON p.artist_id = u.id
@@ -74,7 +74,7 @@ if ($q === '') {
 
     $artists = db_query(
         $conn,
-        "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), CONCAT('https://api.dicebear.com/7.x/avataaars/svg?seed=', u.username)) AS avatar_url,
+        "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
                 COALESCE(u.bio, '') AS bio,
                 COUNT(DISTINCT p.id) AS post_count,
                 COUNT(DISTINCT f.id) AS follower_count
@@ -135,7 +135,7 @@ $tagCount = count($tags);
 
         <div class="ga-srch-header">
             <h1>Hasil untuk "<span id="queryLabel"><?php echo htmlspecialchars($q ?: 'semua', ENT_QUOTES); ?></span>"</h1>
-            <p class="ga-srch-meta" id="resultsMeta">Menampilkan <?php echo $tab === 'artist' ? $artistCount : ($tab === 'tag' ? $tagCount : $artworkCount); ?> hasil � <?php echo $tab === 'artist' ? 'Artis' : ($tab === 'tag' ? 'Tag' : 'Artwork'); ?> � Diurutkan: Relevansi</p>
+            <p class="ga-srch-meta" id="resultsMeta">Menampilkan <?php echo $tab === 'artist' ? $artistCount : ($tab === 'tag' ? $tagCount : $artworkCount); ?> hasil &bull; <?php echo $tab === 'artist' ? 'Artis' : ($tab === 'tag' ? 'Tag' : 'Artwork'); ?> &bull; Diurutkan: Relevansi</p>
         </div>
 
         <div class="ga-srch-tabs">
@@ -167,7 +167,13 @@ $tagCount = count($tags);
                             <div class="ga-srch-empty-state">Tidak ada artwork yang cocok.</div>
                         <?php else: ?>
                             <?php foreach ($artworks as $art): ?>
-                                <div class="art-card" style="cursor:pointer;">
+                                <div class="art-card" style="cursor:pointer;"
+                                     data-post-id="<?php echo htmlspecialchars($art['id'], ENT_QUOTES); ?>"
+                                     data-img="<?php echo htmlspecialchars($art['image_url'] ?: 'Assets/draw2.png', ENT_QUOTES); ?>"
+                                     data-artist="@<?php echo htmlspecialchars($art['artist'], ENT_QUOTES); ?>"
+                                     data-avatar-url="<?php echo htmlspecialchars(!empty($art['avatar_url']) ? $art['avatar_url'] : 'Assets/galateart_icon.png', ENT_QUOTES); ?>"
+                                     data-tags="<?php echo htmlspecialchars($art['tags'] ?: '#nohashtag', ENT_QUOTES); ?>"
+                                     data-likes="<?php echo (int)($art['like_count'] ?? 0); ?>">
                                     <img src="<?php echo htmlspecialchars($art['image_url'] ?: 'Assets/draw2.png', ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($art['title'] ?: 'Artwork', ENT_QUOTES); ?>">
                                     <div class="art-info">
                                         <p class="hashtags"><?php echo htmlspecialchars($art['tags'] ?: '#nohashtag', ENT_QUOTES); ?></p>
@@ -192,9 +198,9 @@ $tagCount = count($tags);
                                         <p class="ga-srch-ar-name"><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></p>
                                         <p class="ga-srch-ar-handle">@<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></p>
                                         <p class="ga-srch-ar-bio"><?php echo htmlspecialchars($artist['bio'] ?: 'Artis lokal aktif.', ENT_QUOTES); ?></p>
-                                        <p class="ga-srch-ar-stats"><strong><?php echo number_format((int)$artist['follower_count'], 0, ',', '.'); ?></strong> followers � <strong><?php echo number_format((int)$artist['post_count'], 0, ',', '.'); ?></strong> posts</p>
+                                        <p class="ga-srch-ar-stats"><strong><?php echo number_format((int)$artist['follower_count'], 0, ',', '.'); ?></strong> followers &bull; <strong><?php echo number_format((int)$artist['post_count'], 0, ',', '.'); ?></strong> posts</p>
                                     </div>
-                                    <button class="ga-srch-btn-follow">Follow</button>
+                                    <button class="ga-srch-btn-follow btn-follow" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>">Follow</button>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -235,10 +241,13 @@ $tagCount = count($tags);
                         <div class="ga-srch-suggested-artist"><span>Tidak ada artis</span></div>
                     <?php else: ?>
                         <?php foreach (array_slice($artists, 0, 2) as $artist): ?>
-                            <div class="ga-srch-suggested-artist">
+                            <div class="ga-srch-suggested-artist" style="display: flex; align-items: center; gap: 10px; overflow: hidden; justify-content: space-between;">
                                 <img class="ga-srch-sa-avatar" src="<?php echo htmlspecialchars($artist['avatar_url'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?>">
-                                <div class="ga-srch-sa-info"><strong><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></strong><span>@<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></span></div>
-                                <button class="ga-srch-btn-follow" style="font-size:11px;padding:5px 10px;">+Follow</button>
+                                <div class="ga-srch-sa-info" style="flex: 1; min-width: 0;">
+                                    <strong style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></strong>
+                                    <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></span>
+                                </div>
+                                <button class="ga-srch-btn-follow btn-follow" style="font-size:11px;padding:5px 10px; flex-shrink: 0;" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>">+Follow</button>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -246,6 +255,8 @@ $tagCount = count($tags);
             </div>
         </div>
     </div>
+
+    <?php include __DIR__ . '/components/art-modal.php'; ?>
 
     <script src="js/utils.js"></script>
     <script src="js/navbar.js"></script>
@@ -264,7 +275,7 @@ $tagCount = count($tags);
             ['tab-artwork','tab-artist','tab-tag'].forEach(id => {
                 document.getElementById(id).style.display = id === tabId ? '' : 'none';
             });
-            document.getElementById('resultsMeta').textContent = `Menampilkan ${counts[tabId]} hasil � "${document.getElementById('queryLabel').textContent}"`;
+            document.getElementById('resultsMeta').innerHTML = `Menampilkan ${counts[tabId]} hasil &bull; "${document.getElementById('queryLabel').textContent}"`;
         }
 
         function toggleChip(btn) {
