@@ -13,6 +13,7 @@ function current_user(): ?array
         'id' => $_SESSION['user_id'],
         'username' => $_SESSION['username'] ?? '',
         'role' => $_SESSION['role'] ?? '',
+        'avatar_url' => $_SESSION['avatar_url'] ?? null,
     ];
 }
 

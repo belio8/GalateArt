@@ -6,7 +6,7 @@ require_once __DIR__ . '/components/bootstrap.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cari Karya berdasarkan Tagline â€“ GalateArt</title>
+    <title>Cari Karya berdasarkan Tagline - GalateArt</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@ require_once __DIR__ . '/components/bootstrap.php';
                 <input
                     type="text"
                     id="tagSearchInput"
-                    placeholder="Ketik tag, nama artis, atau jenis karyaâ€¦"
+                    placeholder="Ketik tag, nama artis, atau jenis karya..."
                     autocomplete="off">
                 <button class="ga-tag-btn-search" id="tagBtnSearch">
                     <i class="fas fa-search"></i> Cari
@@ -55,7 +55,7 @@ require_once __DIR__ . '/components/bootstrap.php';
     <!-- â•â• MAIN BODY â•â• -->
     <div class="ga-tag-page">
 
-        <!-- â”€â”€ SIDEBAR â”€â”€ -->
+        <!-- ── SIDEBAR ── -->
         <aside class="ga-tag-sidebar">
 
             <!-- Trending tags -->
@@ -93,7 +93,7 @@ require_once __DIR__ . '/components/bootstrap.php';
 
         </aside>
 
-        <!-- â”€â”€ RESULTS COLUMN â”€â”€ -->
+        <!-- ── RESULTS COLUMN ── -->
         <main class="ga-tag-main">
 
             <!-- Active tag banner -->
@@ -124,7 +124,7 @@ require_once __DIR__ . '/components/bootstrap.php';
             </div>
 
             <!-- Results heading -->
-            <p class="ga-tag-results-heading" id="tagResultsHeading">Memuat karyaâ€¦</p>
+            <p class="ga-tag-results-heading" id="tagResultsHeading">Memuat karya...</p>
 
             <!-- Art grid -->
             <div class="ga-tag-grid" id="tagGrid"></div>
@@ -145,7 +145,7 @@ require_once __DIR__ . '/components/bootstrap.php';
         </main>
     </div>
 
-    <!-- â•â• ART MODAL (popup detail karya â€“ sama dengan landing.php) â•â• -->
+    <!-- â•â• ART MODAL (popup detail karya - sama dengan landing.php) â•â• -->
     <div class="modal-bg" id="modalBg">
         <div class="modal-box" id="modalBox">
             <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
@@ -199,7 +199,7 @@ require_once __DIR__ . '/components/bootstrap.php';
                     <img class="input-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=me" alt="">
                     <div class="input-wrap">
                         <input type="text" class="comment-input" id="commentInput"
-                               placeholder="Tambahkan komentarâ€¦" autocomplete="off">
+                               placeholder="Tambahkan komentar..." autocomplete="off">
                     </div>
                     <button class="post-btn" id="postBtn">Kirim</button>
                 </div>

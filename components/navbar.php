@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/bootstrap.php';
 
-$user = current_user();
+$navUser = current_user();
 $home = active_user_home();
 $profile = active_user_profile();
 ?>
@@ -18,7 +18,7 @@ $profile = active_user_profile();
             </div>
         </div>
 
-        <div class="logo"><a href="<?= e($home) ?>" style="color:inherit;text-decoration:none;">Galate<span>Art</span></a></div>
+        <div class="logo"><a href="<?= e($home) ?>" style="color:inherit;text-decoration:none; display:flex; align-items:center;"><img src="Assets/galateart_logo.png" alt="GalateArt" style="height: 50px; width: auto;"></a></div>
     </div>
 
     <div class="nav-center">
@@ -28,13 +28,13 @@ $profile = active_user_profile();
     </div>
 
     <div class="nav-right">
-        <?php if (!$user): ?>
+        <?php if (!$navUser): ?>
             <button class="btn-artist" id="btnArtist" type="button">Saya seorang artis</button>
             <button class="btn-login" id="btnLogin" type="button">Masuk</button>
             <button class="btn-signup" id="btnSignup" type="button">Daftar</button>
         <?php endif; ?>
 
-        <?php if ($user): ?>
+        <?php if ($navUser): ?>
             <div class="nav-icons">
                 <a href="messages.php" aria-label="Pesan"><i class="far fa-comment"></i></a>
 
@@ -48,8 +48,8 @@ $profile = active_user_profile();
 
                 <a href="cart.php" aria-label="Keranjang"><i class="fas fa-shopping-cart"></i></a>
 
-                <a href="<?= e($profile) ?>" id="userProfileLink" class="profile-icon-link" title="<?= e($user['username']) ?>">
-                    <img src="Assets/draw2.png" alt="Profil">
+                <a href="<?= e($profile) ?>" id="userProfileLink" class="profile-icon-link" title="<?= e($navUser['username']) ?>">
+                    <img src="<?= htmlspecialchars(!empty($navUser['avatar_url']) ? $navUser['avatar_url'] : 'Assets/galateart_icon.png') ?>" alt="Profil" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">
                 </a>
 
                 <form action="api/auth.php" method="post" style="display:inline;">

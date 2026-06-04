@@ -135,7 +135,7 @@ $tagCount = count($tags);
 
         <div class="ga-srch-header">
             <h1>Hasil untuk "<span id="queryLabel"><?php echo htmlspecialchars($q ?: 'semua', ENT_QUOTES); ?></span>"</h1>
-            <p class="ga-srch-meta" id="resultsMeta">Menampilkan <?php echo $tab === 'artist' ? $artistCount : ($tab === 'tag' ? $tagCount : $artworkCount); ?> hasil · <?php echo $tab === 'artist' ? 'Artis' : ($tab === 'tag' ? 'Tag' : 'Artwork'); ?> · Diurutkan: Relevansi</p>
+            <p class="ga-srch-meta" id="resultsMeta">Menampilkan <?php echo $tab === 'artist' ? $artistCount : ($tab === 'tag' ? $tagCount : $artworkCount); ?> hasil ï¿½ <?php echo $tab === 'artist' ? 'Artis' : ($tab === 'tag' ? 'Tag' : 'Artwork'); ?> ï¿½ Diurutkan: Relevansi</p>
         </div>
 
         <div class="ga-srch-tabs">
@@ -192,7 +192,7 @@ $tagCount = count($tags);
                                         <p class="ga-srch-ar-name"><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></p>
                                         <p class="ga-srch-ar-handle">@<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></p>
                                         <p class="ga-srch-ar-bio"><?php echo htmlspecialchars($artist['bio'] ?: 'Artis lokal aktif.', ENT_QUOTES); ?></p>
-                                        <p class="ga-srch-ar-stats"><strong><?php echo number_format((int)$artist['follower_count'], 0, ',', '.'); ?></strong> followers · <strong><?php echo number_format((int)$artist['post_count'], 0, ',', '.'); ?></strong> posts</p>
+                                        <p class="ga-srch-ar-stats"><strong><?php echo number_format((int)$artist['follower_count'], 0, ',', '.'); ?></strong> followers ï¿½ <strong><?php echo number_format((int)$artist['post_count'], 0, ',', '.'); ?></strong> posts</p>
                                     </div>
                                     <button class="ga-srch-btn-follow">Follow</button>
                                 </div>
@@ -264,7 +264,7 @@ $tagCount = count($tags);
             ['tab-artwork','tab-artist','tab-tag'].forEach(id => {
                 document.getElementById(id).style.display = id === tabId ? '' : 'none';
             });
-            document.getElementById('resultsMeta').textContent = `Menampilkan ${counts[tabId]} hasil · "${document.getElementById('queryLabel').textContent}"`;
+            document.getElementById('resultsMeta').textContent = `Menampilkan ${counts[tabId]} hasil ï¿½ "${document.getElementById('queryLabel').textContent}"`;
         }
 
         function toggleChip(btn) {

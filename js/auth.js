@@ -90,7 +90,7 @@
     // Let's make landing.php the redirect_uri, but process the token globally in auth.js.
 
     // Global function called from onclick in the HTML buttons
-    window.triggerGoogleLogin = function() {
+    window.triggerGoogleLogin = function(state = 'google_login') {
         // Find the base URL dynamically based on current location (case-insensitive for GalateArt)
         const pathArray = window.location.pathname.split('/');
         const projectIndex = pathArray.findIndex(p => p.toLowerCase() === 'galateart');
@@ -108,7 +108,7 @@
             response_type: 'token',
             scope: 'email profile',
             include_granted_scopes: 'true',
-            state: 'google_login'
+            state: state
         };
         
         // Build query string
@@ -118,12 +118,30 @@
         window.location.href = `${oauth2Endpoint}?${queryString}`;
     };
 
+    window.triggerArtistGoogleLogin = function() {
+        const portfolioInput = document.getElementById('portfolioLink');
+        const portfolioUrl = portfolioInput ? portfolioInput.value.trim() : '';
+        
+        if (!portfolioUrl) {
+            alert('Silakan isi Link Portofolio Anda terlebih dahulu sebelum mendaftar dengan Google.');
+            if (portfolioInput) portfolioInput.focus();
+            return;
+        }
+        
+        // Store in localStorage temporarily
+        localStorage.setItem('pending_artist_portfolio', portfolioUrl);
+        
+        // Trigger the regular google login but with a different state
+        window.triggerGoogleLogin('google_artist_login');
+    };
+
     // Check if we just returned from Google OAuth (implicit flow puts token in hash)
     window.addEventListener('load', () => {
         const hash = window.location.hash.substring(1);
-        if (hash.includes('access_token=') && hash.includes('state=google_login')) {
+        if (hash.includes('access_token=') && (hash.includes('state=google_login') || hash.includes('state=google_artist_login'))) {
             const params = new URLSearchParams(hash);
             const accessToken = params.get('access_token');
+            const state = params.get('state');
             
             if (accessToken) {
                 // Show loading state
@@ -137,11 +155,26 @@
                 // Clear the hash from URL so it doesn't stay there
                 history.replaceState(null, null, ' ');
 
+                let bodyData = { access_token: accessToken };
+                
+                if (state === 'google_artist_login') {
+                    const portfolioUrl = localStorage.getItem('pending_artist_portfolio');
+                    if (portfolioUrl) {
+                        bodyData.role = 'artist';
+                        bodyData.portfolio_url = portfolioUrl;
+                        localStorage.removeItem('pending_artist_portfolio');
+                    } else {
+                        alert('Link portofolio tidak ditemukan. Silakan ulangi proses pendaftaran.');
+                        window.location.reload();
+                        return;
+                    }
+                }
+
                 // Send to backend
                 fetch('api/google-auth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ access_token: accessToken }),
+                    body: JSON.stringify(bodyData),
                 })
                 .then(res => res.json())
                 .then(data => {

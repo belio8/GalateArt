@@ -5,7 +5,7 @@ require_once __DIR__ . '/config/Db.php';
 
 $me_id       = $_SESSION['user_id'];
 $me_username = $_SESSION['username'] ?? '';
-$me_avatar   = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($me_username);
+$me_avatar   = 'Assets/galateart_icon.png';
 
 // Ambil avatar asli kalau ada
 $me_row = db_row($conn, "SELECT avatar_url FROM users WHERE id = ? LIMIT 1", "s", [$me_id]);

@@ -7,7 +7,7 @@ require_login('admin');
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel â€“ GalateArt</title>
+  <title>Admin Panel - GalateArt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -53,7 +53,7 @@ require_login('admin');
 
   <div class="ga-adm-content">
 
-    <!-- â”€â”€ DASHBOARD â”€â”€ -->
+    <!-- ── DASHBOARD ── -->
     <section class="ga-adm-page-section active" id="page-dashboard">
       <div class="ga-adm-stat-grid">
         <div class="ga-adm-stat-card warn">
@@ -95,7 +95,7 @@ require_login('admin');
       </div>
     </section>
 
-    <!-- â”€â”€ REPORTS â”€â”€ -->
+    <!-- ── REPORTS ── -->
     <section class="ga-adm-page-section" id="page-reports">
       <div class="ga-adm-section-header">
         <h2>Semua Laporan</h2>
@@ -118,7 +118,7 @@ require_login('admin');
       </div>
     </section>
 
-    <!-- â”€â”€ POSTS â”€â”€ -->
+    <!-- ── POSTS ── -->
     <section class="ga-adm-page-section" id="page-posts">
       <div class="ga-adm-section-header">
         <h2>Manajemen Postingan</h2>
@@ -136,7 +136,7 @@ require_login('admin');
       </div>
     </section>
 
-    <!-- â”€â”€ ACCOUNTS â”€â”€ -->
+    <!-- ── ACCOUNTS ── -->
     <section class="ga-adm-page-section" id="page-accounts">
       <div class="ga-adm-section-header">
         <h2>Manajemen Akun</h2>
@@ -173,7 +173,7 @@ require_login('admin');
 <script src="js/auth.js"></script>
 <script>
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   AUTH GUARD â€” redirect ke login jika belum auth
+   AUTH GUARD - redirect ke login jika belum auth
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 

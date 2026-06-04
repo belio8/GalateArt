@@ -67,7 +67,7 @@ if (empty($tags_raw)) {
 }
 
 // ── Simpan file ke directory ──────────────────────────────────
-$uploads_dir = __DIR__ . '/../Assets/uploads';
+$uploads_dir = __DIR__ . '/../Assets/uploads/posts';
 if (!is_dir($uploads_dir)) {
     mkdir($uploads_dir, 0755, true);
 }
@@ -76,7 +76,7 @@ if (!is_dir($uploads_dir)) {
 $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
 $filename = bin2hex(random_bytes(12)) . '.' . $ext;
 $filepath = $uploads_dir . '/' . $filename;
-$image_url = 'Assets/uploads/' . $filename;
+$image_url = 'Assets/uploads/posts/' . $filename;
 
 if (!move_uploaded_file($file['tmp_name'], $filepath)) {
     http_response_code(500);

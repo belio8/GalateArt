@@ -54,7 +54,7 @@ $posts = db_query(
                 <i class="fas fa-cloud-upload-alt pm-upload-icon" id="pmUploadIcon"></i>
                 <p class="pm-upload-label" id="pmUploadText">
                     <span>Pilih gambar</span> atau seret & lepas di sini<br>
-                    <small style="color:#555566;">PNG, JPG, WEBP â€” maks. 10 MB</small>
+                    <small style="color:#555566;">PNG, JPG, WEBP - maks. 10 MB</small>
                 </p>
                 <img class="pm-preview-img" id="pmPreviewImg" alt="Preview">
                 <p class="pm-preview-info" id="pmPreviewInfo"></p>
@@ -64,7 +64,7 @@ $posts = db_query(
         <!-- Judul -->
         <div class="pm-field">
             <label for="pmTitle">Judul Karya <span class="pm-required">*</span></label>
-            <input type="text" id="pmTitle" placeholder="Contoh: Character Design â€” Sakura Spirit" maxlength="80">
+            <input type="text" id="pmTitle" placeholder="Contoh: Character Design - Sakura Spirit" maxlength="80">
         </div>
 
         <!-- Deskripsi -->
@@ -213,7 +213,7 @@ $posts = db_query(
                             </div>
                         </div>
                         
-                        <!-- âœ… Like & Save action bar -->
+                        <!-- ✓ Like & Save action bar -->
                         <div class="like-action-bar" id="likeActionBar">
                             <div class="like-action-left">
                                 <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">

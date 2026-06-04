@@ -34,7 +34,10 @@ function auth_redirect_for_role(string $role): string
 function auth_success(array $payload, int $code = 200): void
 {
     if (wants_json()) {
-        json_response($payload, $code);
+        header('Content-Type: application/json');
+        http_response_code($code);
+        echo json_encode($payload);
+        exit;
     }
 
     $role = $payload['user']['role'] ?? ($_SESSION['role'] ?? '');
@@ -45,11 +48,25 @@ function auth_success(array $payload, int $code = 200): void
 function auth_error(string $message, int $code = 400): void
 {
     if (wants_json()) {
-        json_response(['status' => 'error', 'message' => $message], $code);
+        header('Content-Type: application/json');
+        http_response_code($code);
+        echo json_encode(['status' => 'error', 'message' => $message]);
+        exit;
     }
 
     header('Location: ../landing.php?auth=login&error=' . urlencode($message));
     exit;
+}
+
+function gen_uuid(): string {
+    return sprintf(
+        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0x0fff) | 0x4000,
+        mt_rand(0, 0x3fff) | 0x8000,
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
 }
 
 // ── Router ──────────────────────────────────────────────────
@@ -93,7 +110,7 @@ function handle_register(mysqli $conn, array $body): void
     }
 
     // Simpan ke database
-    $id   = uuid();
+    $id   = gen_uuid();
     $hash = password_hash($password, PASSWORD_BCRYPT);
 
     $affected = db_execute($conn,
@@ -110,11 +127,12 @@ function handle_register(mysqli $conn, array $body): void
     $_SESSION['user_id']   = $id;
     $_SESSION['username']  = $username;
     $_SESSION['role']      = 'regular';
+    $_SESSION['avatar_url'] = null;
 
     auth_success([
         'status'   => 'ok',
         'message'  => 'Akun berhasil dibuat!',
-        'user'     => ['id' => $id, 'username' => $username, 'role' => 'regular'],
+        'user'     => ['id' => $id, 'username' => $username, 'role' => 'regular', 'avatar_url' => null],
     ], 201);
 }
 
@@ -148,7 +166,7 @@ function handle_register_artist(mysqli $conn, array $body): void
     }
 
     // Buat user dulu
-    $user_id = uuid();
+    $user_id = gen_uuid();
     $hash    = password_hash($password, PASSWORD_BCRYPT);
 
     db_execute($conn,
@@ -158,10 +176,10 @@ function handle_register_artist(mysqli $conn, array $body): void
     );
 
     // Buat profil artis di tabel artist_profiles
-    $profile_id = uuid();
+    $profile_id = gen_uuid();
     db_execute($conn,
-        "INSERT INTO artist_profiles (id, user_id, portfolio_url, commission_status, created_at)
-         VALUES (?, ?, ?, 'open', NOW())",
+        "INSERT INTO artist_profiles (id, user_id, portfolio_url, commission_status)
+         VALUES (?, ?, ?, 'open')",
         "sss", [$profile_id, $user_id, $portfolio_url]
     );
 
@@ -169,11 +187,12 @@ function handle_register_artist(mysqli $conn, array $body): void
     $_SESSION['user_id']  = $user_id;
     $_SESSION['username'] = $username;
     $_SESSION['role']     = 'artist';
+    $_SESSION['avatar_url'] = null;
 
     auth_success([
         'status'  => 'ok',
         'message' => 'Akun artis berhasil dibuat!',
-        'user'    => ['id' => $user_id, 'username' => $username, 'role' => 'artist'],
+        'user'    => ['id' => $user_id, 'username' => $username, 'role' => 'artist', 'avatar_url' => null],
     ], 201);
 }
 
@@ -191,7 +210,7 @@ function handle_login(mysqli $conn, array $body): void
 
     // Cari user berdasarkan username ATAU email
     $user = db_row($conn,
-        "SELECT id, username, email, password_hash, role, is_banned
+        "SELECT id, username, email, password_hash, role, is_banned, avatar_url
          FROM users
          WHERE username = ? OR email = ?
          LIMIT 1",
@@ -214,6 +233,7 @@ function handle_login(mysqli $conn, array $body): void
     $_SESSION['user_id']  = $user['id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['role']     = $user['role'];
+    $_SESSION['avatar_url'] = $user['avatar_url'];
 
     auth_success([
         'status'  => 'ok',
@@ -223,6 +243,7 @@ function handle_login(mysqli $conn, array $body): void
             'username' => $user['username'],
             'email'    => $user['email'],
             'role'     => $user['role'],
+            'avatar_url' => $user['avatar_url']
         ],
     ]);
 }
@@ -238,7 +259,10 @@ function handle_logout(): void
         header('Location: ../landing.php');
         exit;
     }
-    json_response(['status' => 'ok', 'message' => 'Berhasil keluar.']);
+    
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'ok', 'message' => 'Berhasil keluar.']);
+    exit;
 }
 
 // ============================================================
@@ -247,18 +271,26 @@ function handle_logout(): void
 function handle_me(mysqli $conn): void
 {
     if (empty($_SESSION['user_id'])) {
-        json_response(['status' => 'error', 'message' => 'Belum login.'], 401);
+        header('Content-Type: application/json');
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Belum login.']);
+        exit;
     }
 
     $user = db_row($conn,
-        "SELECT id, username, email, role FROM users WHERE id = ? LIMIT 1",
+        "SELECT id, username, email, role, avatar_url FROM users WHERE id = ? LIMIT 1",
         "s", [$_SESSION['user_id']]
     );
 
     if (!$user) {
         session_destroy();
-        json_response(['status' => 'error', 'message' => 'Session tidak valid.'], 401);
+        header('Content-Type: application/json');
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Session tidak valid.']);
+        exit;
     }
 
-    json_response(['status' => 'ok', 'user' => $user]);
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'ok', 'user' => $user]);
+    exit;
 }

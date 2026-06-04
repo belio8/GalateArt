@@ -76,7 +76,7 @@ require_once __DIR__ . '/components/bootstrap.php';
             </div>
         </section>
 
-        <!-- âœ… Modal dipindahkan ke luar post-card agar event bubbling tidak menyebabkan glitch -->
+        <!-- ✓ Modal dipindahkan ke luar post-card agar event bubbling tidak menyebabkan glitch -->
         <div class="modal-bg" id="modalBg">
             <div class="modal-box" id="modalBox">
                 <button class="modal-close" id="closeModalPost"><i class="fas fa-times"></i></button>
@@ -121,7 +121,7 @@ require_once __DIR__ . '/components/bootstrap.php';
                         </div>
                     </div>
 
-                    <!-- âœ… Like & Save action bar -->
+                    <!-- ✓ Like & Save action bar -->
                     <div class="like-action-bar" id="likeActionBar">
                         <div class="like-action-left">
                             <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">

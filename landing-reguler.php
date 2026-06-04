@@ -37,14 +37,14 @@ $posts = db_query(
                 <section class="hero-grid">
             <div class="hero-card main-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
                 <div class="hero-text">
-                    <img src="Assets/draw2.png">
+                    <img src="Assets/galateart_icon.png">
                     <h2>Dibuat oleh artis lokal</h2>
                     <p>Semua yang Anda butuhkan untuk vtuber, game, dan aset digital ada di sini!</p>
                 </div>
             </div>
             <div class="hero-card ai-card" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://via.placeholder.com/600x400');">
                 <div class="hero-text">
-                    <img src="Assets/draw2.png">
+                    <img src="Assets/galateart_icon.png">
                     <h2>Tanpa Generative AI</h2>
                     <p>Kami menghargai orisinalitas. Karya tanpa persetujuan dan kredit tidak diterima.</p>
                 </div>
@@ -120,7 +120,7 @@ $posts = db_query(
                             </div>
                         </div>
                         
-                        <!-- âœ… Like & Save action bar -->
+                        <!-- ✓ Like & Save action bar -->
                         <div class="like-action-bar" id="likeActionBar">
                             <div class="like-action-left">
                                 <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">

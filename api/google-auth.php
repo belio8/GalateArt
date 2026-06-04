@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // ── Read the access token ─────────────────────────────────────
 $input = json_decode(file_get_contents('php://input'), true);
 $access_token = trim($input['access_token'] ?? '');
+$requested_role = trim($input['role'] ?? 'regular');
+$portfolio_url = trim($input['portfolio_url'] ?? '');
 
 if (!$access_token) {
     http_response_code(400);
@@ -73,14 +75,14 @@ if (!$google_id || !$email) {
 
 // ── 1. Check if this Google ID already exists ─────────────────
 $user = db_row($conn,
-    "SELECT id, username, email, role, is_banned FROM users WHERE google_id = ? LIMIT 1",
+    "SELECT id, username, email, role, is_banned, avatar_url FROM users WHERE google_id = ? LIMIT 1",
     "s", [$google_id]
 );
 
 // ── 2. If not, check if the email already exists (link accounts) ──
 if (!$user) {
     $user = db_row($conn,
-        "SELECT id, username, email, role, is_banned FROM users WHERE email = ? LIMIT 1",
+        "SELECT id, username, email, role, is_banned, avatar_url FROM users WHERE email = ? LIMIT 1",
         "s", [$email]
     );
 
@@ -89,6 +91,22 @@ if (!$user) {
         db_execute($conn,
             "UPDATE users SET google_id = ?, avatar_url = COALESCE(avatar_url, ?) WHERE id = ?",
             "sss", [$google_id, $avatar, $user['id']]
+        );
+    }
+}
+
+// ── 2.5 Upgrade to artist if requested ─────────────────────────
+if ($user && $requested_role === 'artist' && $user['role'] === 'regular') {
+    db_execute($conn, "UPDATE users SET role = 'artist' WHERE id = ?", "s", [$user['id']]);
+    $user['role'] = 'artist';
+    
+    // Check if artist_profiles exists
+    $profile = db_row($conn, "SELECT id FROM artist_profiles WHERE user_id = ?", "s", [$user['id']]);
+    if (!$profile) {
+        $profile_id = uuid();
+        db_execute($conn,
+            "INSERT INTO artist_profiles (id, user_id, portfolio_url, commission_status) VALUES (?, ?, ?, 'open')",
+            "sss", [$profile_id, $user['id'], $portfolio_url]
         );
     }
 }
@@ -113,12 +131,21 @@ if (!$user) {
 
     // Create user with a random password hash (they'll use Google to log in)
     $random_hash = password_hash(bin2hex(random_bytes(16)), PASSWORD_BCRYPT);
+    $final_role = $requested_role === 'artist' ? 'artist' : 'regular';
 
     $affected = db_execute($conn,
         "INSERT INTO users (id, username, email, password_hash, role, google_id, avatar_url, created_at)
-         VALUES (?, ?, ?, ?, 'regular', ?, ?, NOW())",
-        "ssssss", [$id, $username, $email, $random_hash, $google_id, $avatar]
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+        "sssssss", [$id, $username, $email, $random_hash, $final_role, $google_id, $avatar]
     );
+
+    if ($final_role === 'artist') {
+        $profile_id = uuid();
+        db_execute($conn,
+            "INSERT INTO artist_profiles (id, user_id, portfolio_url, commission_status) VALUES (?, ?, ?, 'open')",
+            "sss", [$profile_id, $id, $portfolio_url]
+        );
+    }
 
     if ($affected < 1) {
         http_response_code(500);
@@ -130,8 +157,9 @@ if (!$user) {
         'id'       => $id,
         'username' => $username,
         'email'    => $email,
-        'role'     => 'regular',
+        'role'     => $final_role,
         'is_banned' => 0,
+        'avatar_url' => $avatar,
     ];
 }
 
@@ -146,6 +174,7 @@ if (!empty($user['is_banned'])) {
 $_SESSION['user_id']  = $user['id'];
 $_SESSION['username'] = $user['username'];
 $_SESSION['role']     = $user['role'];
+$_SESSION['avatar_url'] = $user['avatar_url'] ?? null;
 
 // Determine redirect URL based on role
 $redirect = 'landing.php';
@@ -166,5 +195,6 @@ echo json_encode([
         'username' => $user['username'],
         'email'    => $user['email'],
         'role'     => $user['role'],
+        'avatar_url' => $user['avatar_url'] ?? null,
     ],
 ]);

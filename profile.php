@@ -1,10 +1,14 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
 require_login();
 require_once __DIR__ . '/config/Db.php';
 
-$user = current_user();
-$userId = $user['id'];
+$userSession = current_user();
+$userId = $userSession['id'];
+
+// Fetch full user data
+$userRow = db_row($conn, "SELECT * FROM users WHERE id = ?", "s", [$userId]);
+$user = $userRow ?: $userSession;
 
 $followingRow = db_row(
     $conn,
@@ -42,22 +46,25 @@ $followersCount = (int) ($followersRow['cnt'] ?? 0);
     <main class="profile-page-container is-regular" id="profileWrapper">
         
         <div class="profile-main">
-            <div class="account-badge" id="accountBadgeText">Artist Account</div>
-            
-            <div class="cover-photo" style="background-image: url('https://via.placeholder.com/800x250/222222/555555?text=Cover+Image');">
+            <div class="account-badge" id="accountBadgeText">Regular Account</div>
+            <?php $bannerSrc = !empty($user['banner_url']) ? htmlspecialchars($user['banner_url']) : 'Assets/galateart_banner.png'; ?>
+            <div class="cover-photo" style="background-image: url('<?= $bannerSrc ?>');">
             </div>
             
             <div class="profile-info-section">
-                <div class="avatar-container">
-                    <img src="Assets/draw2.png">
+                <div class="profile-header-row">
+                    <div class="avatar-container">
+                        <img src="<?php echo htmlspecialchars(!empty($user['avatar_url']) ? $user['avatar_url'] : 'Assets/galateart_icon.png'); ?>" referrerpolicy="no-referrer">
+                    </div>
+                    <div class="profile-actions">
+                        <a href="edit-profile.php" class="btn-edit-profile">Edit Profile</a>
+                    </div>
                 </div>
                 
                 <div class="profile-text">
                     <h1 id="userName"><?php echo htmlspecialchars($user['username']); ?></h1>
-                    <p id="userHandle">@<?php echo htmlspecialchars($userId); ?></p>
+                    <p id="userHandle">@<?php echo htmlspecialchars($user['username']); ?></p>
                 </div>
-                
-                
             </div>
 
             <div class="profile-stats">
@@ -74,7 +81,7 @@ $followersCount = (int) ($followersRow['cnt'] ?? 0);
             <div class="profile-content">
                 
                 <div class="tab-content active" id="content-bio">
-                    <p>No character yet...</p>
+                    <p><?php echo nl2br(htmlspecialchars(!empty($user['bio']) ? $user['bio'] : 'Belum ada bio.')); ?></p>
                 </div>
 
 

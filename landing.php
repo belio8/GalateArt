@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
 require_once __DIR__ . '/config/Db.php';
 
@@ -117,7 +117,7 @@ $posts = db_query(
                             </div>
                         </div>
                         
-                        <!-- âœ… Like & Save action bar -->
+                        <!-- ✓ Like & Save action bar -->
                         <div class="like-action-bar" id="likeActionBar">
                             <div class="like-action-left">
                                 <button class="like-post-btn" id="likePostBtn" onclick="toggleLikePost()">
@@ -142,7 +142,7 @@ $posts = db_query(
     <!-- Komponen navbar: hamburger, notifikasi, cart, pesan, search -->
     <script src="js/navbar.js"></script>
     <!-- Autentikasi: login state, modal daftar/masuk/artis -->
-    <script src="js/auth.js"></script>
+    <script src="js/auth.js?v=<?= time() ?>"></script>
     <!-- Modal popup karya seni + follow button -->
     <script src="js/art-modal.js"></script>
     <script src="js/report-modal.js"></script>

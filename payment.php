@@ -84,7 +84,7 @@ require_login();
                         <div class="ga-pay-logo ga-pay-qris"><i class="fas fa-qrcode" style="font-size: 20px;"></i></div>
                         <div>
                             <div class="ga-pay-name">QRIS</div>
-                            <div class="ga-pay-type">Scan QR Â· Semua Bank</div>
+                            <div class="ga-pay-type">Scan QR · Semua Bank</div>
                         </div>
                     </label>
 
@@ -150,7 +150,7 @@ require_login();
                 <!-- Delivery info -->
                 <div class="ga-pay-delivery-info">
                     <i class="fas fa-clock"></i>
-                    <span>Estimasi pengerjaan: <strong>7â€“14 hari kerja</strong> setelah pembayaran dikonfirmasi.</span>
+                    <span>Estimasi pengerjaan: <strong>7-14 hari kerja</strong> setelah pembayaran dikonfirmasi.</span>
                 </div>
 
                 <!-- Price breakdown -->
@@ -209,7 +209,7 @@ require_login();
     <script src="js/navbar.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // â”€â”€ PAYMENT SELECTION â”€â”€
+        // ── PAYMENT SELECTION ──
         let selectedMethod = null;
         let BASE_PRICE = 0;
         let PLATFORM_FEE = 0;
@@ -257,7 +257,7 @@ require_login();
             if (totalEl) totalEl.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
         }
 
-        // â”€â”€ PROMO CODE â”€â”€
+        // ── PROMO CODE ──
         const VALID_PROMOS = {
             'GALATE10': 10,
             'NEWUSER20': 20,
@@ -289,7 +289,7 @@ require_login();
                 discountVal.textContent = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
                 total.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
 
-                msg.textContent = `âœ“ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
+                msg.textContent = `✓ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
                 msg.className = 'ga-pay-promo-msg ga-pay-success';
                 promoApplied = true;
             } else {
@@ -308,7 +308,7 @@ require_login();
             if (e.key === 'Enter') applyPromo();
         });
 
-        // â”€â”€ CONFIRM PAYMENT â”€â”€
+        // ── CONFIRM PAYMENT ──
         function confirmPayment() {
             if (!selectedMethod) return;
 

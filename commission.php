@@ -27,8 +27,8 @@ require_once __DIR__ . '/components/bootstrap.php';
         <div class="ga-com-banner">
             <img src="Assets/draw2.png" alt="Artist Avatar">
             <div class="ga-com-banner-info">
-                <h2>@artis_lokal <span style="font-size:14px; font-weight:400; color:var(--text-gray);">â€” Commission Page</span></h2>
-                <p>Artis lokal spesialis ilustrasi karakter, VTuber sheet, dan desain konseptual. Turnaround time 7â€“14 hari kerja.</p>
+                <h2>@artis_lokal <span style="font-size:14px; font-weight:400; color:var(--text-gray);">- Commission Page</span></h2>
+                <p>Artis lokal spesialis ilustrasi karakter, VTuber sheet, dan desain konseptual. Turnaround time 7-14 hari kerja.</p>
                 <div class="ga-com-status-badge" id="statusBadge">
                     <span class="ga-com-dot"></span> Open for Commission
                 </div>
@@ -130,11 +130,11 @@ require_once __DIR__ . '/components/bootstrap.php';
                 <!-- Terms of Service -->
                 <p class="ga-com-section-title"><i class="fas fa-file-contract"></i> Terms of Service</p>
                 <div class="ga-com-tos-block">
-                    <p>âœ… <strong>Will draw:</strong> OC, Fanart, VTuber, Semi-realistic, Chibi, kemono/furry, light romance.</p>
+                    <p>✓ <strong>Will draw:</strong> OC, Fanart, VTuber, Semi-realistic, Chibi, kemono/furry, light romance.</p>
                     <p>âŒ <strong>Won't draw:</strong> NSFW, content yang mengandung ujaran kebencian, karya yang sudah ada hak ciptanya (fan art komersial tanpa izin), atau permintaan yang melanggar ToS platform.</p>
                     <p>ðŸ’³ <strong>Pembayaran:</strong> Pembayaran 50% di muka sebelum pengerjaan dimulai, 50% sisanya setelah WIP final disetujui. Metode: GoPay / DANA / BCA.</p>
                     <p>ðŸ”„ <strong>Revisi:</strong> Jumlah revisi disesuaikan dengan paket yang dipilih. Revisi mayor di luar paket dikenakan biaya tambahan.</p>
-                    <p>â±ï¸ <strong>Turnaround:</strong> 7â€“14 hari kerja tergantung antrian. Anda akan mendapat estimasi waktu setelah order dikonfirmasi.</p>
+                    <p>â±ï¸ <strong>Turnaround:</strong> 7-14 hari kerja tergantung antrian. Anda akan mendapat estimasi waktu setelah order dikonfirmasi.</p>
                     <p>ðŸ–¼ï¸ <strong>Hak Cipta:</strong> Karya tetap menjadi milik artis. Klien mendapat hak penggunaan personal. Hak komersial tersedia di paket Premium.</p>
                 </div>
 
@@ -344,7 +344,7 @@ require_once __DIR__ . '/components/bootstrap.php';
         function handleFileUpload(input) {
             const label = document.getElementById('refImgText');
             if (input.files && input.files[0]) {
-                label.innerText = 'âœ… ' + input.files[0].name;
+                label.innerText = '✓ ' + input.files[0].name;
             }
         }
 

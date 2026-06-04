@@ -78,7 +78,7 @@ function handle_conversations(mysqli $conn, string $me): void
         }
         // Fallback avatar
         if (empty($row['avatar_url'])) {
-            $row['avatar_url'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($row['username']);
+            $row['avatar_url'] = 'Assets/galateart_icon.png';
         }
     }
     unset($row);
@@ -105,7 +105,7 @@ function handle_history(mysqli $conn, string $me): void
         json_response(['status' => 'error', 'message' => 'User tidak ditemukan.'], 404);
     }
     if (empty($partner['avatar_url'])) {
-        $partner['avatar_url'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($partner['username']);
+        $partner['avatar_url'] = 'Assets/galateart_icon.png';
     }
 
     // Tandai pesan dari partner sebagai sudah dibaca
@@ -213,7 +213,7 @@ function handle_users(mysqli $conn, string $me): void
 
     foreach ($users as &$u) {
         if (empty($u['avatar_url'])) {
-            $u['avatar_url'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode($u['username']);
+            $u['avatar_url'] = 'Assets/galateart_icon.png';
         }
     }
     unset($u);
