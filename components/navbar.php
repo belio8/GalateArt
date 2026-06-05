@@ -22,9 +22,10 @@ $profile = active_user_profile();
     </div>
 
     <div class="nav-center">
-        <div class="search-bar">
-            <input type="text" placeholder="Cari karya seni...">
-        </div>
+        <form class="search-bar" action="search-results.php" method="GET">
+            <input type="text" name="q" placeholder="Cari karya seni..." value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES) : '' ?>">
+            <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+        </form>
     </div>
 
     <div class="nav-right">

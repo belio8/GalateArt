@@ -170,7 +170,11 @@ $posts = db_query(
                     <img src="<?= e($image) ?>" alt="<?= e($post['title']) ?>">
                     <div class="art-info">
                         <p class="hashtags"><?= e($hashtags) ?></p>
-                        <p class="artist-name">@<?= e($post['username']) ?></p>
+                        <p class="artist-name">
+                            <a href="visit-profile.php?user=<?= e($post['username']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                @<?= e($post['username']) ?>
+                            </a>
+                        </p>
                     </div>
                 </div>
             <?php endforeach; ?>

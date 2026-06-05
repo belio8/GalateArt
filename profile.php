@@ -132,7 +132,11 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                     <img src="<?= $img ?>" alt="Art">
                                     <div class="art-info">
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name"><?= $artist ?></p>
+                                        <p class="artist-name">
+                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                                <?= $artist ?>
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -163,7 +167,11 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                     <img src="<?= $img ?>" alt="Art">
                                     <div class="art-info">
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name"><?= $artist ?></p>
+                                        <p class="artist-name">
+                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                                <?= $artist ?>
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

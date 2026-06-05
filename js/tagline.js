@@ -113,7 +113,11 @@
         <img src="${escapeHtml(art.img)}" alt="Artwork by ${escapeHtml(art.artist)}" loading="lazy">
         <div class="art-info">
           <p class="hashtags">${escapeHtml(tagsHtml)}</p>
-          <p class="artist-name">${escapeHtml(art.artist)}</p>
+          <p class="artist-name">
+            <a href="visit-profile.php?user=${escapeHtml(art.artist.replace('@', ''))}" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                ${escapeHtml(art.artist)}
+            </a>
+          </p>
         </div>
       </div>`;
   }

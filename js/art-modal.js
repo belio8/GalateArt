@@ -6,7 +6,7 @@ let _postSaved = false;
 let _postLikes = 0;
 
 function _updateLikeUI() {
-    const btn  = $('#likePostBtn');
+    const btn = $('#likePostBtn');
     const text = $('#likeCountText');
     if (btn) {
         btn.innerHTML = _postLiked
@@ -16,9 +16,9 @@ function _updateLikeUI() {
     }
     if (text) {
         const strong = text.querySelector('strong') || document.createElement('strong');
-        const span   = text.querySelector('span')   || document.createElement('span');
+        const span = text.querySelector('span') || document.createElement('span');
         strong.textContent = _postLikes.toLocaleString('id');
-        span.textContent   = ' orang menyukai ini';
+        span.textContent = ' orang menyukai ini';
         if (!text.contains(strong)) { text.appendChild(strong); text.appendChild(span); }
 
     }
@@ -101,16 +101,16 @@ let _currentPostId = null;
 
 // ── INISIALISASI MODAL ─────────────────────────────────────────
 (function initArtModal() {
-    const modalBg      = $('#modalBg');
-    const modalBox     = $('#modalBox');
-    const closeBtn     = $('#closeModalPost');
-    const modalImg     = $('#modalImageDisplay');
-    const phName       = $('#phName');
-    const capName      = $('#captionName');
-    const capTags      = $('#captionTags');
-    const postBtn      = $('#postBtn');
+    const modalBg = $('#modalBg');
+    const modalBox = $('#modalBox');
+    const closeBtn = $('#closeModalPost');
+    const modalImg = $('#modalImageDisplay');
+    const phName = $('#phName');
+    const capName = $('#captionName');
+    const capTags = $('#captionTags');
+    const postBtn = $('#postBtn');
     const commentInput = $('#commentInput');
-    const commentFeed  = $('#commentFeed');
+    const commentFeed = $('#commentFeed');
 
     if (!modalBg) return;
 
@@ -135,28 +135,53 @@ let _currentPostId = null;
 
         _currentPostId = postId;
 
-        if (modalImg)  modalImg.src     = img;
-        if (phName)    phName.innerText  = artist;
-        if (capName)   capName.innerText = artist;
-        if (capTags)   capTags.innerText = tags;
-        
+        if (modalImg) modalImg.src = img;
+        if (phName) phName.innerText = artist;
+        if (capName) capName.innerText = artist;
+        if (capTags) capTags.innerText = tags;
+
         const phAv = $('#phAv');
         const capAv = $('#capAv');
-        
+
+        // Add click listeners to navigate to profile
+        const navigateToProfile = () => {
+            const username = artist.replace(/^@/, '');
+            if (username) {
+                window.location.href = `visit-profile.php?user=${username}`;
+            }
+        };
+
+        if (phName) {
+            phName.style.cursor = 'pointer';
+            phName.onclick = navigateToProfile;
+        }
+        if (phAv) {
+            phAv.style.cursor = 'pointer';
+            phAv.onclick = navigateToProfile;
+        }
+        if (capName) {
+            capName.style.cursor = 'pointer';
+            capName.onclick = navigateToProfile;
+        }
+        if (capAv) {
+            capAv.style.cursor = 'pointer';
+            capAv.onclick = navigateToProfile;
+        }
+
         const setAvatar = (el) => {
             if (!el) return;
             el.src = avatarUrl || 'Assets/galateart_icon.png';
-            el.onerror = function() {
+            el.onerror = function () {
                 this.onerror = null;
                 this.src = 'Assets/galateart_icon.png';
             };
         };
-        
+
         setAvatar(phAv);
         setAvatar(capAv);
 
         _resetModalState(likes);
-        
+
         // Render initial skeleton for comments
         if (commentFeed) {
             commentFeed.innerHTML = `
@@ -181,16 +206,16 @@ let _currentPostId = null;
                     fetch('api/post-status.php?post_id=' + postId),
                     fetch('api/comments.php?post_id=' + postId)
                 ]);
-                
+
                 const data = await resStatus.json();
                 const result = await resComments.json();
-                
+
                 let descText = "Menampilkan karya seni terbaru!";
                 if (data.status === 'ok') {
                     _postLiked = data.liked;
                     _postSaved = data.saved;
                     _postLikes = data.likes_count;
-                    
+
                     const saveBtn = $('#savePostBtn');
                     if (saveBtn) {
                         saveBtn.innerHTML = _postSaved
@@ -199,7 +224,7 @@ let _currentPostId = null;
                         saveBtn.classList.toggle('saved', _postSaved);
                     }
                     _updateLikeUI();
-                    
+
                     // Update Follow button
                     const followBtn = $('#followBtn');
                     if (followBtn && data.artist_id) {
@@ -207,12 +232,12 @@ let _currentPostId = null;
                         followBtn.dataset.following = data.is_following ? 'true' : 'false';
                         followBtn.textContent = data.is_following ? 'Following' : 'Follow';
                     }
-                    
+
                     if (data.description) {
                         descText = data.description;
                     }
                 }
-                
+
                 if (result.status === 'ok') {
                     renderComments(result.comments, artist, tags, capAv ? capAv.src : '', descText);
                 } else {
@@ -224,13 +249,13 @@ let _currentPostId = null;
             }
         }
     }
-    
+
     // Global expose
     window.openArtModal = openModal;
-    
+
     function renderComments(comments, artist, tags, avatarUrl, descText = "Menampilkan karya seni terbaru!") {
         if (!commentFeed) return;
-        
+
         let html = `
             <div class="caption-block" style="padding-top: 10px;">
                 <div class="c-body" style="margin-left: 0;">
@@ -241,7 +266,7 @@ let _currentPostId = null;
             <div class="feed-divider"></div>
             <div class="comment-count">${comments.length} Komentar</div>
         `;
-        
+
         comments.forEach(c => {
             html += `
                 <div class="comment-item">
@@ -256,10 +281,10 @@ let _currentPostId = null;
                 </div>
             `;
         });
-        
+
         commentFeed.innerHTML = html;
     }
-    
+
     function updateCommentCount(count) {
         const countEl = commentFeed.querySelector('.comment-count');
         if (countEl) countEl.innerText = count + ' Komentar';
@@ -298,9 +323,9 @@ let _currentPostId = null;
         if (!commentInput || !commentFeed || !_currentPostId) return;
         const text = commentInput.value.trim();
         if (!text) return;
-        
+
         commentInput.disabled = true;
-        
+
         try {
             const res = await fetch('api/comments.php', {
                 method: 'POST',
@@ -311,7 +336,7 @@ let _currentPostId = null;
                 })
             });
             const data = await res.json();
-            
+
             if (data.status === 'ok') {
                 const c = data.comment;
                 const html = `
@@ -329,7 +354,7 @@ let _currentPostId = null;
                 `;
                 commentFeed.insertAdjacentHTML('beforeend', html);
                 commentFeed.scrollTop = commentFeed.scrollHeight;
-                
+
                 // Update comment count
                 const countEl = commentFeed.querySelector('.comment-count');
                 if (countEl) {
@@ -343,13 +368,13 @@ let _currentPostId = null;
             console.error('Submit comment error:', err);
             alert('Gagal mengirim komentar (Network Error).');
         }
-        
+
         commentInput.disabled = false;
         commentInput.value = '';
         commentInput.focus();
     }
- 
-    postBtn      && postBtn.addEventListener('click', submitComment);
+
+    postBtn && postBtn.addEventListener('click', submitComment);
     commentInput && commentInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') submitComment();
     });
@@ -367,7 +392,7 @@ let _currentPostId = null;
         if (!artistId) return;
 
         const allArtistBtns = document.querySelectorAll(`.btn-follow[data-artist-id="${artistId}"], .follow-btn[data-artist-id="${artistId}"]`);
-        
+
         allArtistBtns.forEach(b => b.disabled = true);
         try {
             const res = await fetch('api/follow.php', {

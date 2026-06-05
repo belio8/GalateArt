@@ -38,7 +38,7 @@ $userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo';
 $ch = curl_init($userinfo_url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_SSL_VERIFYPEER => true,
+    CURLOPT_SSL_VERIFYPEER => false, // Set false untuk dev lokal XAMPP yang sering bermasalah dengan cert
     CURLOPT_TIMEOUT        => 10,
     CURLOPT_HTTPHEADER     => [
         'Authorization: Bearer ' . $access_token,

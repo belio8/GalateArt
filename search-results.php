@@ -126,12 +126,7 @@ $tagCount = count($tags);
     <?php include __DIR__ . '/components/navbar.php'; ?>
 
     <div class="ga-srch-page">
-        <form action="search-results.php" method="get" class="ga-srch-bar-large">
-            <input type="text" id="mainSearchInput" name="q" placeholder="Cari karya seni, artis, atau tag..." value="<?php echo htmlspecialchars($q, ENT_QUOTES); ?>">
-            <button type="submit" class="ga-srch-btn-go">
-                <i class="fas fa-search"></i> Cari
-            </button>
-        </form>
+
 
         <div class="ga-srch-header">
             <h1>Hasil untuk "<span id="queryLabel"><?php echo htmlspecialchars($q ?: 'semua', ENT_QUOTES); ?></span>"</h1>
@@ -177,7 +172,11 @@ $tagCount = count($tags);
                                     <img src="<?php echo htmlspecialchars($art['image_url'] ?: 'Assets/draw2.png', ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($art['title'] ?: 'Artwork', ENT_QUOTES); ?>">
                                     <div class="art-info">
                                         <p class="hashtags"><?php echo htmlspecialchars($art['tags'] ?: '#nohashtag', ENT_QUOTES); ?></p>
-                                        <p class="artist-name">@<?php echo htmlspecialchars($art['artist'], ENT_QUOTES); ?></p>
+                                        <p class="artist-name">
+                                            <a href="visit-profile.php?user=<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                                @<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?>
+                                            </a>
+                                        </p>
                                         <p style="font-size:12px;color:#b3b3b3;margin:4px 0 0;"><i class="fas fa-heart" style="color:#ff4d6a;margin-right:4px;"></i><?php echo number_format((int)($art['like_count'] ?? 0), 0, ',', '.'); ?></p>
                                     </div>
                                 </div>

@@ -43,9 +43,11 @@ $top_artists = db_query(
                 <?php else: ?>
                     <?php foreach ($top_artists as $artist): ?>
                         <div class="artist-card">
-                            <img src="<?= e($artist['avatar_url']) ?>" alt="<?= e($artist['username']) ?>" class="artist-avatar" loading="lazy">
+                            <a href="visit-profile.php?user=<?= e($artist['username']) ?>">
+                                <img src="<?= e($artist['avatar_url']) ?>" alt="<?= e($artist['username']) ?>" class="artist-avatar" loading="lazy">
+                            </a>
                             <div class="artist-details">
-                                <h3>@<?= e($artist['username']) ?></h3>
+                                <h3><a href="visit-profile.php?user=<?= e($artist['username']) ?>" style="color: inherit; text-decoration: none;">@<?= e($artist['username']) ?></a></h3>
                                 <p><?= e($artist['bio'] ?: 'Artis lokal aktif yang membuat karya luar biasa.') ?></p>
                                 <div class="artist-stats">
                                     <span><strong><?= number_format((int)$artist['follower_count'], 0, ',', '.') ?></strong> Followers</span>

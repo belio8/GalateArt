@@ -10,6 +10,10 @@ $userId = $userSession['id'];
 $userRow = db_row($conn, "SELECT * FROM users WHERE id = ?", "s", [$userId]);
 $user = $userRow ?: $userSession;
 
+// Fetch artist profile specifically for commission status
+$artistProfileRow = db_row($conn, "SELECT commission_status FROM artist_profiles WHERE user_id = ?", "s", [$userId]);
+$commissionStatus = $artistProfileRow['commission_status'] ?? 'closed';
+
 $postRow = db_row(
     $conn,
     "SELECT COUNT(*) AS cnt FROM posts WHERE artist_id = ? AND status = 'active'",
@@ -109,10 +113,10 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                     
                     <div class="commission-status">
                         <label>Set commission status</label>
-                        <select>
-                            <option>Open</option>
-                            <option>Closed</option>
-                            <option>Waitlist</option>
+                        <select id="commissionStatusSelect">
+                            <option value="open" <?= $commissionStatus === 'open' ? 'selected' : '' ?>>Open</option>
+                            <option value="closed" <?= $commissionStatus === 'closed' ? 'selected' : '' ?>>Closed</option>
+                            <option value="waitlist" <?= $commissionStatus === 'waitlist' ? 'selected' : '' ?>>Waitlist</option>
                         </select>
                     </div>
                 </div>
@@ -192,7 +196,11 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                     <img src="<?= $img ?>" alt="Art">
                                     <div class="art-info">
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name"><?= $artist ?></p>
+                                        <p class="artist-name">
+                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                                <?= $artist ?>
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -223,7 +231,11 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                     <img src="<?= $img ?>" alt="Art">
                                     <div class="art-info">
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name"><?= $artist ?></p>
+                                        <p class="artist-name">
+                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
+                                                <?= $artist ?>
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -239,5 +251,32 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
     <script src="js/profile.js?v=<?= time() ?>"></script>
     <script src="js/report-modal.js?v=<?= time() ?>"></script>
     <script src="js/art-modal.js?v=<?= time() ?>"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const select = document.getElementById('commissionStatusSelect');
+        if (select) {
+            select.addEventListener('change', async function() {
+                this.disabled = true;
+                const status = this.value;
+                try {
+                    const res = await fetch('api/update-commission-status.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: status })
+                    });
+                    const data = await res.json();
+                    if (data.status !== 'ok') {
+                        alert(data.message || 'Gagal mengupdate status komisi.');
+                    }
+                } catch (e) {
+                    console.error('Update commission status error:', e);
+                    alert('Terjadi kesalahan jaringan.');
+                }
+                this.disabled = false;
+            });
+        }
+    });
+    </script>
 </body>
 </html>
