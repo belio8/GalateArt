@@ -339,7 +339,7 @@
     // Jika user mengaktifkan filter NSFW, tambahkan class ke body
     // Ini bisa dihubungkan ke toggle settings di profil nanti
     const savedFilter = Store.get('nsfwFilter');
-    if (savedFilter === 'on') {
+    if (savedFilter !== 'off') {
         document.body.classList.add('nsfw-filter');
     }
 

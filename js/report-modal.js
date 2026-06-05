@@ -126,14 +126,24 @@
       const btn = document.createElement('button');
       btn.className = 'ga-rpt-card-menu-btn';
       btn.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
-      btn.title = 'More options';
+      btn.title = 'Opsi';
 
       const menu = document.createElement('div');
       menu.className = 'ga-rpt-card-ctx-menu';
-      menu.innerHTML = `
-        <button data-action="report" class="danger"><i class="fas fa-flag"></i> Laporkan Postingan</button>
-        <button data-action="report-account"><i class="fas fa-user-slash"></i> Laporkan Akun</button>
-      `;
+      
+      const isOwner = window.GA_CURRENT_USER && window.GA_CURRENT_USER === artistName.replace(/^@/, '');
+
+      if (isOwner) {
+        menu.innerHTML = `
+          <button data-action="edit" class="ga-ctx-edit"><i class="fas fa-edit"></i> Edit Postingan</button>
+          <button data-action="delete" class="danger"><i class="fas fa-trash"></i> Hapus Postingan</button>
+        `;
+      } else {
+        menu.innerHTML = `
+          <button data-action="report" class="danger"><i class="fas fa-flag"></i> Laporkan Postingan</button>
+          <button data-action="report-account"><i class="fas fa-user-slash"></i> Laporkan Akun</button>
+        `;
+      }
 
       card.appendChild(btn);
       card.appendChild(menu);
@@ -145,10 +155,25 @@
       });
 
       menu.addEventListener('click', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        
         const action = e.target.closest('[data-action]')?.dataset.action;
+        if (!action) return;
+
         menu.classList.remove('open');
         if (action === 'report') openReportModal({ type: 'post', id: targetId, title: targetTitle });
         if (action === 'report-account') openReportModal({ type: 'account', id: artistName || 'unknown', title: artistName || 'Account' });
+        if (action === 'edit') {
+          if (typeof window.openEditPostModal === 'function') {
+            window.openEditPostModal(targetId);
+          }
+        }
+        if (action === 'delete') {
+          if (typeof window.deletePost === 'function') {
+            window.deletePost(targetId);
+          }
+        }
       });
     });
 

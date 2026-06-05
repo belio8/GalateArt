@@ -57,7 +57,7 @@ $savedPostsSql = "
     FROM saves s
     JOIN posts p ON s.post_id = p.id
     JOIN users u ON p.artist_id = u.id
-    WHERE s.user_id = ?
+    WHERE s.user_id = ? AND p.status = 'active'
     ORDER BY s.created_at DESC
 ";
 $savedPosts = db_query($conn, $savedPostsSql, "s", [$userId]);
@@ -68,7 +68,7 @@ $likedPostsSql = "
     FROM likes l
     JOIN posts p ON l.post_id = p.id
     JOIN users u ON p.artist_id = u.id
-    WHERE l.user_id = ?
+    WHERE l.user_id = ? AND p.status = 'active'
     ORDER BY l.created_at DESC
 ";
 $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);

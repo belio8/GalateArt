@@ -36,6 +36,10 @@ $profile = active_user_profile();
         <?php endif; ?>
 
         <?php if ($navUser): ?>
+            <script>
+                window.GA_CURRENT_USER = <?= json_encode($navUser['username'] ?? '') ?>;
+                window.GA_CURRENT_ROLE = <?= json_encode($navUser['role'] ?? '') ?>;
+            </script>
             <div class="nav-icons">
                 <a href="messages.php" aria-label="Pesan"><i class="far fa-comment"></i></a>
 
@@ -66,3 +70,13 @@ $profile = active_user_profile();
     </div>
 </header>
 <?php include __DIR__ . '/auth-modals.php'; ?>
+<?php include __DIR__ . '/edit-post-modal.php'; ?>
+<script>
+(function(){
+    try {
+        if (localStorage.getItem('nsfwFilter') !== 'off') {
+            document.body.classList.add('nsfw-filter');
+        }
+    } catch(e){}
+})();
+</script>

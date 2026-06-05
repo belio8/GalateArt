@@ -1686,7 +1686,7 @@ STYLE UNTUK HALAMAN TRENDING
 }
 
 /* ── OVERLAY MODAL POST ─────────────────────────────────────── */
-#postModal {
+#postModal, #editPostModal {
     display: none;
     position: fixed;
     inset: 0;
@@ -1698,7 +1698,7 @@ STYLE UNTUK HALAMAN TRENDING
     backdrop-filter: blur(4px);
 }
 
-#postModal.open {
+#postModal.open, #editPostModal.open {
     display: flex;
     animation: pmFadeIn 0.22s ease;
 }
@@ -2100,6 +2100,14 @@ STYLE UNTUK HALAMAN TRENDING
     transform: none;
 }
 
+
+
+
+
+
+
+
+
 /* ── NOTIFIKASI SUKSES (toast) ────────────────────────────────── */
 #pmToast {
     position: fixed;
@@ -2133,30 +2141,37 @@ STYLE UNTUK HALAMAN TRENDING
     font-size: 18px;
 }
 
+
+
+
+
+
+
+
+
+
 /* ── NSFW BADGE pada kartu postingan ─────────────────────────── */
 .art-card .nsfw-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 85px;
+    left: 10px;
     background: rgba(255, 126, 51, 0.9);
     color: #fff;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 6px;
+    border-radius: 4px;
     letter-spacing: 0.5px;
     z-index: 3;
 }
 
 /* Blur NSFW jika filter diaktifkan */
-body.nsfw-filter .art-card.is-nsfw img {
+body.nsfw-filter .art-card.is-nsfw > img {
     filter: blur(20px);
     transition: filter 0.3s;
 }
 
-body.nsfw-filter .art-card.is-nsfw:hover img {
-    filter: blur(0);
-}
+
 
 /* ── KARTU POSTINGAN BARU (dipasang ke art-grid) ─────────────── */
 .art-card .price-badge {
@@ -6172,6 +6187,9 @@ body.ga-adm-page .ga-adm-empty-table i {
     pointer-events: none;
     transition: opacity 0.2s ease;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
     transform: translateX(-5px);
 }
 
