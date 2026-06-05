@@ -2162,7 +2162,7 @@ body.nsfw-filter .art-card.is-nsfw:hover img {
 .art-card .price-badge {
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 10px;
     background: rgba(18, 18, 24, 0.85);
     color: #ff7e33;
     font-size: 11px;
@@ -2170,6 +2170,12 @@ body.nsfw-filter .art-card.is-nsfw:hover img {
     padding: 4px 10px;
     border-radius: 8px;
     z-index: 3;
+    transition: opacity 0.2s ease;
+}
+
+.art-card:hover .price-badge {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -6125,3 +6131,52 @@ body.ga-adm-page .ga-adm-empty-table i {
     color: #f1c40f;
     border: 1px solid rgba(241, 196, 15, 0.3);
 }
+/* --- Art Card Modifications --- */
+.art-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-avatar-wrap {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.art-card img.card-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.card-avatar-tooltip {
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+    transform: translateX(-5px);
+}
+
+.card-avatar-wrap:hover .card-avatar-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+

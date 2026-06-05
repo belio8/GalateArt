@@ -8,6 +8,9 @@ if (!in_array($tab, ['artwork', 'artist', 'tag'], true)) {
     $tab = 'artwork';
 }
 
+$userSession = current_user();
+$currentUserId = $userSession ? $userSession['id'] : '';
+
 $searchTerm = '%' . str_replace(' ', '%', $q) . '%';
 $tagSearch = ltrim($q, '#');
 
@@ -31,14 +34,17 @@ if ($q === '') {
         "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
                 COALESCE(u.bio, '') AS bio,
                 COUNT(DISTINCT p.id) AS post_count,
-                COUNT(DISTINCT f.id) AS follower_count
+                COUNT(DISTINCT f.id) AS follower_count,
+                (SELECT COUNT(*) FROM follows f2 WHERE f2.follower_id = ? AND f2.following_id = u.id) AS is_following
          FROM users u
          LEFT JOIN posts p ON p.artist_id = u.id AND p.status = 'active'
          LEFT JOIN follows f ON f.following_id = u.id
          WHERE u.role = 'artist'
          GROUP BY u.id
          ORDER BY post_count DESC
-         LIMIT 12"
+         LIMIT 12",
+        "s",
+        [$currentUserId]
     );
 
     $tags = db_query(
@@ -77,7 +83,8 @@ if ($q === '') {
         "SELECT u.id, u.username, COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
                 COALESCE(u.bio, '') AS bio,
                 COUNT(DISTINCT p.id) AS post_count,
-                COUNT(DISTINCT f.id) AS follower_count
+                COUNT(DISTINCT f.id) AS follower_count,
+                (SELECT COUNT(*) FROM follows f2 WHERE f2.follower_id = ? AND f2.following_id = u.id) AS is_following
          FROM users u
          LEFT JOIN posts p ON p.artist_id = u.id AND p.status = 'active'
          LEFT JOIN follows f ON f.following_id = u.id
@@ -88,8 +95,8 @@ if ($q === '') {
          GROUP BY u.id
          ORDER BY post_count DESC
          LIMIT 12",
-        'ss',
-        [$searchTerm, $searchTerm]
+        'sss',
+        [$currentUserId, $searchTerm, $searchTerm]
     );
 
     $tags = db_query(
@@ -162,21 +169,31 @@ $tagCount = count($tags);
                             <div class="ga-srch-empty-state">Tidak ada artwork yang cocok.</div>
                         <?php else: ?>
                             <?php foreach ($artworks as $art): ?>
-                                <div class="art-card" style="cursor:pointer;"
+                                <div class="art-card <?= !empty($art['is_nsfw']) ? 'is-nsfw' : '' ?>" style="cursor:pointer;"
                                      data-post-id="<?php echo htmlspecialchars($art['id'], ENT_QUOTES); ?>"
                                      data-img="<?php echo htmlspecialchars($art['image_url'] ?: 'Assets/draw2.png', ENT_QUOTES); ?>"
                                      data-artist="@<?php echo htmlspecialchars($art['artist'], ENT_QUOTES); ?>"
                                      data-avatar-url="<?php echo htmlspecialchars(!empty($art['avatar_url']) ? $art['avatar_url'] : 'Assets/galateart_icon.png', ENT_QUOTES); ?>"
                                      data-tags="<?php echo htmlspecialchars($art['tags'] ?: '#nohashtag', ENT_QUOTES); ?>"
-                                     data-likes="<?php echo (int)($art['like_count'] ?? 0); ?>">
+                                     data-likes="<?php echo (int)($art['like_count'] ?? 0); ?>"
+                                     data-title="<?php echo htmlspecialchars($art['title'] ?: '', ENT_QUOTES); ?>">
+                                     
+                                    <?php if (!empty($art['is_nsfw'])): ?>
+                                        <span class="nsfw-badge">18+</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($art['price']) && $art['price'] > 0): ?>
+                                        <span class="price-badge">Rp <?php echo number_format((float)$art['price'], 0, ',', '.'); ?></span>
+                                    <?php endif; ?>
+
                                     <img src="<?php echo htmlspecialchars($art['image_url'] ?: 'Assets/draw2.png', ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($art['title'] ?: 'Artwork', ENT_QUOTES); ?>">
+                                    <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?>';">
+                                        <img class="card-avatar" src="<?php echo htmlspecialchars(!empty($art['avatar_url']) ? $art['avatar_url'] : 'Assets/galateart_icon.png', ENT_QUOTES); ?>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+                                        <span class="card-avatar-tooltip">@<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?></span>
+                                    </div>
                                     <div class="art-info">
+                                        <p class="art-title"><?php echo htmlspecialchars($art['title'] ?: 'Artwork', ENT_QUOTES); ?></p>
                                         <p class="hashtags"><?php echo htmlspecialchars($art['tags'] ?: '#nohashtag', ENT_QUOTES); ?></p>
-                                        <p class="artist-name">
-                                            <a href="visit-profile.php?user=<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
-                                                @<?php echo htmlspecialchars(ltrim($art['artist'], '@'), ENT_QUOTES); ?>
-                                            </a>
-                                        </p>
                                         <p style="font-size:12px;color:#b3b3b3;margin:4px 0 0;"><i class="fas fa-heart" style="color:#ff4d6a;margin-right:4px;"></i><?php echo number_format((int)($art['like_count'] ?? 0), 0, ',', '.'); ?></p>
                                     </div>
                                 </div>
@@ -191,7 +208,8 @@ $tagCount = count($tags);
                             <div class="ga-srch-empty-state">Tidak ada artis yang cocok.</div>
                         <?php else: ?>
                             <?php foreach ($artists as $artist): ?>
-                                <div class="ga-srch-artist-result-card">
+                                <?php $isFollowing = !empty($artist['is_following']); ?>
+                                <div class="ga-srch-artist-result-card" style="cursor: pointer;" onclick="window.location.href='visit-profile.php?user=<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?>';">
                                     <img class="ga-srch-ar-avatar" src="<?php echo htmlspecialchars($artist['avatar_url'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?>">
                                     <div class="ga-srch-ar-body">
                                         <p class="ga-srch-ar-name"><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></p>
@@ -199,7 +217,7 @@ $tagCount = count($tags);
                                         <p class="ga-srch-ar-bio"><?php echo htmlspecialchars($artist['bio'] ?: 'Artis lokal aktif.', ENT_QUOTES); ?></p>
                                         <p class="ga-srch-ar-stats"><strong><?php echo number_format((int)$artist['follower_count'], 0, ',', '.'); ?></strong> followers &bull; <strong><?php echo number_format((int)$artist['post_count'], 0, ',', '.'); ?></strong> posts</p>
                                     </div>
-                                    <button class="ga-srch-btn-follow btn-follow" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>">Follow</button>
+                                    <button class="ga-srch-btn-follow btn-follow" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>" data-following="<?php echo $isFollowing ? 'true' : 'false'; ?>" onclick="event.stopPropagation();"><?php echo $isFollowing ? 'Following' : 'Follow'; ?></button>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -240,13 +258,14 @@ $tagCount = count($tags);
                         <div class="ga-srch-suggested-artist"><span>Tidak ada artis</span></div>
                     <?php else: ?>
                         <?php foreach (array_slice($artists, 0, 2) as $artist): ?>
-                            <div class="ga-srch-suggested-artist" style="display: flex; align-items: center; gap: 10px; overflow: hidden; justify-content: space-between;">
+                            <?php $isFollowing = !empty($artist['is_following']); ?>
+                            <div class="ga-srch-suggested-artist" style="display: flex; align-items: center; gap: 10px; overflow: hidden; justify-content: space-between; cursor: pointer;" onclick="window.location.href='visit-profile.php?user=<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?>';">
                                 <img class="ga-srch-sa-avatar" src="<?php echo htmlspecialchars($artist['avatar_url'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?>">
                                 <div class="ga-srch-sa-info" style="flex: 1; min-width: 0;">
                                     <strong style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></strong>
                                     <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@<?php echo htmlspecialchars($artist['username'], ENT_QUOTES); ?></span>
                                 </div>
-                                <button class="ga-srch-btn-follow btn-follow" style="font-size:11px;padding:5px 10px; flex-shrink: 0;" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>">+Follow</button>
+                                <button class="ga-srch-btn-follow btn-follow" style="font-size:11px;padding:5px 10px; flex-shrink: 0;" data-artist-id="<?php echo htmlspecialchars($artist['id'], ENT_QUOTES); ?>" data-following="<?php echo $isFollowing ? 'true' : 'false'; ?>" onclick="event.stopPropagation();"><?php echo $isFollowing ? 'Following' : '+Follow'; ?></button>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>

@@ -101,23 +101,40 @@
 
   function buildCard(art) {
     const tagsHtml = art.tags.join(' ');
+    const isNsfwClass = art.is_nsfw ? ' is-nsfw' : '';
+    
+    let badges = '';
+    if (art.is_nsfw) {
+      badges += `<span class="nsfw-badge">18+</span>`;
+    }
+    if (art.price && Number(art.price) > 0) {
+      const formattedPrice = 'Rp ' + Number(art.price).toLocaleString('id-ID');
+      badges += `<span class="price-badge">${formattedPrice}</span>`;
+    }
+
     return `
-      <div class="art-card"
+      <div class="art-card${isNsfwClass}"
            data-post-id="${escapeHtml(art.id)}"
            data-img="${escapeHtml(art.img)}"
            data-artist="${escapeHtml(art.artist)}"
            data-avatar-url="${escapeHtml(art.artist_avatar)}"
            data-tags="${escapeHtml(tagsHtml)}"
            data-likes="${art.likes}"
+           data-title="${escapeHtml(art.title || '')}"
            style="cursor:pointer;">
+        
+        ${badges}
+
         <img src="${escapeHtml(art.img)}" alt="Artwork by ${escapeHtml(art.artist)}" loading="lazy">
+        
+        <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=${escapeHtml(art.artist.replace('@', ''))}';">
+            <img class="card-avatar" src="${escapeHtml(art.artist_avatar)}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+            <span class="card-avatar-tooltip">${escapeHtml(art.artist)}</span>
+        </div>
+
         <div class="art-info">
+          <p class="art-title">${escapeHtml(art.title || 'Artwork')}</p>
           <p class="hashtags">${escapeHtml(tagsHtml)}</p>
-          <p class="artist-name">
-            <a href="visit-profile.php?user=${escapeHtml(art.artist.replace('@', ''))}" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
-                ${escapeHtml(art.artist)}
-            </a>
-          </p>
         </div>
       </div>`;
   }

@@ -2,17 +2,23 @@
 require_once __DIR__ . '/components/bootstrap.php';
 require_once __DIR__ . '/config/Db.php';
 
+$userSession = current_user();
+$currentUserId = $userSession ? $userSession['id'] : '';
+
 // Ambil top artist berdasarkan follower terbanyak
 $top_artists = db_query(
     $conn,
     "SELECT u.id, u.username, u.bio, 
             COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
             (SELECT COUNT(*) FROM follows f WHERE f.following_id = u.id) AS follower_count,
-            (SELECT COUNT(*) FROM posts p WHERE p.artist_id = u.id AND p.status = 'active') AS post_count
+            (SELECT COUNT(*) FROM posts p WHERE p.artist_id = u.id AND p.status = 'active') AS post_count,
+            (SELECT COUNT(*) FROM follows f2 WHERE f2.follower_id = ? AND f2.following_id = u.id) AS is_following
      FROM users u
      WHERE u.role = 'artist' AND u.is_banned = 0
      ORDER BY follower_count DESC, post_count DESC
-     LIMIT 12"
+     LIMIT 12",
+    "s",
+    [$currentUserId]
 );
 ?>
 <!DOCTYPE html>
@@ -42,6 +48,7 @@ $top_artists = db_query(
                     <p style="text-align: center; color: #888; grid-column: 1 / -1;">Belum ada artis yang tersedia.</p>
                 <?php else: ?>
                     <?php foreach ($top_artists as $artist): ?>
+                        <?php $isFollowing = !empty($artist['is_following']); ?>
                         <div class="artist-card">
                             <a href="visit-profile.php?user=<?= e($artist['username']) ?>">
                                 <img src="<?= e($artist['avatar_url']) ?>" alt="<?= e($artist['username']) ?>" class="artist-avatar" loading="lazy">
@@ -53,7 +60,7 @@ $top_artists = db_query(
                                     <span><strong><?= number_format((int)$artist['follower_count'], 0, ',', '.') ?></strong> Followers</span>
                                     <span><strong><?= number_format((int)$artist['post_count'], 0, ',', '.') ?></strong> Posts</span>
                                 </div>
-                                <button class="btn-follow" data-artist-id="<?= e($artist['id']) ?>">Follow</button>
+                                <button class="btn-follow" data-artist-id="<?= e($artist['id']) ?>" data-following="<?= $isFollowing ? 'true' : 'false' ?>"><?= $isFollowing ? 'Following' : 'Follow' ?></button>
                             </div>
                         </div>
                     <?php endforeach; ?>

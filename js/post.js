@@ -198,17 +198,41 @@
             card.appendChild(priceBadge);
         }
 
+        card.dataset.postId = data.postId;
+        card.dataset.title = data.title;
         // Info overlay
         const info     = document.createElement('div');
         info.className = 'art-info';
+        const pTitle   = document.createElement('p');
+        pTitle.className = 'art-title';
+        pTitle.textContent = data.title;
         const pTags    = document.createElement('p');
         pTags.className   = 'hashtags';
         pTags.textContent = data.tags;
-        const pArtist  = document.createElement('p');
-        pArtist.className   = 'artist-name';
-        pArtist.textContent = '@' + (Store.get('artistUsername') || 'saya');
+        
+        // Avatar Tooltip logic
+        const username = Store.get('artistUsername') || 'saya';
+        const avatarUrl = Store.get('artistAvatarUrl') || 'Assets/galateart_icon.png';
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'card-avatar-wrap';
+        avatarWrap.onclick = (e) => {
+            e.stopPropagation();
+            window.location.href = `visit-profile.php?user=${username}`;
+        };
+        const avatarImg = document.createElement('img');
+        avatarImg.className = 'card-avatar';
+        avatarImg.src = avatarUrl;
+        avatarImg.setAttribute('referrerpolicy', 'no-referrer');
+        avatarImg.onerror = function() { this.onerror=null; this.src='Assets/galateart_icon.png'; };
+        const avatarTooltip = document.createElement('span');
+        avatarTooltip.className = 'card-avatar-tooltip';
+        avatarTooltip.textContent = '@' + username;
+        avatarWrap.appendChild(avatarImg);
+        avatarWrap.appendChild(avatarTooltip);
+        card.appendChild(avatarWrap);
+
+        info.appendChild(pTitle);
         info.appendChild(pTags);
-        info.appendChild(pArtist);
         card.appendChild(info);
 
 

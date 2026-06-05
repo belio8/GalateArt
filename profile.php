@@ -28,7 +28,7 @@ $followersCount = (int) ($followersRow['cnt'] ?? 0);
 
 // Fetch saved posts
 $savedPostsSql = "
-    SELECT p.id as post_id, p.image_url, p.title, p.like_count, u.username as artist_name, u.avatar_url,
+    SELECT p.id as post_id, p.image_url, p.title, p.like_count, p.price, p.is_free, p.is_nsfw, u.username as artist_name, u.avatar_url,
            (SELECT GROUP_CONCAT(tag SEPARATOR ',') FROM post_tags WHERE post_id = p.id) as tags
     FROM saves s
     JOIN posts p ON s.post_id = p.id
@@ -40,7 +40,7 @@ $savedPosts = db_query($conn, $savedPostsSql, "s", [$userId]);
 
 // Fetch liked posts
 $likedPostsSql = "
-    SELECT p.id as post_id, p.image_url, p.title, p.like_count, u.username as artist_name, u.avatar_url,
+    SELECT p.id as post_id, p.image_url, p.title, p.like_count, p.price, p.is_free, p.is_nsfw, u.username as artist_name, u.avatar_url,
            (SELECT GROUP_CONCAT(tag SEPARATOR ',') FROM post_tags WHERE post_id = p.id) as tags
     FROM likes l
     JOIN posts p ON l.post_id = p.id
@@ -128,15 +128,23 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                 }
                                 $tagsFormatted = htmlspecialchars(trim($tagsStr));
                                 ?>
-                                <div class="art-card" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>">
+                                <div class="art-card <?= !empty($post['is_nsfw']) ? 'is-nsfw' : '' ?>" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>" data-avatar-url="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>" data-title="<?= htmlspecialchars($post['title'] ?: '') ?>">
+                                    <?php if (!empty($post['is_nsfw'])): ?>
+                                        <span class="nsfw-badge">18+</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($post['price']) && $post['price'] > 0): ?>
+                                        <span class="price-badge">Rp <?= number_format((float)$post['price'], 0, ',', '.') ?></span>
+                                    <?php endif; ?>
+
                                     <img src="<?= $img ?>" alt="Art">
+                                    <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>';">
+                                        <img class="card-avatar" src="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+                                        <span class="card-avatar-tooltip"><?= $artist ?></span>
+                                    </div>
                                     <div class="art-info">
+                                        <p class="art-title"><?= htmlspecialchars($post['title'] ?: 'Karya Seni') ?></p>
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name">
-                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
-                                                <?= $artist ?>
-                                            </a>
-                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -163,15 +171,23 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                                 }
                                 $tagsFormatted = htmlspecialchars(trim($tagsStr));
                                 ?>
-                                <div class="art-card" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>">
+                                <div class="art-card <?= !empty($post['is_nsfw']) ? 'is-nsfw' : '' ?>" data-post-id="<?= htmlspecialchars($post['post_id']) ?>" data-img="<?= $img ?>" data-artist="<?= $artist ?>" data-tags="<?= $tagsFormatted ?>" data-likes="<?= $likes ?>" data-avatar-url="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>" data-title="<?= htmlspecialchars($post['title'] ?: '') ?>">
+                                    <?php if (!empty($post['is_nsfw'])): ?>
+                                        <span class="nsfw-badge">18+</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($post['price']) && $post['price'] > 0): ?>
+                                        <span class="price-badge">Rp <?= number_format((float)$post['price'], 0, ',', '.') ?></span>
+                                    <?php endif; ?>
+
                                     <img src="<?= $img ?>" alt="Art">
+                                    <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>';">
+                                        <img class="card-avatar" src="<?= htmlspecialchars($post['avatar_url'] ?: 'Assets/galateart_icon.png') ?>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+                                        <span class="card-avatar-tooltip"><?= $artist ?></span>
+                                    </div>
                                     <div class="art-info">
+                                        <p class="art-title"><?= htmlspecialchars($post['title'] ?: 'Karya Seni') ?></p>
                                         <p class="hashtags"><?= $tagsFormatted ?></p>
-                                        <p class="artist-name">
-                                            <a href="visit-profile.php?user=<?= htmlspecialchars($post['artist_name']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
-                                                <?= $artist ?>
-                                            </a>
-                                        </p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

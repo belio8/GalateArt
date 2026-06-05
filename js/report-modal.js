@@ -118,10 +118,10 @@
   function injectCardMenus() {
     document.querySelectorAll('.art-card, .post-card').forEach((card, i) => {
       if (card.querySelector('.ga-rpt-card-menu-btn')) return; // skip if already injected
-      const artistEl = card.querySelector('.artist-name');
+      const artistName = card.dataset.artist || card.querySelector('.card-avatar-tooltip')?.textContent || '';
       const hashEl   = card.querySelector('.hashtags');
-      const targetTitle = hashEl ? hashEl.textContent : `Post #${i+1}`;
-      const targetId    = `card-${i}-${Date.now()}`;
+      const targetTitle = card.dataset.title || (hashEl ? hashEl.textContent : `Post #${i+1}`);
+      const targetId    = card.dataset.postId || `card-${i}-${Date.now()}`;
 
       const btn = document.createElement('button');
       btn.className = 'ga-rpt-card-menu-btn';
@@ -148,7 +148,7 @@
         const action = e.target.closest('[data-action]')?.dataset.action;
         menu.classList.remove('open');
         if (action === 'report') openReportModal({ type: 'post', id: targetId, title: targetTitle });
-        if (action === 'report-account') openReportModal({ type: 'account', id: artistEl?.textContent || 'unknown', title: artistEl?.textContent || 'Account' });
+        if (action === 'report-account') openReportModal({ type: 'account', id: artistName || 'unknown', title: artistName || 'Account' });
       });
     });
 

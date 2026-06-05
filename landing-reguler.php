@@ -4,7 +4,7 @@ require_once __DIR__ . '/config/Db.php';
 require_login('regular');
 
 $posts = db_query(
-    "SELECT p.id, p.title, p.image_url, p.like_count, u.username,
+    "SELECT p.id, p.title, p.image_url, p.like_count, p.price, p.is_free, p.is_nsfw, u.username,
      COALESCE(NULLIF(u.avatar_url, ''), 'Assets/galateart_icon.png') AS avatar_url,
      COALESCE(GROUP_CONCAT(DISTINCT pt.tag ORDER BY pt.tag SEPARATOR ' '), '') AS tags
      FROM posts p
@@ -67,21 +67,31 @@ $posts = db_query(
                     $tags = trim((string) ($post['tags'] ?? ''));
                     $hashtags = $tags ? '#' . str_replace(' ', ' #', $tags) : '#original #illustration';
                 ?>
-                <div class="art-card" style="cursor: pointer;"
+                <div class="art-card <?= !empty($post['is_nsfw']) ? 'is-nsfw' : '' ?>" style="cursor: pointer;"
                      data-post-id="<?= e($post['id']) ?>"
                      data-img="<?= e($image) ?>"
                      data-artist="@<?= e($post['username']) ?>"
                      data-avatar-url="<?= e($post['avatar_url']) ?>"
                      data-tags="<?= e($hashtags) ?>"
-                     data-likes="<?= (int)$post['like_count'] ?>">
+                     data-likes="<?= (int)$post['like_count'] ?>"
+                     data-title="<?= e($post['title']) ?>">
+                    
+                    <?php if (!empty($post['is_nsfw'])): ?>
+                        <span class="nsfw-badge">18+</span>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($post['price']) && $post['price'] > 0): ?>
+                        <span class="price-badge">Rp <?= number_format((float)$post['price'], 0, ',', '.') ?></span>
+                    <?php endif; ?>
+
                     <img src="<?= e($image) ?>" alt="<?= e($post['title']) ?>">
+                    <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=<?= e($post['username']) ?>';">
+                        <img class="card-avatar" src="<?= e($post['avatar_url']) ?>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+                        <span class="card-avatar-tooltip">@<?= e($post['username']) ?></span>
+                    </div>
                     <div class="art-info">
+                        <p class="art-title"><?= e($post['title']) ?></p>
                         <p class="hashtags"><?= e($hashtags) ?></p>
-                        <p class="artist-name">
-                            <a href="visit-profile.php?user=<?= e($post['username']) ?>" style="color: inherit; text-decoration: none;" onclick="event.stopPropagation();">
-                                @<?= e($post['username']) ?>
-                            </a>
-                        </p>
                     </div>
                 </div>
             <?php endforeach; ?>

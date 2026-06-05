@@ -123,14 +123,16 @@ let _currentPostId = null;
         let likes = data.likes !== undefined ? parseInt(data.likes) : (data.dataset ? parseInt(data.dataset.likes || '0') : 0);
         let avatarUrl = data.avatar_url || (data.dataset ? data.dataset.avatarUrl : '');
         let postId = data.postId || (data.dataset ? data.dataset.postId : null);
+        let title = data.title || (data.dataset ? data.dataset.title : '');
 
         // Fallback fallback
         if (!img && data.querySelector) {
             img = data.querySelector('img')?.src || '';
-            artist = data.querySelector('.artist-name')?.innerText || '';
+            artist = data.querySelector('.card-avatar-tooltip')?.innerText || data.dataset?.artist || '';
             tags = data.querySelector('.hashtags')?.innerText || '';
             let likesText = data.querySelector('.likes')?.innerText || '';
             likes = parseInt(likesText.replace(/\D/g, '')) || 0;
+            title = data.querySelector('.art-title')?.innerText || title;
         }
 
         _currentPostId = postId;
@@ -187,6 +189,7 @@ let _currentPostId = null;
             commentFeed.innerHTML = `
                 <div class="caption-block" style="padding-top: 10px;">
                     <div class="c-body" style="margin-left: 0;">
+                        ${title ? `<h3 style="margin: 0 0 8px 0; font-size: 1.1rem; color: #fff;">${escapeHtml(title)}</h3>` : ''}
                         <span style="font-weight: 500; font-size: 0.95rem;">Menampilkan karya seni terbaru!</span>
                         <div class="tags" style="margin-top: 4px;">${escapeHtml(tags)}</div>
                     </div>
@@ -236,10 +239,13 @@ let _currentPostId = null;
                     if (data.description) {
                         descText = data.description;
                     }
+                    if (data.title) {
+                        title = data.title;
+                    }
                 }
 
                 if (result.status === 'ok') {
-                    renderComments(result.comments, artist, tags, capAv ? capAv.src : '', descText);
+                    renderComments(result.comments, artist, tags, capAv ? capAv.src : '', descText, title);
                 } else {
                     updateCommentCount(0);
                 }
@@ -253,12 +259,13 @@ let _currentPostId = null;
     // Global expose
     window.openArtModal = openModal;
 
-    function renderComments(comments, artist, tags, avatarUrl, descText = "Menampilkan karya seni terbaru!") {
+    function renderComments(comments, artist, tags, avatarUrl, descText = "Menampilkan karya seni terbaru!", title = "") {
         if (!commentFeed) return;
 
         let html = `
             <div class="caption-block" style="padding-top: 10px;">
                 <div class="c-body" style="margin-left: 0;">
+                    ${title ? `<h3 style="margin: 0 0 8px 0; font-size: 1.1rem; color: #fff;">${escapeHtml(title)}</h3>` : ''}
                     <span style="font-weight: 500; font-size: 0.95rem;">${escapeHtml(descText)}</span>
                     <div class="tags" style="margin-top: 4px;">${escapeHtml(tags)}</div>
                 </div>

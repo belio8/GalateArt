@@ -19,7 +19,7 @@ if (!$post_id) {
     exit;
 }
 
-$post = db_row($conn, "SELECT like_count, artist_id, description FROM posts WHERE id = ?", "s", [$post_id]);
+$post = db_row($conn, "SELECT title, like_count, artist_id, description FROM posts WHERE id = ?", "s", [$post_id]);
 if (!$post) {
     http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Post tidak ditemukan.']);
@@ -53,5 +53,6 @@ echo json_encode([
     'likes_count' => $likes_count,
     'artist_id' => $artist_id,
     'is_following' => $is_following,
-    'description' => $post['description'] ?? ''
+    'description' => $post['description'] ?? '',
+    'title' => $post['title'] ?? ''
 ]);

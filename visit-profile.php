@@ -65,7 +65,7 @@ if ($isArtist) {
     // Fetch posts
     $postRows = db_query(
         $conn,
-        "SELECT p.id, p.image_url, p.like_count, p.title, p.description,
+        "SELECT p.id, p.image_url, p.like_count, p.title, p.description, p.price, p.is_free, p.is_nsfw,
                 COALESCE(GROUP_CONCAT(pt.tag ORDER BY pt.id SEPARATOR ' '), '') AS tags
          FROM posts p
          LEFT JOIN post_tags pt ON pt.post_id = p.id
@@ -182,15 +182,30 @@ if ($isArtist) {
                                     $tags = trim((string) ($post['tags'] ?? ''));
                                     $hashtags = $tags ? '#' . str_replace(' ', ' #', $tags) : '#digitalart';
                                 ?>
-                                <div class="art-card" style="cursor: pointer;"
+                                <div class="art-card <?= !empty($post['is_nsfw']) ? 'is-nsfw' : '' ?>" style="cursor: pointer;"
                                      data-post-id="<?= e($post['id']) ?>"
                                      data-img="<?= e($post['image_url'] ?: 'Assets/draw2.png') ?>"
                                      data-artist="@<?= e($user['username']) ?>"
                                      data-avatar-url="<?= e($user['avatar_url'] ?: 'Assets/galateart_icon.png') ?>"
                                      data-tags="<?= e($hashtags) ?>"
-                                     data-likes="<?= (int)$post['like_count'] ?>">
+                                     data-likes="<?= (int)$post['like_count'] ?>"
+                                     data-title="<?= e($post['title'] ?: '') ?>">
+                                    
+                                    <?php if (!empty($post['is_nsfw'])): ?>
+                                        <span class="nsfw-badge">18+</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($post['price']) && $post['price'] > 0): ?>
+                                        <span class="price-badge">Rp <?= number_format((float)$post['price'], 0, ',', '.') ?></span>
+                                    <?php endif; ?>
+
                                     <img src="<?= e($post['image_url'] ?: 'Assets/draw2.png') ?>" alt="<?= e($post['title'] ?: 'Postingan') ?>">
+                                    <div class="card-avatar-wrap" onclick="event.stopPropagation(); window.location.href='visit-profile.php?user=<?= e($user['username']) ?>';">
+                                        <img class="card-avatar" src="<?= e($user['avatar_url'] ?: 'Assets/galateart_icon.png') ?>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='Assets/galateart_icon.png';">
+                                        <span class="card-avatar-tooltip">@<?= e($user['username']) ?></span>
+                                    </div>
                                     <div class="art-info">
+                                        <p class="art-title"><?= e($post['title'] ?: 'Postingan') ?></p>
                                         <p class="hashtags"><?= e($hashtags) ?></p>
                                         <p class="likes"><i class="fas fa-heart"></i> <?= number_format((int) $post['like_count'], 0, ',', '.') ?> likes</p>
                                     </div>
