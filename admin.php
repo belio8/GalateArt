@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
 require_login('admin');
 ?>
@@ -26,9 +26,6 @@ require_login('admin');
     <button class="ga-adm-nav-item" data-page="reports"><i class="fas fa-flag"></i> Laporan <span class="ga-adm-badge" id="ga-adm-report-badge">0</span></button>
     <button class="ga-adm-nav-item" data-page="posts"><i class="fas fa-images"></i> Postingan</button>
     <button class="ga-adm-nav-item" data-page="accounts"><i class="fas fa-users"></i> Akun</button>
-
-    <div class="ga-adm-nav-group-label">Sistem</div>
-    <button class="ga-adm-nav-item" onclick="alert('Fitur log aktivitas akan segera hadir.')"><i class="fas fa-history"></i> Log Aktivitas</button>
   </nav>
   <div class="ga-adm-sidebar-footer">
     <form action="api/auth.php" method="post" style="display:inline;">
@@ -122,7 +119,12 @@ require_login('admin');
     <section class="ga-adm-page-section" id="page-posts">
       <div class="ga-adm-section-header">
         <h2>Manajemen Postingan</h2>
-        <input class="ga-adm-search-input" type="text" placeholder="Cari postingan..." oninput="filterTable(this.value,'ga-adm-post-tbody')">
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ga-adm-muted);cursor:pointer;">
+            <input type="checkbox" id="ga-adm-show-removed" onchange="loadPosts()" style="accent-color:var(--ga-adm-accent);cursor:pointer;"> Tampilkan Removed
+          </label>
+          <input class="ga-adm-search-input" type="text" placeholder="Cari postingan..." oninput="filterTable(this.value,'ga-adm-post-tbody')">
+        </div>
       </div>
       <div class="ga-adm-table-wrap">
         <table>
@@ -173,15 +175,41 @@ require_login('admin');
 <script src="js/auth.js"></script>
 <script>
 /* ========================================================================
-   AUTH GUARD - redirect ke login jika belum auth
+   API HELPER
 ======================================================================== */
+const API_BASE = 'api/admin.php';
 
+async function api(action, params = {}, method = 'GET') {
+  try {
+    let url = API_BASE;
+    let opts = { headers: { 'Content-Type': 'application/json' } };
+
+    if (method === 'GET') {
+      const qs = new URLSearchParams({ action, ...params }).toString();
+      url += '?' + qs;
+      opts.method = 'GET';
+    } else {
+      opts.method = 'POST';
+      opts.body = JSON.stringify({ action, ...params });
+    }
+
+    const res = await fetch(url, opts);
+    const json = await res.json();
+    if (!res.ok || json.status === 'error') {
+      throw new Error(json.message || 'Terjadi kesalahan.');
+    }
+    return json;
+  } catch (err) {
+    console.error(`API [${action}]:`, err);
+    throw err;
+  }
+}
 
 /* ========================================================================
-   SEED DATA
+   CONSTANTS
 ======================================================================== */
 const REASON_LABELS = {
-  sensitive: 'Unmarked sensitive ga-adm-content',
+  sensitive: 'Unmarked sensitive content',
   hashtag:   'Misused hashtags / category',
   ai:        'AI / tracing / scam / fraud',
   harass:    'Harassment / doxxing / threats',
@@ -190,41 +218,12 @@ const REASON_LABELS = {
   other:     'Something else',
 };
 
-// Seed mock posts
-const MOCK_POSTS = [
-  { id:'p1', title:'Character Illustration #1', artist:'@artis_lokal',  tags:'#original #illustration', likes:120, status:'active' },
-  { id:'p2', title:'VTuber Design Kobo',        artist:'@ichigowarano', tags:'#vtuber #hololive',       likes:250, status:'active' },
-  { id:'p3', title:'Fantasy Landscape',          artist:'@jasper_xandros', tags:'#fantasy #landscape',  likes:88,  status:'active' },
-  { id:'p4', title:'Anime Style Portrait',       artist:'@keenbiscuit', tags:'#anime #portrait',         likes:64,  status:'flagged' },
-  { id:'p5', title:'Dark Concept Art',           artist:'@seniman_digital', tags:'#concept #dark',       likes:310, status:'active' },
-];
-
-const MOCK_ACCOUNTS = [
-  { id:'a1', name:'Artis Lokal',     handle:'@artis_lokal',      type:'artist', posts:150, followers:2500, status:'active' },
-  { id:'a2', name:'Ichigowarano',    handle:'@ichigowarano',     type:'artist', posts:180, followers:3200, status:'active' },
-  { id:'a3', name:'Jasper Xandros',  handle:'@jasper_xandros',   type:'artist', posts:140, followers:2100, status:'active' },
-  { id:'a4', name:'Keenbiscuit',     handle:'@keenbiscuit',      type:'artist', posts:95,  followers:1500, status:'banned'  },
-  { id:'a5', name:'Seniman Digital', handle:'@seniman_digital',  type:'artist', posts:120, followers:1800, status:'active' },
-  { id:'a6', name:'User GalateArt',  handle:'@user_galateart',   type:'user',   posts:4,   followers:12,   status:'active' },
-];
-
-/* Seed default reports if localStorage empty */
-function seedReports() {
-  if (localStorage.getItem('galateart_reports')) return;
-  const now = new Date();
-  const ago = (m) => new Date(now - m * 60000).toISOString();
-  const defaults = [
-    { id:1, type:'post',    targetId:'p4', targetTitle:'Anime Style Portrait', reason:'sensitive', status:'pending',  createdAt: ago(10) },
-    { id:2, type:'account', targetId:'a4', targetTitle:'@keenbiscuit',          reason:'ai',        status:'pending',  createdAt: ago(45) },
-    { id:3, type:'post',    targetId:'p5', targetTitle:'Dark Concept Art',      reason:'hate',      status:'approved', createdAt: ago(120) },
-    { id:4, type:'account', targetId:'a6', targetTitle:'@user_galateart',       reason:'harass',    status:'rejected', createdAt: ago(200) },
-  ];
-  localStorage.setItem('galateart_reports', JSON.stringify(defaults));
-}
-seedReports();
-
-function getReports() { return JSON.parse(localStorage.getItem('galateart_reports') || '[]'); }
-function saveReports(arr) { localStorage.setItem('galateart_reports', JSON.stringify(arr)); }
+/* ========================================================================
+   IN-MEMORY DATA CACHE (filled from DB)
+======================================================================== */
+let reports  = [];
+let posts    = [];
+let accounts = [];
 
 /* ========================================================================
    NAVIGATION
@@ -232,16 +231,16 @@ function saveReports(arr) { localStorage.setItem('galateart_reports', JSON.strin
 const PAGE_TITLES = { dashboard:'Dashboard', reports:'Laporan', posts:'Postingan', accounts:'Akun' };
 
 function showPage(name) {
-  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ga-adm-page-section').forEach(s => s.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.nav-item[data-page]').forEach(b => b.classList.remove('active'));
-  const btn = document.querySelector(`.nav-item[data-page="${name}"]`);
+  document.querySelectorAll('.ga-adm-nav-item[data-page]').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.ga-adm-nav-item[data-page="${name}"]`);
   if (btn) btn.classList.add('active');
   document.getElementById('ga-adm-page-title').textContent = PAGE_TITLES[name] || name;
-  renderAll();
+  loadAll();
 }
 
-document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+document.querySelectorAll('.ga-adm-nav-item[data-page]').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.page));
 });
 
@@ -257,7 +256,7 @@ function timeAgo(iso) {
 }
 
 function badgeStatus(s) {
-  const map = { pending:'Pending', approved:'Disetujui', rejected:'Ditolak', active:'Aktif', banned:'Banned', artist:'Artist', user:'User', flagged:'Ditandai' };
+  const map = { pending:'Pending', approved:'Disetujui', rejected:'Ditolak', active:'Aktif', banned:'Banned', artist:'Artist', user:'User', admin:'Admin', flagged:'Ditandai', removed:'Dihapus' };
   return `<span class="ga-adm-badge-status ${s}">${map[s]||s}</span>`;
 }
 
@@ -270,73 +269,85 @@ function filterReports(btn) {
   document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   reportFilter = btn.dataset.filter;
-  renderReports();
+  loadReports();
 }
 
-function reportRow(r, idx, bodyId) {
-  const short = (REASON_LABELS[r.reason]||r.reason).substring(0,32)+'...';
+function reportRow(r, bodyId) {
+  const reasonLabel = REASON_LABELS[r.reason] || r.reason;
+  const short = reasonLabel.length > 32 ? reasonLabel.substring(0,32)+'...' : reasonLabel;
+  const idShort = typeof r.id === 'string' ? r.id.substring(0,8) : r.id;
   return `<tr>
-    ${bodyId === 'ga-adm-report-tbody' ? `<td style="color:var(--ga-adm-muted);font-size:12px">#${r.id}</td>` : ''}
+    ${bodyId === 'ga-adm-report-tbody' ? `<td style="color:var(--ga-adm-muted);font-size:12px">${escapeHtml(String(idShort))}</td>` : ''}
     <td><strong>${escapeHtml(r.targetTitle)}</strong></td>
-    <td title="${REASON_LABELS[r.reason]||r.reason}" style="color:var(--ga-adm-muted);font-size:12px">${short}</td>
+    <td title="${escapeHtml(reasonLabel)}" style="color:var(--ga-adm-muted);font-size:12px">${escapeHtml(short)}</td>
     <td>${r.type === 'post' ? '<i class="fas fa-image" style="color:var(--ga-adm-accent)"></i> Post' : '<i class="fas fa-user" style="color:var(--ga-adm-warn)"></i> Akun'}</td>
     <td>${badgeStatus(r.status)}</td>
     <td style="color:var(--ga-adm-muted);font-size:12px">${timeAgo(r.createdAt)}</td>
     <td>
       <div class="ga-adm-action-btns">
-        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewReport(${r.id})">Detail</button>
+        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewReport('${escapeHtml(r.id)}')">Detail</button>
         ${r.status==='pending' ? `
-          <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport(${r.id},'approved')">Setuju</button>
-          <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport(${r.id},'rejected')">Tolak</button>
+          <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport('${escapeHtml(r.id)}','approved')">Setuju</button>
+          <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport('${escapeHtml(r.id)}','rejected')">Tolak</button>
         ` : ''}
       </div>
     </td>
   </tr>`;
 }
 
+async function loadReports() {
+  try {
+    const params = reportFilter !== 'all' ? { status: reportFilter } : {};
+    const res = await api('reports', params);
+    reports = res.data || [];
+  } catch { reports = []; }
+  renderReports();
+  renderDashReports();
+}
+
 function renderReports() {
-  let reports = getReports();
-  if (reportFilter !== 'all') reports = reports.filter(r => r.status === reportFilter);
   const tbody = document.getElementById('ga-adm-report-tbody');
   tbody.innerHTML = reports.length
-    ? reports.map(r => reportRow(r, r.id, 'ga-adm-report-tbody')).join('')
+    ? reports.map(r => reportRow(r, 'ga-adm-report-tbody')).join('')
     : `<tr><td colspan="7"><div class="ga-adm-empty-table"><i class="fas fa-flag"></i>Tidak ada laporan</div></td></tr>`;
 }
 
 function renderDashReports() {
-  const reports = getReports().slice(0,5);
   const tbody = document.getElementById('ga-adm-dash-report-tbody');
-  tbody.innerHTML = reports.length
-    ? reports.map(r => reportRow(r, r.id, 'ga-adm-dash-report-tbody')).join('')
+  const dashReports = reports.slice(0,5);
+  tbody.innerHTML = dashReports.length
+    ? dashReports.map(r => reportRow(r, 'ga-adm-dash-report-tbody')).join('')
     : `<tr><td colspan="6"><div class="ga-adm-empty-table"><i class="fas fa-flag"></i>Belum ada laporan</div></td></tr>`;
 }
 
-function updateReport(id, status) {
-  const reports = getReports();
-  const r = reports.find(x => x.id === id);
-  if (!r) return;
-  r.status = status;
-  saveReports(reports);
-  renderAll();
-  toast(status === 'approved' ? 'Laporan disetujui' : 'Laporan ditolak');
+async function updateReport(id, status) {
+  try {
+    const res = await api('update_report', { id, status }, 'POST');
+    toast(res.message || (status === 'approved' ? 'Laporan disetujui' : 'Laporan ditolak'));
+    await loadAll();
+  } catch (err) {
+    toast('Gagal: ' + err.message);
+  }
 }
 
 function viewReport(id) {
-  const r = getReports().find(x => x.id === id);
+  const r = reports.find(x => x.id === id);
   if (!r) return;
   document.getElementById('ga-adm-drawer-title-el').textContent = 'Detail Laporan';
   document.getElementById('ga-adm-drawer-body').innerHTML = `
-    <div class="ga-adm-detail-row"><label>ID</label><span>#${r.id}</span></div>
+    <div class="ga-adm-detail-row"><label>ID</label><span>${escapeHtml(String(r.id).substring(0,8))}...</span></div>
     <div class="ga-adm-detail-row"><label>Tipe Target</label><span>${r.type === 'post' ? 'Postingan' : 'Akun'}</span></div>
     <div class="ga-adm-detail-row"><label>Target</label><span>${escapeHtml(r.targetTitle)}</span></div>
     <div class="ga-adm-detail-row"><label>Alasan</label><span>${REASON_LABELS[r.reason]||r.reason}</span></div>
+    ${r.message ? `<div class="ga-adm-detail-row"><label>Pesan Tambahan</label><span style="white-space: pre-wrap; background: var(--ga-adm-surface2); padding: 10px; border-radius: 8px; margin-top: 5px;">${escapeHtml(r.message)}</span></div>` : ''}
     <div class="ga-adm-detail-row"><label>Status</label><span>${badgeStatus(r.status)}</span></div>
+    <div class="ga-adm-detail-row"><label>Pelapor</label><span>${escapeHtml(r.reporter || '-')}</span></div>
     <div class="ga-adm-detail-row"><label>Waktu</label><span>${new Date(r.createdAt).toLocaleString('id-ID')}</span></div>
   `;
   const actions = document.getElementById('ga-adm-drawer-actions-el');
   actions.innerHTML = r.status === 'pending' ? `
-    <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport(${r.id},'approved');closeDrawer()">Setujui Laporan</button>
-    <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport(${r.id},'rejected');closeDrawer()">Tolak Laporan</button>
+    <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport('${escapeHtml(r.id)}','approved');closeDrawer()">Setujui Laporan</button>
+    <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport('${escapeHtml(r.id)}','rejected');closeDrawer()">Tolak Laporan</button>
   ` : `<button class="ga-adm-btn-sm ga-adm-btn-view" onclick="closeDrawer()">Tutup</button>`;
   openDrawer();
 }
@@ -344,13 +355,22 @@ function viewReport(id) {
 /* ========================================================================
    POSTS
 ======================================================================== */
-let posts = JSON.parse(localStorage.getItem('ga_posts') || 'null') || MOCK_POSTS;
-function savePosts() { localStorage.setItem('ga_posts', JSON.stringify(posts)); }
+async function loadPosts(filter = '') {
+  try {
+    const showRemoved = document.getElementById('ga-adm-show-removed')?.checked ? '1' : '0';
+    const params = { show_removed: showRemoved };
+    if (filter) params.q = filter;
+    const res = await api('posts', params);
+    posts = res.data || [];
+  } catch { posts = []; }
+  renderPosts();
+}
 
-function renderPosts(filter='') {
+function renderPosts() {
   const tbody = document.getElementById('ga-adm-post-tbody');
-  const list = filter ? posts.filter(p => (p.title+p.artist+p.tags).toLowerCase().includes(filter.toLowerCase())) : posts;
-  tbody.innerHTML = list.map(p => `<tr>
+  tbody.innerHTML = posts.length ? posts.map(p => {
+    const isRemoved = p.status === 'removed';
+    return `<tr${isRemoved ? ' style="opacity:0.55"' : ''}>
     <td><strong>${escapeHtml(p.title)}</strong></td>
     <td style="color:var(--ga-adm-muted)">${escapeHtml(p.artist)}</td>
     <td style="font-size:12px;color:var(--ga-adm-muted)">${escapeHtml(p.tags)}</td>
@@ -358,22 +378,42 @@ function renderPosts(filter='') {
     <td>${badgeStatus(p.status)}</td>
     <td>
       <div class="ga-adm-action-btns">
-        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewPost('${p.id}')">Detail</button>
-        <button class="ga-adm-btn-sm ga-adm-btn-delete" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></button>
+        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewPost('${escapeHtml(p.id)}')">Detail</button>
+        ${isRemoved
+          ? `<button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="restorePost('${escapeHtml(p.id)}')"><i class="fas fa-undo"></i> Pulihkan</button>`
+          : `<button class="ga-adm-btn-sm ga-adm-btn-delete" onclick="deletePost('${escapeHtml(p.id)}')"><i class="fas fa-trash"></i></button>`}
       </div>
     </td>
-  </tr>`).join('') || `<tr><td colspan="6"><div class="ga-adm-empty-table"><i class="fas fa-images"></i>Tidak ada postingan</div></td></tr>`;
+  </tr>`;
+  }).join('') : `<tr><td colspan="6"><div class="ga-adm-empty-table"><i class="fas fa-images"></i>Tidak ada postingan</div></td></tr>`;
 }
 
-function deletePost(id) {
+async function deletePost(id) {
   if (!confirm('Hapus postingan ini?')) return;
-  posts = posts.filter(p => p.id !== id);
-  savePosts(); renderAll(); toast('ðŸ—‘ Postingan dihapus');
+  try {
+    await api('delete_post', { id }, 'POST');
+    toast('🗑 Postingan dihapus');
+    await loadAll();
+  } catch (err) {
+    toast('Gagal: ' + err.message);
+  }
+}
+
+async function restorePost(id) {
+  if (!confirm('Pulihkan postingan ini?')) return;
+  try {
+    const res = await api('restore_post', { id }, 'POST');
+    toast(res.message || '✅ Postingan dipulihkan');
+    await loadAll();
+  } catch (err) {
+    toast('Gagal: ' + err.message);
+  }
 }
 
 function viewPost(id) {
   const p = posts.find(x => x.id === id);
   if (!p) return;
+  const isRemoved = p.status === 'removed';
   document.getElementById('ga-adm-drawer-title-el').textContent = 'Detail Postingan';
   document.getElementById('ga-adm-drawer-body').innerHTML = `
     <div class="ga-adm-detail-row"><label>Judul</label><span>${escapeHtml(p.title)}</span></div>
@@ -383,7 +423,9 @@ function viewPost(id) {
     <div class="ga-adm-detail-row"><label>Status</label><span>${badgeStatus(p.status)}</span></div>
   `;
   document.getElementById('ga-adm-drawer-actions-el').innerHTML = `
-    <button class="ga-adm-btn-sm ga-adm-btn-delete" onclick="deletePost('${p.id}');closeDrawer()">Hapus Postingan</button>
+    ${isRemoved
+      ? `<button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="restorePost('${escapeHtml(p.id)}');closeDrawer()">Pulihkan Postingan</button>`
+      : `<button class="ga-adm-btn-sm ga-adm-btn-delete" onclick="deletePost('${escapeHtml(p.id)}');closeDrawer()">Hapus Postingan</button>`}
     <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="closeDrawer()">Tutup</button>
   `;
   openDrawer();
@@ -392,13 +434,18 @@ function viewPost(id) {
 /* ========================================================================
    ACCOUNTS
 ======================================================================== */
-let accounts = JSON.parse(localStorage.getItem('ga_accounts') || 'null') || MOCK_ACCOUNTS;
-function saveAccounts() { localStorage.setItem('ga_accounts', JSON.stringify(accounts)); }
+async function loadAccounts(filter = '') {
+  try {
+    const params = filter ? { q: filter } : {};
+    const res = await api('accounts', params);
+    accounts = res.data || [];
+  } catch { accounts = []; }
+  renderAccounts();
+}
 
-function renderAccounts(filter='') {
+function renderAccounts() {
   const tbody = document.getElementById('ga-adm-account-tbody');
-  const list = filter ? accounts.filter(a => (a.name+a.handle).toLowerCase().includes(filter.toLowerCase())) : accounts;
-  tbody.innerHTML = list.map(a => `<tr>
+  tbody.innerHTML = accounts.length ? accounts.map(a => `<tr>
     <td>
       <div class="ga-adm-user-cell">
         <div class="ga-adm-u-avatar">${escapeHtml(a.name[0].toUpperCase())}</div>
@@ -411,23 +458,27 @@ function renderAccounts(filter='') {
     <td>${badgeStatus(a.status)}</td>
     <td>
       <div class="ga-adm-action-btns">
-        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewAccount('${a.id}')">Detail</button>
+        <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="viewAccount('${escapeHtml(a.id)}')">Detail</button>
         ${a.status === 'banned'
-          ? `<button class="ga-adm-btn-sm ga-adm-btn-unban" onclick="toggleBan('${a.id}')">Unban</button>`
-          : `<button class="ga-adm-btn-sm ga-adm-btn-ban"   onclick="toggleBan('${a.id}')">Ban</button>`}
+          ? `<button class="ga-adm-btn-sm ga-adm-btn-unban" onclick="toggleBan('${escapeHtml(a.id)}')">Unban</button>`
+          : `<button class="ga-adm-btn-sm ga-adm-btn-ban"   onclick="toggleBan('${escapeHtml(a.id)}')">Ban</button>`}
       </div>
     </td>
-  </tr>`).join('') || `<tr><td colspan="6"><div class="ga-adm-empty-table"><i class="fas fa-users"></i>Tidak ada akun</div></td></tr>`;
+  </tr>`).join('') : `<tr><td colspan="6"><div class="ga-adm-empty-table"><i class="fas fa-users"></i>Tidak ada akun</div></td></tr>`;
 }
 
-function toggleBan(id) {
+async function toggleBan(id) {
   const a = accounts.find(x => x.id === id);
   if (!a) return;
   const willBan = a.status !== 'banned';
-  if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${escapeHtml(a.handle)}?`)) return;
-  a.status = willBan ? 'banned' : 'active';
-  saveAccounts(); renderAll();
-  toast(willBan ? `${escapeHtml(a.handle)} di-ban` : `${escapeHtml(a.handle)} di-unban`);
+  if (!confirm(`${willBan ? 'Ban' : 'Unban'} akun ${a.handle}?`)) return;
+  try {
+    const res = await api('toggle_ban', { id }, 'POST');
+    toast(res.message);
+    await loadAll();
+  } catch (err) {
+    toast('Gagal: ' + err.message);
+  }
 }
 
 function viewAccount(id) {
@@ -444,8 +495,8 @@ function viewAccount(id) {
   `;
   document.getElementById('ga-adm-drawer-actions-el').innerHTML = `
     ${a.status === 'banned'
-      ? `<button class="ga-adm-btn-sm ga-adm-btn-unban" onclick="toggleBan('${a.id}');closeDrawer()">Unban Akun</button>`
-      : `<button class="ga-adm-btn-sm ga-adm-btn-ban"   onclick="toggleBan('${a.id}');closeDrawer()">Ban Akun</button>`}
+      ? `<button class="ga-adm-btn-sm ga-adm-btn-unban" onclick="toggleBan('${escapeHtml(a.id)}');closeDrawer()">Unban Akun</button>`
+      : `<button class="ga-adm-btn-sm ga-adm-btn-ban"   onclick="toggleBan('${escapeHtml(a.id)}');closeDrawer()">Ban Akun</button>`}
     <button class="ga-adm-btn-sm ga-adm-btn-view" onclick="closeDrawer()">Tutup</button>
   `;
   openDrawer();
@@ -454,21 +505,30 @@ function viewAccount(id) {
 /* ========================================================================
    STATS
 ======================================================================== */
-function renderStats() {
-  const reports = getReports();
-  document.getElementById('ga-adm-stat-pending').textContent  = reports.filter(r=>r.status==='pending').length;
-  document.getElementById('ga-adm-stat-approved').textContent = reports.filter(r=>r.status==='approved').length;
-  document.getElementById('ga-adm-stat-posts').textContent    = posts.length;
-  document.getElementById('ga-adm-stat-accounts').textContent = accounts.length;
-  document.getElementById('ga-adm-report-badge').textContent  = reports.filter(r=>r.status==='pending').length;
+async function loadStats() {
+  try {
+    const res = await api('stats');
+    const d = res.data;
+    document.getElementById('ga-adm-stat-pending').textContent  = d.pending;
+    document.getElementById('ga-adm-stat-approved').textContent = d.approved;
+    document.getElementById('ga-adm-stat-posts').textContent    = d.posts;
+    document.getElementById('ga-adm-stat-accounts').textContent = d.accounts;
+    document.getElementById('ga-adm-report-badge').textContent  = d.pending;
+  } catch (err) {
+    console.error('Stats load error:', err);
+  }
 }
 
 /* ========================================================================
-   FILTER TABLE (search)
+   FILTER TABLE (search) — debounced DB search
 ======================================================================== */
+let _searchTimer = null;
 function filterTable(val, tbodyId) {
-  if (tbodyId === 'ga-adm-post-tbody')    renderPosts(val);
-  if (tbodyId === 'ga-adm-account-tbody') renderAccounts(val);
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => {
+    if (tbodyId === 'ga-adm-post-tbody')    loadPosts(val);
+    if (tbodyId === 'ga-adm-account-tbody') loadAccounts(val);
+  }, 300);
 }
 
 /* ========================================================================
@@ -491,17 +551,19 @@ function toast(msg) {
 }
 
 /* ========================================================================
-   RENDER ALL
+   LOAD ALL — fetch everything from DB
 ======================================================================== */
-function renderAll() {
-  renderStats();
-  renderDashReports();
-  renderReports();
-  renderPosts();
-  renderAccounts();
+async function loadAll() {
+  await Promise.all([
+    loadStats(),
+    loadReports(),
+    loadPosts(),
+    loadAccounts(),
+  ]);
 }
-renderAll();
+
+// Initial load
+loadAll();
 </script>
 </body>
 </html>
-

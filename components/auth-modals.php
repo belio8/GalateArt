@@ -80,6 +80,7 @@
         <span class="close-btn" id="closeLoginModal">&times;</span>
         <h2>Masuk ke GalateArt</h2>
         <form action="api/auth.php" method="POST" class="register-form" id="loginForm">
+            <div id="loginErrorMsg" style="display: none; background: rgba(224, 92, 92, 0.15); color: #e05c5c; border: 1px solid rgba(224, 92, 92, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center;"></div>
             <input type="hidden" name="action" value="login">
             <div class="input-group">
                 <label for="loginUsername">Username</label>
@@ -104,6 +105,42 @@
             Masuk dengan Google
         </button>
         <p class="login-link">Belum punya akun? <a href="#" id="switchToSignup">Daftar di sini</a></p>
+    </div>
+</div>
+
+<!-- Banned Warning Modal -->
+<div class="modal-overlay" id="bannedWarningModal">
+    <div class="modal-content" style="text-align: center; padding: 40px 30px;">
+        <i class="fas fa-ban" style="font-size: 50px; color: var(--danger); margin-bottom: 20px;"></i>
+        <h2 style="margin-bottom: 15px; color: var(--danger);">Akun Dinonaktifkan</h2>
+        <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 25px;">
+            Akun Anda telah di-ban oleh administrator karena melanggar ketentuan layanan kami.
+        </p>
+        <button class="btn-submit" id="openAppealBtn" style="margin-bottom: 10px;">Hubungi Admin</button>
+        <button class="btn-submit" id="backToLoginFromBannedBtn" style="background: transparent; border: 1px solid var(--border); color: var(--text-gray);">Kembali ke Login</button>
+    </div>
+</div>
+
+<!-- Appeal Form Modal -->
+<div class="modal-overlay" id="appealModal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeAppealModal">&times;</span>
+        <h2>Hubungi Admin</h2>
+        <p style="color: var(--text-gray); font-size: 13px; margin-bottom: 20px;">Ajukan banding atau tanyakan alasan penonaktifan akun Anda.</p>
+        <form id="appealForm" class="register-form">
+            <div id="appealErrorMsg" style="display: none; background: rgba(224, 92, 92, 0.15); color: #e05c5c; border: 1px solid rgba(224, 92, 92, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center;"></div>
+            <div id="appealSuccessMsg" style="display: none; background: rgba(92, 221, 139, 0.15); color: #5cdd8b; border: 1px solid rgba(92, 221, 139, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center;"></div>
+            <div class="input-group">
+                <label for="appealUsername">Username Akun</label>
+                <input type="text" id="appealUsername" name="username" placeholder="Masukkan username Anda..." required readonly style="opacity: 0.7; cursor: not-allowed;">
+            </div>
+            <div class="input-group">
+                <label for="appealMessage">Pesan Banding</label>
+                <textarea id="appealMessage" name="message" placeholder="Tuliskan alasan atau pesan Anda di sini..." required rows="4" style="width: 100%; padding: 12px 16px; background: #2a2a35; border: 1px solid #3d3d4e; border-radius: 10px; color: #fff; font-family: inherit; font-size: 14px; resize: vertical; outline: none;"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Kirim Pesan</button>
+            <button type="button" class="btn-submit" id="backToWarningBtn" style="margin-top: 10px; background: transparent; border: 1px solid var(--border); color: var(--text-gray);">Kembali</button>
+        </form>
     </div>
 </div>
 <?php endif; ?>

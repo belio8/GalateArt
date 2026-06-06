@@ -255,6 +255,7 @@ $tables['reports'] = "CREATE TABLE IF NOT EXISTS reports (
     target_post_id CHAR(36)  DEFAULT NULL,
     target_type    ENUM('post','account') NOT NULL,
     reason         ENUM('sensitive','hashtag','ai','harass','hate','misrep','other') NOT NULL,
+    message        TEXT      NULL,
     status         ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reporter_id)    REFERENCES users(id) ON DELETE CASCADE,

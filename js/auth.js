@@ -5,6 +5,8 @@
     const registerModal = document.getElementById('registerModal');
     const artistModal = document.getElementById('artistModal');
     const loginModal = document.getElementById('loginModal');
+    const bannedWarningModal = document.getElementById('bannedWarningModal');
+    const appealModal = document.getElementById('appealModal');
 
     const btnSignup = document.getElementById('btnSignup');
     const btnLogin = document.getElementById('btnLogin');
@@ -47,7 +49,138 @@
         if (event.target === registerModal) closeModal(registerModal);
         if (event.target === artistModal) closeModal(artistModal);
         if (event.target === loginModal) closeModal(loginModal);
+        if (event.target === bannedWarningModal) closeModal(bannedWarningModal);
+        if (event.target === appealModal) closeModal(appealModal);
     });
+
+    const openAppealBtn = document.getElementById('openAppealBtn');
+    const backToLoginFromBannedBtn = document.getElementById('backToLoginFromBannedBtn');
+    const closeAppealModal = document.getElementById('closeAppealModal');
+    const backToWarningBtn = document.getElementById('backToWarningBtn');
+
+    openAppealBtn && openAppealBtn.addEventListener('click', () => {
+        closeModal(bannedWarningModal);
+        openModal(appealModal);
+    });
+
+    backToLoginFromBannedBtn && backToLoginFromBannedBtn.addEventListener('click', () => {
+        closeModal(bannedWarningModal);
+        openModal(loginModal);
+    });
+
+    closeAppealModal && closeAppealModal.addEventListener('click', () => closeModal(appealModal));
+
+    backToWarningBtn && backToWarningBtn.addEventListener('click', () => {
+        closeModal(appealModal);
+        openModal(loginModal);
+    });
+
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('loginErrorMsg');
+            const submitBtn = loginForm.querySelector('.btn-submit');
+            
+            errorMsg.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Memproses...';
+            
+            const formData = new FormData(loginForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const res = await fetch('api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                
+                if (res.ok && result.status === 'ok') {
+                    // Redirect based on role
+                    if (result.user.role === 'admin') window.location.href = 'admin.php';
+                    else if (result.user.role === 'artist') window.location.href = 'landing-artist.php';
+                    else if (result.user.role === 'regular') window.location.href = 'landing-reguler.php';
+                    else window.location.reload();
+                } else if (result.is_banned) {
+                    closeModal(loginModal);
+                    const appealUsername = document.getElementById('appealUsername');
+                    if (appealUsername) appealUsername.value = result.banned_username || data.username;
+                    openModal(bannedWarningModal);
+                    
+                    // Reset login form state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Masuk';
+                } else {
+                    errorMsg.textContent = result.message || 'Username atau password salah.';
+                    errorMsg.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Masuk';
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
+                errorMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Masuk';
+            }
+        });
+    }
+
+    const appealForm = document.getElementById('appealForm');
+    if (appealForm) {
+        appealForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('appealErrorMsg');
+            const successMsg = document.getElementById('appealSuccessMsg');
+            const submitBtn = appealForm.querySelector('button[type="submit"]');
+            
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Mengirim...';
+            
+            const formData = new FormData(appealForm);
+            const data = Object.fromEntries(formData.entries());
+            data.action = 'appeal';
+            
+            try {
+                const res = await fetch('api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                
+                if (res.ok && result.status === 'ok') {
+                    successMsg.textContent = result.message || 'Pesan berhasil dikirim.';
+                    successMsg.style.display = 'block';
+                    appealForm.reset();
+                    submitBtn.style.display = 'none'; // Hide submit button after success
+                } else {
+                    errorMsg.textContent = result.message || 'Gagal mengirim pesan.';
+                    errorMsg.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Kirim Pesan';
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
+                errorMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Kirim Pesan';
+            }
+        });
+    }
 })();
 
 // ── Guard guest interactions ────────────────────────────────────

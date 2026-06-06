@@ -45,12 +45,13 @@ function auth_success(array $payload, int $code = 200): void
     exit;
 }
 
-function auth_error(string $message, int $code = 400): void
+function auth_error(string $message, int $code = 400, array $extra = []): void
 {
     if (wants_json()) {
         header('Content-Type: application/json');
         http_response_code($code);
-        echo json_encode(['status' => 'error', 'message' => $message]);
+        $res = array_merge(['status' => 'error', 'message' => $message], $extra);
+        echo json_encode($res);
         exit;
     }
 
@@ -76,6 +77,7 @@ switch ($action) {
     case 'login':           handle_login($conn, $body);            break;
     case 'logout':          handle_logout();                       break;
     case 'me':              handle_me($conn);                      break;
+    case 'appeal':          handle_appeal($conn, $body);           break;
     default:
         auth_error('Action tidak dikenal.', 400);
 }
@@ -226,7 +228,10 @@ function handle_login(mysqli $conn, array $body): void
     }
 
     if ($user['is_banned']) {
-        auth_error('Akun ini telah dinonaktifkan. Hubungi admin.', 403);
+        auth_error('Akun ini telah dinonaktifkan. Hubungi admin.', 403, [
+            'is_banned' => true,
+            'banned_username' => $user['username']
+        ]);
     }
 
     // Simpan session
@@ -293,4 +298,42 @@ function handle_me(mysqli $conn): void
     header('Content-Type: application/json');
     echo json_encode(['status' => 'ok', 'user' => $user]);
     exit;
+}
+
+// ============================================================
+//  APPEAL (Banding Akun Banned)
+// ============================================================
+function handle_appeal(mysqli $conn, array $body): void
+{
+    $username = trim($body['username'] ?? '');
+    $message  = trim($body['message'] ?? '');
+
+    if (!$username || !$message) {
+        auth_error('Username dan pesan wajib diisi.', 422);
+    }
+
+    $user = db_row($conn, "SELECT id FROM users WHERE username = ? LIMIT 1", "s", [$username]);
+    if (!$user) {
+        auth_error('Username tidak ditemukan.', 404);
+    }
+
+    $id = gen_uuid();
+    $user_id = $user['id'];
+    
+    // Insert into reports table as an account report with 'other' reason.
+    // Also store the message. We assume the table has a 'message' column now.
+    $affected = db_execute($conn,
+        "INSERT INTO reports (id, reporter_id, target_user_id, target_type, reason, message, created_at)
+         VALUES (?, ?, ?, 'account', 'other', ?, NOW())",
+        "ssss", [$id, $user_id, $user_id, $message]
+    );
+
+    if ($affected < 1) {
+        auth_error('Gagal mengirim banding. Coba lagi.', 500);
+    }
+
+    auth_success([
+        'status'  => 'ok',
+        'message' => 'Pesan banding berhasil dikirim ke Admin.',
+    ]);
 }

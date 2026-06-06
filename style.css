@@ -1686,7 +1686,8 @@ STYLE UNTUK HALAMAN TRENDING
 }
 
 /* ── OVERLAY MODAL POST ─────────────────────────────────────── */
-#postModal, #editPostModal {
+#postModal,
+#editPostModal {
     display: none;
     position: fixed;
     inset: 0;
@@ -1698,7 +1699,8 @@ STYLE UNTUK HALAMAN TRENDING
     backdrop-filter: blur(4px);
 }
 
-#postModal.open, #editPostModal.open {
+#postModal.open,
+#editPostModal.open {
     display: flex;
     animation: pmFadeIn 0.22s ease;
 }
@@ -2166,7 +2168,7 @@ STYLE UNTUK HALAMAN TRENDING
 }
 
 /* Blur NSFW jika filter diaktifkan */
-body.nsfw-filter .art-card.is-nsfw > img {
+body.nsfw-filter .art-card.is-nsfw>img {
     filter: blur(20px);
     transition: filter 0.3s;
 }
@@ -2910,6 +2912,11 @@ body.ga-adm-page .ga-adm-badge-status.banned {
 body.ga-adm-page .ga-adm-badge-status.artist {
     background: rgba(124, 106, 255, .12);
     color: var(--ga-adm-accent);
+}
+
+body.ga-adm-page .ga-adm-badge-status.removed {
+    background: rgba(120, 120, 140, .15);
+    color: #888;
 }
 
 body.ga-adm-page .ga-adm-action-btns {
@@ -6146,6 +6153,7 @@ body.ga-adm-page .ga-adm-empty-table i {
     color: #f1c40f;
     border: 1px solid rgba(241, 196, 15, 0.3);
 }
+
 /* --- Art Card Modifications --- */
 .art-title {
     font-size: 14px;
@@ -6173,7 +6181,7 @@ body.ga-adm-page .ga-adm-empty-table i {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .card-avatar-tooltip {
@@ -6197,4 +6205,3 @@ body.ga-adm-page .ga-adm-empty-table i {
     opacity: 1;
     transform: translateX(0);
 }
-

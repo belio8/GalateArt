@@ -10,7 +10,7 @@
             <div class="post-header">
                 <img src="Assets/galateart_icon.png" alt="Avatar" class="post-av" id="phAv" referrerpolicy="no-referrer">
                 <div class="post-author">
-                    <strong id="phName">@artist_name</strong>
+                    <strong id="phName"></strong>
                     <span id="phSpec">Karya Seni</span>
                 </div>
                 <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'"><i class="fas fa-shopping-cart"></i> Order</button>
