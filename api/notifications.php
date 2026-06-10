@@ -19,10 +19,11 @@ $user_id = $_SESSION['user_id'];
 // ── Fetch notifications ─────────────────────────────────────
 $notifications = db_query(
     $conn,
-    "SELECT id, text, type, is_read, created_at
-     FROM notifications
-     WHERE user_id = ?
-     ORDER BY created_at DESC
+    "SELECT n.id, n.text, n.type, n.is_read, n.created_at, n.ref_id, o.status as order_status
+     FROM notifications n
+     LEFT JOIN orders o ON n.ref_id = o.id AND n.type = 'commission'
+     WHERE n.user_id = ?
+     ORDER BY n.created_at DESC
      LIMIT 20",
     "s",
     [$user_id]
@@ -32,11 +33,13 @@ $notifications = db_query(
 $result = [];
 foreach ($notifications as $n) {
     $result[] = [
-        'id'      => $n['id'],
-        'text'    => $n['text'],
-        'type'    => $n['type'],
-        'is_read' => (bool) $n['is_read'],
-        'time'    => format_notif_time($n['created_at']),
+        'id'           => $n['id'],
+        'text'         => $n['text'],
+        'type'         => $n['type'],
+        'is_read'      => (bool) $n['is_read'],
+        'time'         => format_notif_time($n['created_at']),
+        'ref_id'       => $n['ref_id'],
+        'order_status' => $n['order_status'],
     ];
 }
 

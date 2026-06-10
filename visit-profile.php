@@ -107,6 +107,11 @@ if ($isArtist) {
                         <img src="<?= e(!empty($user['avatar_url']) ? $user['avatar_url'] : 'Assets/galateart_icon.png') ?>" referrerpolicy="no-referrer">
                     </div>
                     <div class="visit-profile-actions">
+                        <?php if ($isArtist && in_array($commissionStatus, ['open', 'waitlist'])): ?>
+                            <a href="commission.php?artist=<?= urlencode($user['username']) ?>" class="btn-request-commission" style="background: var(--accent); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+                                <i class="fas fa-paint-brush"></i> Request Commission
+                            </a>
+                        <?php endif; ?>
                         <button class="btn-follow-profile <?= $isFollowing ? 'following' : '' ?>"
                                 id="btnFollowProfile"
                                 data-artist-id="<?= e($targetUserId) ?>"

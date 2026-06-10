@@ -38,9 +38,22 @@ async function fetchAndRenderNotifications() {
             return;
         }
 
-        body.innerHTML = data.notifications.map(n =>
-            `<div class="notif-item"><p>${n.text}</p><span>${escapeHtml(n.time)}</span></div>`
-        ).join('');
+        body.innerHTML = data.notifications.map(n => {
+            let actionsHtml = '';
+            if (n.type === 'commission' && n.order_status === 'pending') {
+                actionsHtml = `
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <button onclick="updateOrderStatus('${n.ref_id}', 'confirmed')" style="flex:1; background:#22c55e; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">Terima</button>
+                    <button onclick="updateOrderStatus('${n.ref_id}', 'cancelled')" style="flex:1; background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">Tolak</button>
+                </div>`;
+            } else if (n.type === 'commission' && n.order_status === 'confirmed') {
+                actionsHtml = `<div style="margin-top:10px; font-size:12px; color:#22c55e;"><i class="fas fa-check"></i> Diterima</div>`;
+            } else if (n.type === 'commission' && n.order_status === 'cancelled') {
+                actionsHtml = `<div style="margin-top:10px; font-size:12px; color:#ef4444;"><i class="fas fa-times"></i> Ditolak</div>`;
+            }
+
+            return `<div class="notif-item"><p>${escapeHtml(n.text)}</p><span>${escapeHtml(n.time)}</span>${actionsHtml}</div>`;
+        }).join('');
 
         // Update badge unread count jika ada
         const badge = $('#notifBadge');
@@ -61,6 +74,26 @@ async function fetchAndRenderNotifications() {
             </div>`;
     }
 }
+
+window.updateOrderStatus = async function(orderId, status) {
+    if (!confirm(status === 'confirmed' ? 'Terima order commission ini?' : 'Tolak order commission ini?')) return;
+    try {
+        const res = await fetch('api/update-order.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ order_id: orderId, status: status })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            fetchAndRenderNotifications(); // Refresh notifications
+            alert(data.message);
+        } else {
+            alert(data.message || 'Gagal mengubah status order.');
+        }
+    } catch(e) {
+        alert('Terjadi kesalahan jaringan.');
+    }
+};
 
 (function initNotifDropdown() {
     const toggle   = $('#notifToggle');

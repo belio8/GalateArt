@@ -1,375 +1,213 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
+require_once __DIR__ . '/config/Db.php';
+
+// Must be logged in
+require_login();
+
+$artistUsername = trim($_GET['artist'] ?? '');
+if (!$artistUsername) {
+    header('Location: ' . active_user_home());
+    exit;
+}
+
+$artistRow = db_row($conn, "SELECT id, username, avatar_url, banner_url FROM users WHERE username = ? AND role = 'artist' AND is_banned = 0", "s", [$artistUsername]);
+if (!$artistRow) {
+    header('Location: ' . active_user_home());
+    exit;
+}
+
+$artistProfile = db_row($conn, "SELECT * FROM artist_profiles WHERE user_id = ?", "s", [$artistRow['id']]);
+if (!$artistProfile || $artistProfile['commission_status'] === 'closed') {
+    $isClosed = true;
+} else {
+    $isClosed = false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commission - GalateArt</title>
+    <title>Commission @<?= e($artistRow['username']) ?> - GalateArt</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- ==================== NAVBAR ==================== -->
     <?php include __DIR__ . '/components/navbar.php'; ?>
 
-    <!-- ==================== MAIN ==================== -->
     <main class="ga-com-page">
-
-        <!-- Artist Banner -->
-        <div class="ga-com-banner">
-            <img src="Assets/draw2.png" alt="Artist Avatar">
-            <div class="ga-com-banner-info">
-                <h2>@artis_lokal <span style="font-size:14px; font-weight:400; color:var(--text-gray);">- Commission Page</span></h2>
-                <p>Artis lokal spesialis ilustrasi karakter, VTuber sheet, dan desain konseptual. Turnaround time 7-14 hari kerja.</p>
-                <div class="ga-com-status-badge" id="statusBadge">
-                    <span class="ga-com-dot"></span> Open for Commission
+        <!-- Banner -->
+        <div class="ga-com-banner" style="background-image: url('<?= e(!empty($artistRow['banner_url']) ? $artistRow['banner_url'] : 'Assets/galateart_banner.png') ?>'); background-size: cover; background-position: center; position:relative; overflow:hidden; min-height: 200px;">
+            <div style="position:absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(135deg, rgba(26, 26, 36, 0.92), rgba(40, 20, 50, 0.85)); backdrop-filter:blur(8px); z-index:0;"></div>
+            <!-- Floating decorative orbs -->
+            <div class="com-float-orb" style="position:absolute; top:20px; right:80px; width:100px; height:100px; background: radial-gradient(circle, rgba(255,107,107,0.15), transparent); border-radius:50%; z-index:0; animation: comFloat 6s ease-in-out infinite;"></div>
+            <div class="com-float-orb" style="position:absolute; bottom:10px; right:200px; width:60px; height:60px; background: radial-gradient(circle, rgba(139,92,246,0.15), transparent); border-radius:50%; z-index:0; animation: comFloat 8s ease-in-out infinite reverse;"></div>
+            <div class="ga-com-banner-info" style="position:relative; z-index:1; display:flex; align-items:center; gap:25px; padding: 40px 35px;">
+                <div class="com-avatar-ring">
+                    <img src="<?= e(!empty($artistRow['avatar_url']) ? $artistRow['avatar_url'] : 'Assets/galateart_icon.png') ?>" alt="Avatar">
                 </div>
+                <div>
+                    <h2 style="margin:0; font-size:30px; letter-spacing: -0.5px;">@<?= e($artistRow['username']) ?></h2>
+                    <p style="margin:5px 0 12px 0; color:var(--text-gray); font-size: 14px;"><i class="fas fa-palette" style="margin-right:6px; opacity:0.6;"></i>Commission Page</p>
+                    <?php if ($isClosed): ?>
+                        <div class="ga-com-status-badge com-badge-closed"><span class="com-badge-dot"></span> Closed for Commission</div>
+                    <?php else: ?>
+                        <div class="ga-com-status-badge com-badge-open"><span class="com-badge-dot com-dot-pulse"></span> Open for Commission</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- Step indicators -->
+            <div id="comStepIndicator" style="position:relative; z-index:1; display:flex; justify-content:center; gap:10px; padding-bottom:20px;">
+                <div class="com-step-pill active" data-step="1"><span>1</span> Terms of Service</div>
+                <div class="com-step-pill" data-step="2"><span>2</span> Detail & Submit</div>
             </div>
         </div>
 
-        <!-- Two-Column Layout -->
-        <div class="ga-com-layout">
-
-            <!-- LEFT: Tiers + Samples + TOS -->
-            <div class="commission-left">
-
-                <!-- Tier Selection -->
-                <p class="ga-com-section-title"><i class="fas fa-layer-group"></i> Pilih Paket</p>
-                <div class="ga-com-tier-list" id="tierList">
-
-                    <div class="ga-com-tier-card" data-tier="sketch" data-price="75000" onclick="selectTier(this)">
-                        <span class="ga-com-tier-tag">Basic</span>
-                        <div class="ga-com-tier-header">
-                            <span class="ga-com-tier-name">Sketch</span>
-                            <span class="ga-com-tier-price">Rp 75.000</span>
-                        </div>
-                        <p class="ga-com-tier-desc">Sketsa pensil digital dengan detail dasar. Cocok untuk referensi karakter atau pose sederhana.</p>
-                        <ul class="ga-com-tier-features">
-                            <li><i class="fas fa-check"></i> 1 karakter</li>
-                            <li><i class="fas fa-check"></i> Background polos / transparan</li>
-                            <li><i class="fas fa-check"></i> 1x revisi minor</li>
-                            <li><i class="fas fa-check"></i> File PNG 2000Ã—2000px</li>
-                        </ul>
-                    </div>
-
-                    <div class="ga-com-tier-card" data-tier="lineart" data-price="150000" onclick="selectTier(this)">
-                        <span class="ga-com-tier-tag ga-com-popular">Populer</span>
-                        <div class="ga-com-tier-header">
-                            <span class="ga-com-tier-name">Lineart + Flat Color</span>
-                            <span class="ga-com-tier-price">Rp 150.000</span>
-                        </div>
-                        <p class="ga-com-tier-desc">Line art bersih dengan warna flat dan shading sederhana. Ideal untuk avatar, stiker, atau profil VTuber.</p>
-                        <ul class="ga-com-tier-features">
-                            <li><i class="fas fa-check"></i> 1 karakter</li>
-                            <li><i class="fas fa-check"></i> Flat color + simple shading</li>
-                            <li><i class="fas fa-check"></i> Background sederhana</li>
-                            <li><i class="fas fa-check"></i> 2x revisi</li>
-                            <li><i class="fas fa-check"></i> File PNG & PSD</li>
-                        </ul>
-                    </div>
-
-                    <div class="ga-com-tier-card" data-tier="fullcolor" data-price="300000" onclick="selectTier(this)">
-                        <span class="ga-com-tier-tag">Premium</span>
-                        <div class="ga-com-tier-header">
-                            <span class="ga-com-tier-name">Full Color Illustration</span>
-                            <span class="ga-com-tier-price">Rp 300.000</span>
-                        </div>
-                        <p class="ga-com-tier-desc">Ilustrasi penuh dengan rendering detail, pencahayaan kompleks, dan latar belakang kreatif. Kualitas terbaik.</p>
-                        <ul class="ga-com-tier-features">
-                            <li><i class="fas fa-check"></i> Hingga 2 karakter</li>
-                            <li><i class="fas fa-check"></i> Full rendering & lighting</li>
-                            <li><i class="fas fa-check"></i> Background kreatif custom</li>
-                            <li><i class="fas fa-check"></i> 3x revisi</li>
-                            <li><i class="fas fa-check"></i> File PNG 4000px + PSD berlapis</li>
-                            <li><i class="fas fa-check"></i> Commercial use allowed</li>
-                        </ul>
-                    </div>
-
-                </div>
-
-                <!-- Add-ons -->
-                <p class="ga-com-section-title" style="margin-top:10px;"><i class="fas fa-plus-circle"></i> Add-ons (Opsional)</p>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:35px;" id="addonList">
-                    <label class="addon-chip" style="background:#111118; border:1px solid #2e2e44; border-radius:30px; padding:8px 16px; font-size:13px; color:var(--text-gray); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" value="50000" data-label="Karakter tambahan" style="display:none;" onchange="updateAddons()">
-                        <i class="fas fa-user-plus" style="color:var(--purple);"></i> Karakter Tambahan <strong style="color:var(--accent);">+Rp 50.000</strong>
-                    </label>
-                    <label class="addon-chip" style="background:#111118; border:1px solid #2e2e44; border-radius:30px; padding:8px 16px; font-size:13px; color:var(--text-gray); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" value="30000" data-label="Background detail" style="display:none;" onchange="updateAddons()">
-                        <i class="fas fa-image" style="color:var(--purple);"></i> Background Detail <strong style="color:var(--accent);">+Rp 30.000</strong>
-                    </label>
-                    <label class="addon-chip" style="background:#111118; border:1px solid #2e2e44; border-radius:30px; padding:8px 16px; font-size:13px; color:var(--text-gray); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" value="40000" data-label="Speedpaint video" style="display:none;" onchange="updateAddons()">
-                        <i class="fas fa-video" style="color:var(--purple);"></i> Speedpaint Video <strong style="color:var(--accent);">+Rp 40.000</strong>
-                    </label>
-                    <label class="addon-chip" style="background:#111118; border:1px solid #2e2e44; border-radius:30px; padding:8px 16px; font-size:13px; color:var(--text-gray); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" value="25000" data-label="Prioritas antrian" style="display:none;" onchange="updateAddons()">
-                        <i class="fas fa-bolt" style="color:var(--purple);"></i> Prioritas Antrian <strong style="color:var(--accent);">+Rp 25.000</strong>
-                    </label>
-                </div>
-
-                <!-- Sample Works -->
-                <p class="ga-com-section-title"><i class="fas fa-palette"></i> Contoh Karya</p>
-                <div class="ga-com-sample-grid" style="margin-bottom:35px;">
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 1"></div>
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 2"></div>
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 3"></div>
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 4"></div>
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 5"></div>
-                    <div class="ga-com-sample-img"><img src="Assets/draw2.png" alt="Sample 6"></div>
-                </div>
-
-                <!-- Terms of Service -->
-                <p class="ga-com-section-title"><i class="fas fa-file-contract"></i> Terms of Service</p>
-                <div class="ga-com-tos-block">
-                    <p>✓ <strong>Will draw:</strong> OC, Fanart, VTuber, Semi-realistic, Chibi, kemono/furry, light romance.</p>
-                    <p>âŒ <strong>Won't draw:</strong> NSFW, content yang mengandung ujaran kebencian, karya yang sudah ada hak ciptanya (fan art komersial tanpa izin), atau permintaan yang melanggar ToS platform.</p>
-                    <p>ðŸ’³ <strong>Pembayaran:</strong> Pembayaran 50% di muka sebelum pengerjaan dimulai, 50% sisanya setelah WIP final disetujui. Metode: GoPay / DANA / BCA.</p>
-                    <p>ðŸ”„ <strong>Revisi:</strong> Jumlah revisi disesuaikan dengan paket yang dipilih. Revisi mayor di luar paket dikenakan biaya tambahan.</p>
-                    <p>â±ï¸ <strong>Turnaround:</strong> 7-14 hari kerja tergantung antrian. Anda akan mendapat estimasi waktu setelah order dikonfirmasi.</p>
-                    <p>ðŸ–¼ï¸ <strong>Hak Cipta:</strong> Karya tetap menjadi milik artis. Klien mendapat hak penggunaan personal. Hak komersial tersedia di paket Premium.</p>
-                </div>
-
+        <?php if ($isClosed): ?>
+            <div style="text-align:center; padding:50px; background:#1a1a24; border-radius:15px; margin-top:20px;">
+                <i class="fas fa-door-closed" style="font-size:48px; color:var(--text-gray); margin-bottom:20px;"></i>
+                <h2>Artist ini sedang tidak menerima commission.</h2>
+                <button onclick="history.back()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:20px; cursor:pointer; margin-top:10px;">Kembali</button>
             </div>
-
-            <!-- RIGHT: Order Form Sidebar -->
-            <div class="ga-com-order-sidebar">
-                <h3><i class="fas fa-shopping-cart" style="color:var(--accent); margin-right:8px;"></i> Buat Order</h3>
-
-                <div class="ga-com-selected-tier-summary" id="tierSummary">
-                    <span id="summaryTierName">Belum ada paket dipilih</span>
-                    <strong id="summaryTierPrice">Rp 0</strong>
-                </div>
-
-                <div class="ga-com-form-group">
-                    <label>Username / Kontak Anda *</label>
-                    <input type="text" id="contactInput" placeholder="@username atau email Anda...">
-                </div>
-
-                <div class="ga-com-form-group">
-                    <label>Deskripsi Karakter *</label>
-                    <textarea id="descInput" placeholder="Jelaskan karakter Anda: warna rambut, mata, pakaian, mood, pose yang diinginkan..." maxlength="500" oninput="updateCharCount(this, 'descCount')"></textarea>
-                    <div class="ga-com-char-count"><span id="descCount">0</span>/500</div>
-                </div>
-
-                <div class="ga-com-form-group">
-                    <label>Gambar Referensi (opsional)</label>
-                    <label class="ga-com-refimg-label" for="refImgInput" id="refImgLabel">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span id="refImgText">Klik untuk unggah referensi</span>
-                        <span style="font-size:11px; color:#55556e;">PNG, JPG, GIF maks. 5MB</span>
-                    </label>
-                    <input type="file" id="refImgInput" accept="image/*" onchange="handleFileUpload(this)">
-                </div>
-
-                <div class="ga-com-form-group">
-                    <label>Catatan Tambahan</label>
-                    <textarea id="notesInput" placeholder="Hal lain yang ingin Anda sampaikan kepada artis..." maxlength="300" oninput="updateCharCount(this, 'notesCount')" style="min-height:65px;"></textarea>
-                    <div class="ga-com-char-count"><span id="notesCount">0</span>/300</div>
-                </div>
-
-                <!-- Price Breakdown -->
-                <div class="ga-com-price-breakdown">
-                    <div class="ga-com-price-row">
-                        <span>Harga paket</span>
-                        <span id="priceBase">Rp 0</span>
-                    </div>
-                    <div class="ga-com-price-row" id="addonRow" style="display:none;">
-                        <span>Add-ons</span>
-                        <span id="priceAddons">Rp 0</span>
-                    </div>
-                    <div class="ga-com-price-row ga-com-total">
-                        <span>Total Estimasi</span>
-                        <span id="priceTotal">Rp 0</span>
+        <?php else: ?>
+            <div class="ga-com-layout" id="commissionWizard">
+                
+                <!-- STEP 1: Terms of Service -->
+                <div id="step1" class="wizard-step active" style="display:flex; justify-content:center;">
+                    <div class="com-box" style="max-width: 800px; width: 100%; padding: 40px; position: relative; overflow: hidden;">
+                        <!-- Decorative glow -->
+                        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent); opacity: 0.1; filter: blur(40px); border-radius: 50%; pointer-events: none;"></div>
+                        
+                        <div style="text-align:center; margin-bottom: 30px;">
+                            <div style="width:60px; height:60px; background:rgba(255,107,107,0.1); color:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin: 0 auto 15px auto;">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <h2 style="margin:0; font-size: 24px;">Terms of Service</h2>
+                            <p style="color:var(--text-gray); margin-top:5px; font-size: 14px;">Harap baca dan setujui Terms of Service sebelum melanjutkan.</p>
+                        </div>
+                        
+                        <div class="ga-com-tos-block" id="tosContent" style="background: rgba(26, 26, 36, 0.5); border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);">
+                            <div class="spinner">Memuat TOS...</div>
+                        </div>
+                        
+                        <div style="margin-top:30px; padding:20px; background: linear-gradient(145deg, #2a2a35, #22222d); border-radius:12px; border: 1px solid #333; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#333'">
+                            <label style="display:flex; align-items:center; gap:15px; cursor:pointer; font-weight:600;">
+                                <input type="checkbox" id="agreeTos" style="width:24px; height:24px; accent-color:var(--accent); cursor:pointer;">
+                                <span style="font-size: 15px;">Saya telah membaca dan menyetujui Terms of Service di atas.</span>
+                            </label>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:center; margin-top:30px;">
+                            <button class="com-btn-primary" id="btnNextStep1" disabled style="width: 100%; max-width: 300px; padding: 15px; font-size: 16px; border-radius: 30px;">Lanjutkan <i class="fas fa-arrow-right" style="margin-left:8px;"></i></button>
+                        </div>
                     </div>
                 </div>
 
-                <button class="ga-com-btn-order-submit" onclick="submitOrder()">
-                    <i class="fas fa-paper-plane"></i> Kirim Order
-                </button>
-                <p class="ga-com-order-note">Order akan dikonfirmasi artis dalam 1Ã—24 jam</p>
+                <!-- STEP 2: Commission Form -->
+                <div id="step2" class="wizard-step" style="display:none;">
+                    <div style="display:flex; gap:40px; flex-wrap: wrap;">
+                        
+                        <!-- LEFT COLUMN: The Dynamic Form -->
+                        <div class="com-form-col" style="flex:1; min-width: 300px;">
+                            <button class="com-btn-back" onclick="goToStep(1)" style="margin-bottom:20px; transition: color 0.2s;"><i class="fas fa-arrow-left"></i> Kembali ke TOS</button>
+                            
+                            <div class="com-box" style="position: relative;">
+                                <!-- Decorative glow -->
+                                <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: var(--purple); opacity: 0.05; filter: blur(40px); border-radius: 50%; pointer-events: none;"></div>
+                                
+                                <h3 class="com-title" style="border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 15px; margin-bottom: 25px;">Detail Commission</h3>
+                                <div id="dynamicFormContainer">
+                                    <div class="spinner">Memuat form...</div>
+                                </div>
+
+                                <div class="com-form-group" style="margin-top:35px; background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.02);">
+                                    <h4 class="com-section-title" style="margin-top: 0;">Character Reference <span class="required">*</span></h4>
+                                    <p class="com-hint">Character reference sheets, PSD for rigging, mood boards, sample poses.</p>
+                                    <div style="position: relative;">
+                                        <input type="file" id="refFiles" multiple accept="image/*,.pdf,.psd" style="width:100%; background:#1a1a24; border:1px dashed #555; padding:15px; border-radius:8px; color:white; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#555'">
+                                    </div>
+                                </div>
+
+                                <div class="com-form-group" style="margin-top:30px;">
+                                    <h4 class="com-section-title">Please Describe your request here :3 <span class="required">*</span></h4>
+                                    <textarea id="descInput" placeholder="Deskripsikan dengan detail apa yang Anda inginkan..." style="width:100%; min-height:150px; background:#1a1a24; border:1px solid #444; color:white; padding:15px; border-radius:12px; font-family:inherit; resize:vertical; transition: border-color 0.3s, box-shadow 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 3px rgba(255,107,107,0.1)';" onblur="this.style.borderColor='#444'; this.style.boxShadow='none';"></textarea>
+                                </div>
+
+                                <div class="com-form-group" style="margin-top:30px;">
+                                    <h4 class="com-section-title">Do you have a deadline for this project?</h4>
+                                    <p class="com-hint">Refers to your preferred completion date. Artists are not required to deliver by this date.</p>
+                                    <input type="date" id="deadlineInput" style="width:100%; max-width:250px; background:#1a1a24; border:1px solid #444; padding:12px 15px; border-radius:8px; color:white; font-family:inherit; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='#444'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN: Price Breakdown Sidebar -->
+                        <div class="com-sidebar-col" style="width:400px; flex-shrink:0;">
+                            <div class="com-sidebar-sticky" style="position:sticky; top:100px; background:linear-gradient(180deg, #1e1e28 0%, #1a1a24 100%); border:1px solid #333; border-radius:20px; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <h3 style="margin-top:0; font-size:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                                    Order Summary
+                                    <i class="fas fa-receipt" style="color:var(--text-gray); opacity:0.5;"></i>
+                                </h3>
+                                
+                                <div id="summaryList" style="margin:20px 0; min-height: 50px;">
+                                    <!-- Dynamic summary items -->
+                                </div>
+
+                                <div style="border-top:1px dashed rgba(255,255,255,0.08); margin:20px 0;"></div>
+                                
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; background: rgba(255,107,107,0.05); padding: 15px; border-radius: 12px;">
+                                    <strong style="font-size:16px;">Total Estimasi</strong>
+                                    <strong id="totalPriceDisplay" style="font-size:24px; color:var(--accent); font-weight: 800;">Rp 0</strong>
+                                </div>
+
+                                <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.03)); border: 1px solid rgba(34, 197, 94, 0.15); color:#86efac; padding:15px; border-radius:12px; margin-bottom:20px; font-size:12px;">
+                                    <div style="font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-shield-alt" style="color:#22c55e;"></i> Priority support</div>
+                                    <div style="font-weight:600; display:flex; align-items:center; gap:8px;"><i class="fas fa-tasks" style="color:#22c55e;"></i> Track all requests + deliveries</div>
+                                </div>
+
+                                <div style="font-size:12px; color:var(--text-gray); margin-bottom:20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px;">
+                                    <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+                                        <input type="checkbox" id="understandCheck" style="margin-top:2px; accent-color: var(--accent); width: 16px; height: 16px;">
+                                        <span style="line-height: 1.4;">I understand that submitting this request does not guarantee that the artist will accept my commission*</span>
+                                    </label>
+                                </div>
+
+                                <button id="btnSubmitOrder" class="com-btn-submit" disabled style="width:100%; padding:16px; font-weight:bold; font-size:16px; background: linear-gradient(45deg, var(--accent), #ff8a8a); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,107,0.3);" onmouseover="if(!this.disabled) this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">Request Commission</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-
-        </div>
+        <?php endif; ?>
     </main>
 
     <!-- Success Modal -->
-    <div class="ga-com-success-overlay" id="successOverlay">
-        <div class="ga-com-success-box">
-            <div class="ga-com-success-icon"><i class="fas fa-check"></i></div>
-            <h3>Order Terkirim! ðŸŽ‰</h3>
-            <p>Commission request kamu berhasil dikirim ke <strong>@artis_lokal</strong>. Pilih aksi berikut setelah ini.</p>
-            <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-                <button class="ga-com-btn-back" onclick="closeOrderSuccess()">Kembali ke Halaman</button>
-                <button class="ga-com-btn-order-submit" onclick="addOrderToCart()" style="justify-content:center; width:100%;">
-                    <i class="fas fa-shopping-cart"></i> Tambah ke Cart
-                </button>
+    <div class="modal-overlay" id="successOverlay">
+        <div class="modal-content" style="text-align:center; position: relative; overflow: hidden; padding: 40px 30px;">
+            <!-- Confetti decoration -->
+            <div class="com-confetti-bg"></div>
+            <div style="width:80px; height:80px; background:rgba(34,197,94,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px auto; animation: comSuccessPop 0.5s ease-out;">
+                <i class="fas fa-check-circle" style="font-size:42px; color:#22c55e;"></i>
             </div>
+            <h2 style="margin-bottom:8px; font-size: 22px;">Commission Terkirim! 🎉</h2>
+            <p style="color:var(--text-gray); margin-bottom:30px; font-size: 14px; line-height: 1.5;">Request kamu berhasil dikirim ke <strong style="color:white;">@<?= e($artistRow['username']) ?></strong>. Order sudah ditambahkan ke keranjang kamu.</p>
+            <button onclick="window.location.href='cart.php'" style="background: linear-gradient(45deg, var(--accent), #ff8a8a); color:white; border:none; padding:14px 20px; border-radius:30px; font-weight:bold; width:100%; cursor:pointer; font-size: 15px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,107,107,0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'"><i class="fas fa-shopping-cart" style="margin-right:8px;"></i>Lihat Keranjang</button>
+            <button onclick="window.location.href='visit-profile.php?user=<?= urlencode($artistRow['username']) ?>'" style="background:transparent; color:var(--text-gray); border:1px solid #333; padding:12px 20px; width:100%; cursor:pointer; margin-top:12px; border-radius: 30px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='white'" onmouseout="this.style.borderColor='#333'; this.style.color='var(--text-gray)'">Kembali ke Profil Artist</button>
         </div>
     </div>
-    <script src="js/utils.js"></script>
-    <script src="js/navbar.js"></script>
-    <script src="js/auth.js"></script>
+
     <script>
-        // ==========================================
-        // COMMISSION PAGE LOGIC
-        // ==========================================
-
-        let selectedTierPrice = 0;
-        let addonTotal = 0;
-        const CART_KEY = 'galateart_cart';
-        const ORDER_KEY = 'galateart_pending_order';
-
-        function getCartItems() {
-            try {
-                return JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-            } catch {
-                return [];
-            }
-        }
-
-        function saveCartItems(items) {
-            localStorage.setItem(CART_KEY, JSON.stringify(items));
-        }
-
-        function closeOrderSuccess() {
-            document.getElementById('successOverlay').classList.remove('ga-com-open');
-        }
-
-        function buildOrderData() {
-            const selectedCard = document.querySelector('.ga-com-tier-card.ga-com-selected');
-            const tierName = selectedCard ? selectedCard.querySelector('.ga-com-tier-name')?.textContent.trim() : 'Paket Commission';
-            const tierPrice = selectedTierPrice;
-            const addonLabels = [...document.querySelectorAll('.addon-chip input[type="checkbox"]:checked')].map(cb => ({
-                label: cb.getAttribute('data-label') || 'Addon',
-                value: parseInt(cb.value, 10) || 0
-            }));
-            const referenceFile = document.getElementById('refImgInput').files[0]?.name || '';
-
-            return {
-                id: 'GAL-' + Date.now(),
-                tierName,
-                tierPrice,
-                addons: addonLabels,
-                addonTotal,
-                totalPrice: tierPrice + addonTotal,
-                contact: document.getElementById('contactInput').value.trim(),
-                description: document.getElementById('descInput').value.trim(),
-                notes: document.getElementById('notesInput').value.trim(),
-                referenceFile,
-                createdAt: new Date().toISOString(),
-            };
-        }
-
-        function addOrderToCart() {
-            const order = buildOrderData();
-            const cart = getCartItems();
-            cart.push(order);
-            saveCartItems(cart);
-            localStorage.setItem(ORDER_KEY, JSON.stringify(order));
-            closeOrderSuccess();
-            alert('Order berhasil ditambahkan ke keranjang.');
-        }
-
-        // Highlight ga-com-selected tier
-        function selectTier(card) {
-            document.querySelectorAll('.ga-com-tier-card').forEach(c => c.classList.remove('ga-com-selected'));
-            card.classList.add('ga-com-selected');
-
-            const price = parseInt(card.dataset.price, 10);
-            const name = card.querySelector('.ga-com-tier-name')?.textContent.trim() || 'Paket dipilih';
-            selectedTierPrice = price;
-
-            document.getElementById('summaryTierName').innerText = name;
-            document.getElementById('summaryTierPrice').innerText = formatRupiah(price);
-            updatePriceBreakdown();
-        }
-
-        // Add-on chips visual toggle
-        document.querySelectorAll('.addon-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const cb = chip.querySelector('input[type="checkbox"]');
-                // checkbox toggled by label naturally
-                setTimeout(() => {
-                    if (cb.checked) {
-                        chip.style.borderColor = 'var(--purple)';
-                        chip.style.background = 'rgba(142,84,233,0.1)';
-                        chip.style.color = '#fff';
-                    } else {
-                        chip.style.borderColor = '#2e2e44';
-                        chip.style.background = '#111118';
-                        chip.style.color = 'var(--text-gray)';
-                    }
-                }, 10);
-            });
-        });
-
-        function updateAddons() {
-            addonTotal = 0;
-            document.querySelectorAll('.addon-chip input[type="checkbox"]:checked').forEach(cb => {
-                addonTotal += parseInt(cb.value);
-            });
-            updatePriceBreakdown();
-        }
-
-        function updatePriceBreakdown() {
-            const total = selectedTierPrice + addonTotal;
-            document.getElementById('priceBase').innerText = formatRupiah(selectedTierPrice);
-            document.getElementById('priceTotal').innerText = formatRupiah(total);
-
-            const addonRow = document.getElementById('addonRow');
-            if (addonTotal > 0) {
-                addonRow.style.display = 'flex';
-                document.getElementById('priceAddons').innerText = formatRupiah(addonTotal);
-            } else {
-                addonRow.style.display = 'none';
-            }
-        }
-
-
-        // Character count
-        function updateCharCount(el, countId) {
-            document.getElementById(countId).innerText = el.value.length;
-        }
-
-        // File upload label update
-        function handleFileUpload(input) {
-            const label = document.getElementById('refImgText');
-            if (input.files && input.files[0]) {
-                label.innerText = '✓ ' + input.files[0].name;
-            }
-        }
-
-        // Submit validation
-        function submitOrder() {
-            if (!document.querySelector('.ga-com-tier-card.ga-com-selected')) {
-                alert('Silakan pilih paket commission terlebih dahulu.');
-                return;
-            }
-            const contact = document.getElementById('contactInput').value.trim();
-            if (!contact) {
-                alert('Harap isi username atau kontak Anda.');
-                return;
-            }
-            const desc = document.getElementById('descInput').value.trim();
-            if (!desc) {
-                alert('Harap isi deskripsi karakter Anda.');
-                return;
-            }
-
-            const order = buildOrderData();
-            localStorage.setItem(ORDER_KEY, JSON.stringify(order));
-            document.getElementById('successOverlay').classList.add('ga-com-open');
-        }
-
+        const ARTIST_USERNAME = <?= json_encode($artistRow['username']) ?>;
     </script>
+    <script src="js/utils.js?v=<?= time() ?>"></script>
+    <script src="js/navbar.js?v=<?= time() ?>"></script>
+    <script src="js/auth.js?v=<?= time() ?>"></script>
+    <script src="js/commission.js?v=<?= time() ?>"></script>
 </body>
 </html>

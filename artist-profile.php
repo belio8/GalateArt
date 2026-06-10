@@ -133,6 +133,7 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                 <button class="tab-btn" onclick="switchTab(this, 'content-posts')">Posts</button>
                 <button class="tab-btn" onclick="switchTab(this, 'content-saved')">Saved</button>
                 <button class="tab-btn" onclick="switchTab(this, 'content-liked')">Liked</button>
+                <button class="tab-btn" onclick="switchTab(this, 'content-commission')"><i class="fas fa-cog"></i> Commission</button>
             </div>
 
             <div class="profile-content">
@@ -273,9 +274,125 @@ $likedPosts = db_query($conn, $likedPostsSql, "s", [$userId]);
                         <?php endif; ?>
                     </div>
                 </div>
+
+                <div class="tab-content" id="content-commission">
+                    <div style="background: #2a2a35; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="margin-top:0;">Terms of Service</h3>
+                        <textarea id="tosInput" style="width:100%; min-height:100px; background:#1a1a24; border:1px solid #444; color:white; padding:10px; border-radius:8px; margin-bottom:10px; font-family:'Poppins', sans-serif;"><?= e($artistProfileRow['tos'] ?? '') ?></textarea>
+                        <button onclick="saveTos()" style="background:var(--purple); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">Simpan TOS</button>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0;">Commission Tiers</h3>
+                        <button onclick="openTierModal()" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;"><i class="fas fa-plus"></i> Tambah Tier</button>
+                    </div>
+                    <div id="commissionTiersList" style="margin-bottom: 30px;">
+                        <!-- Dimuat via AJAX -->
+                        <div style="text-align:center; padding:30px; color:var(--text-gray);">Memuat tiers...</div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0;">Opsi Kustomisasi Commission</h3>
+                        <button onclick="openAddOptionModal()" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;"><i class="fas fa-plus"></i> Tambah Kategori</button>
+                    </div>
+                    <div id="commissionOptionsList">
+                        <!-- Dimuat via AJAX -->
+                        <div style="text-align:center; padding:30px; color:var(--text-gray);">Memuat opsi...</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
+
+    <!-- Modal Tambah/Edit Tier -->
+    <div class="modal-overlay" id="tierModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeTierModal()">&times;</span>
+            <h2 id="tierModalTitle">Tambah Tier Baru</h2>
+            <div class="register-form">
+                <input type="hidden" id="tierId">
+                <div class="input-group">
+                    <label>Nama Tier (ex: Chibi, Fullbody)</label>
+                    <input type="text" id="tierName" required>
+                </div>
+                <div class="input-group">
+                    <label>Harga Dasar (Rp)</label>
+                    <input type="number" id="tierPrice" required>
+                </div>
+                <div class="input-group">
+                    <label>Deskripsi Singkat</label>
+                    <textarea id="tierDesc" style="width:100%; padding:10px; background:#2a2a35; border:1px solid #444; border-radius:8px; color:white;"></textarea>
+                </div>
+                <button class="btn-submit" onclick="saveTier()">Simpan Tier</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Kategori -->
+    <div class="modal-overlay" id="optionModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeOptionModal()">&times;</span>
+            <h2 id="optionModalTitle">Tambah Kategori Opsi</h2>
+            <div class="register-form">
+                <input type="hidden" id="optId">
+                <div class="input-group">
+                    <label>Nama Kategori (ex: Background, License)</label>
+                    <input type="text" id="optCat" required>
+                </div>
+                <div class="input-group">
+                    <label>Deskripsi (opsional)</label>
+                    <input type="text" id="optDesc">
+                </div>
+                <div class="input-group" style="display:flex; gap:20px;">
+                    <div style="flex:1;">
+                        <label>Tipe Pilihan</label>
+                        <select id="optType" style="width:100%; padding:12px; border-radius:8px; background:#2a2a35; color:white; border:1px solid #444;">
+                            <option value="single">Single (Pilih 1)</option>
+                            <option value="multiple">Multiple (Bisa pilih >1)</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Wajib diisi?</label>
+                        <select id="optReq" style="width:100%; padding:12px; border-radius:8px; background:#2a2a35; color:white; border:1px solid #444;">
+                            <option value="1">Ya</option>
+                            <option value="0">Tidak</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-submit" onclick="saveOption()">Simpan Kategori</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Item -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeItemModal()">&times;</span>
+            <h2>Tambah Pilihan Item</h2>
+            <div class="register-form">
+                <input type="hidden" id="parentOptId">
+                <div class="input-group">
+                    <label>Label Pilihan (ex: Simple Background)</label>
+                    <input type="text" id="itemLabel" required>
+                </div>
+                <div class="input-group" style="display:flex; gap:20px;">
+                    <div style="flex:1;">
+                        <label>Tipe Harga</label>
+                        <select id="itemPriceType" style="width:100%; padding:12px; border-radius:8px; background:#2a2a35; color:white; border:1px solid #444;">
+                            <option value="fixed">Fixed (+ Rp)</option>
+                            <option value="percent">Persentase (+ %)</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Nilai Harga</label>
+                        <input type="number" id="itemPriceVal" value="0">
+                    </div>
+                </div>
+                <button class="btn-submit" onclick="saveItem()">Simpan Pilihan</button>
+            </div>
+        </div>
+    </div>
     <script src="js/utils.js?v=<?= time() ?>"></script>
     <script src="js/navbar.js?v=<?= time() ?>"></script>
     <script src="js/auth.js?v=<?= time() ?>"></script>

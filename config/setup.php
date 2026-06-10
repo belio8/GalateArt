@@ -156,6 +156,30 @@ $tables['commission_addons'] = "CREATE TABLE IF NOT EXISTS commission_addons (
     FOREIGN KEY (artist_id) REFERENCES artist_profiles(id) ON DELETE CASCADE
 ) ENGINE=InnoDB";
 
+// ── COMMISSION_OPTIONS ──────────────────────────────────────
+$tables['commission_options'] = "CREATE TABLE IF NOT EXISTS commission_options (
+    id              CHAR(36)      PRIMARY KEY,
+    artist_id       CHAR(36)      NOT NULL,
+    category        VARCHAR(100)  NOT NULL,
+    description     TEXT          DEFAULT NULL,
+    selection_type  ENUM('single','multiple') NOT NULL DEFAULT 'single',
+    is_required     TINYINT(1)    NOT NULL DEFAULT 0,
+    sort_order      INT           NOT NULL DEFAULT 0,
+    FOREIGN KEY (artist_id) REFERENCES artist_profiles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+// ── COMMISSION_OPTION_ITEMS ─────────────────────────────────
+$tables['commission_option_items'] = "CREATE TABLE IF NOT EXISTS commission_option_items (
+    id          CHAR(36)      PRIMARY KEY,
+    option_id   CHAR(36)      NOT NULL,
+    label       VARCHAR(255)  NOT NULL,
+    price_type  ENUM('fixed','percent') NOT NULL DEFAULT 'fixed',
+    price_value DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    is_default  TINYINT(1)    NOT NULL DEFAULT 0,
+    sort_order  INT           NOT NULL DEFAULT 0,
+    FOREIGN KEY (option_id) REFERENCES commission_options(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
 // ── ORDERS ───────────────────────────────────────────────────
 $tables['orders'] = "CREATE TABLE IF NOT EXISTS orders (
     id                 CHAR(36)      PRIMARY KEY,
@@ -168,6 +192,11 @@ $tables['orders'] = "CREATE TABLE IF NOT EXISTS orders (
     tier_price         DECIMAL(12,2) NOT NULL,
     addon_total        DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     total_price        DECIMAL(12,2) NOT NULL,
+    selected_options   TEXT          DEFAULT NULL,
+    character_count    INT           NOT NULL DEFAULT 1,
+    is_nsfw            TINYINT(1)    NOT NULL DEFAULT 0,
+    deadline           DATE          DEFAULT NULL,
+    reference_files    TEXT          DEFAULT NULL,
     status             ENUM('pending','confirmed','in_progress','completed','cancelled')
                        NOT NULL DEFAULT 'pending',
     created_at         TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -242,7 +271,8 @@ $tables['notifications'] = "CREATE TABLE IF NOT EXISTS notifications (
     user_id    CHAR(36)     NOT NULL,
     text       VARCHAR(255) NOT NULL,
     is_read    TINYINT(1)   NOT NULL DEFAULT 0,
-    type       ENUM('new_post','order','like','follow','report') NOT NULL,
+    type       ENUM('new_post','order','like','follow','report','commission') NOT NULL,
+    ref_id     CHAR(36)     DEFAULT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB";
@@ -446,6 +476,109 @@ foreach ($addon_data as [$uname, $alabel, $aprice, $atype]) {
         $ins->close();
     } else {
         echo "<p style='color:#facc15;'>⚠️ Addon <strong>$alabel</strong> $uname sudah ada.</p>";
+    }
+    $check->close();
+}
+
+// ─── Commission Options (Dynamic) ────────────────────────────
+// Seed opsi commission dinamis untuk artist demo
+$commission_options_data = [
+    // [artist_username, category, description, selection_type, is_required, sort_order, items[]]
+    // items: [label, price_type, price_value, is_default, sort_order]
+    ['artis_lokal', 'Canvas Size', 'Pilih ukuran canvas yang diinginkan', 'single', 1, 1, [
+        ['Portrait', 'fixed', 0, 1, 1],
+        ['Square', 'fixed', 0, 0, 2],
+        ['Banner', 'fixed', 358660, 0, 3],
+        ['Landscape 1920x1080', 'fixed', 358660, 0, 4],
+        ['Landscape 2K', 'fixed', 448325, 0, 5],
+        ['Landscape 4K', 'fixed', 537990, 0, 6],
+    ]],
+    ['artis_lokal', 'License Type', 'Pilih lisensi yang dibutuhkan', 'multiple', 1, 2, [
+        ['Personal', 'fixed', 0, 1, 1],
+        ['Monetized Content', 'percent', 50, 0, 2],
+        ['Commercial Merchandising', 'percent', 100, 0, 3],
+    ]],
+    ['artis_lokal', 'Background', 'Pilih tipe background', 'single', 1, 3, [
+        ['Transparent / Single Color Background (FREE)', 'fixed', 0, 1, 1],
+        ['Simple Background', 'fixed', 358660, 0, 2],
+        ['Complex Background', 'fixed', 717320, 0, 3],
+        ['Very Detailed + Lot of Objects', 'fixed', 1434640, 0, 4],
+    ]],
+    ['artis_lokal', 'NSFW', 'Apakah ini konten NSFW? Jika tidak ada bagian privat yang terlihat, maka bukan NSFW.', 'single', 1, 4, [
+        ['No', 'fixed', 0, 1, 1],
+        ['Yes', 'fixed', 358660, 0, 2],
+    ]],
+    ['artis_lokal', 'Streaming Permission', 'Bolehkah karya ini dipublikasikan / di-stream dengan credit?', 'single', 1, 5, [
+        ['Yes (Free)', 'fixed', 0, 1, 1],
+        ['Not while WIP but final work is ok (Free)', 'fixed', 0, 0, 2],
+        ['Few days / week after I post (Free)', 'fixed', 0, 0, 3],
+        ['NDA required (Do not post Forever)', 'fixed', 896650, 0, 4],
+        ['Delete all data about me and my commission / anonymous', 'fixed', 1793300, 0, 5],
+    ]],
+    ['artis_lokal', 'Add-on', 'Layanan tambahan opsional', 'multiple', 0, 6, [
+        ['No, I dont need any of this.', 'fixed', 0, 1, 1],
+        ['PSD Files (Some will be merged) (Free)', 'fixed', 0, 0, 2],
+        ['PSD Files (DO NOT MERGE ANYTHING)', 'fixed', 358660, 0, 3],
+        ['Layered, Ready for animated (Only Character)', 'fixed', 717320, 0, 4],
+        ['Layered, Ready for animated (Only Background)', 'fixed', 717320, 0, 5],
+        ['Layered, Ready for animated (Character & Background)', 'fixed', 1434640, 0, 6],
+    ]],
+    // ichigowarano options
+    ['ichigowarano', 'Canvas Size', 'Pilih ukuran canvas', 'single', 1, 1, [
+        ['Portrait', 'fixed', 0, 1, 1],
+        ['Square', 'fixed', 0, 0, 2],
+        ['Landscape 1920x1080', 'fixed', 200000, 0, 3],
+    ]],
+    ['ichigowarano', 'License Type', 'Pilih lisensi penggunaan', 'multiple', 1, 2, [
+        ['Personal', 'fixed', 0, 1, 1],
+        ['Monetized Content', 'percent', 50, 0, 2],
+        ['Commercial Merchandising', 'percent', 100, 0, 3],
+    ]],
+    ['ichigowarano', 'Background', 'Pilih tipe background', 'single', 1, 3, [
+        ['Transparent / Single Color (FREE)', 'fixed', 0, 1, 1],
+        ['Simple Background', 'fixed', 200000, 0, 2],
+        ['Complex Background', 'fixed', 400000, 0, 3],
+    ]],
+    ['ichigowarano', 'NSFW', 'Konten NSFW?', 'single', 1, 4, [
+        ['No', 'fixed', 0, 1, 1],
+        ['Yes', 'fixed', 200000, 0, 2],
+    ]],
+];
+
+foreach ($commission_options_data as [$uname, $cat, $desc, $selType, $isReq, $sortOrd, $items]) {
+    if (empty($ap_ids[$uname])) continue;
+    $ap_id = $ap_ids[$uname];
+
+    // Check if this option already exists
+    $check = $conn->prepare("SELECT id FROM commission_options WHERE artist_id = ? AND category = ?");
+    $check->bind_param("ss", $ap_id, $cat);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows === 0) {
+        $optId = gen_uuid();
+        $ins = $conn->prepare(
+            "INSERT INTO commission_options (id, artist_id, category, description, selection_type, is_required, sort_order)
+             VALUES (?,?,?,?,?,?,?)"
+        );
+        $ins->bind_param("sssssii", $optId, $ap_id, $cat, $desc, $selType, $isReq, $sortOrd);
+        $ins->execute();
+        $ins->close();
+
+        // Insert items
+        foreach ($items as [$label, $priceType, $priceVal, $isDef, $itemSort]) {
+            $itemId = gen_uuid();
+            $insItem = $conn->prepare(
+                "INSERT INTO commission_option_items (id, option_id, label, price_type, price_value, is_default, sort_order)
+                 VALUES (?,?,?,?,?,?,?)"
+            );
+            $insItem->bind_param("ssssdii", $itemId, $optId, $label, $priceType, $priceVal, $isDef, $itemSort);
+            $insItem->execute();
+            $insItem->close();
+        }
+        echo "<p class='ok'>✅ Commission option <strong>$cat</strong> untuk $uname ditambahkan.</p>";
+    } else {
+        echo "<p style='color:#facc15;'>⚠️ Commission option <strong>$cat</strong> $uname sudah ada.</p>";
     }
     $check->close();
 }
