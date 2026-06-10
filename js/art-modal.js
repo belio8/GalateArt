@@ -242,6 +242,9 @@ let _currentPostId = null;
                     if (data.title) {
                         title = data.title;
                     }
+
+                    // ── Render Purchase / Download Bar ──────────────
+                    renderPurchaseBar(data, postId);
                 }
 
                 if (result.status === 'ok') {
@@ -426,3 +429,106 @@ let _currentPostId = null;
         allArtistBtns.forEach(b => b.disabled = false);
     });
 })();
+
+
+// ── PURCHASE BAR RENDERING ────────────────────────────────────
+function renderPurchaseBar(data, postId) {
+    const btn = document.getElementById('orderBtn');
+    if (!btn) return;
+
+    // Reset inline styles
+    btn.style.display = '';
+    btn.style.background = '';
+    btn.style.color = '';
+
+    const hasPrice = data.price > 0 || data.is_free;
+    const hasSource = data.has_source;
+
+    // Jika post tidak punya harga dan bukan free download, kembalikan ke tombol order komisi biasa
+    if (!hasPrice && !hasSource) {
+        btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Order Komisi';
+        btn.onclick = () => location.href = 'commission.php';
+        return;
+    }
+
+    const priceLabel = data.is_free 
+        ? 'Gratis' 
+        : `Rp ${Number(data.price).toLocaleString('id-ID')}`;
+
+    if (data.is_owner) {
+        // Artis pemilik
+        btn.innerHTML = `<i class="fas fa-download"></i> Unduh File Asli`;
+        btn.style.background = 'var(--accent)';
+        btn.style.color = '#fff';
+        btn.onclick = () => window.open(`api/download-post.php?post_id=${postId}`, '_blank');
+    } else if (data.is_purchased) {
+        // Sudah dibeli
+        btn.innerHTML = `<i class="fas fa-download"></i> Unduh File Asli`;
+        btn.style.background = 'linear-gradient(135deg,#4ade80,#22c55e)';
+        btn.style.color = '#fff';
+        btn.onclick = () => window.open(`api/download-post.php?post_id=${postId}`, '_blank');
+    } else if (data.is_in_cart) {
+        // Sudah ada di cart
+        btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Lihat Keranjang`;
+        btn.style.background = '#facc15';
+        btn.style.color = '#1a1a2e';
+        btn.onclick = () => location.href = 'cart.php';
+    } else {
+        // Belum dibeli — tampilkan tombol beli
+        btn.innerHTML = `<i class="fas fa-cart-plus"></i> ${priceLabel}`;
+        btn.style.background = 'linear-gradient(135deg,var(--accent),#8b5cf6)';
+        btn.style.color = '#fff';
+        btn.onclick = () => addPostToCart(postId, priceLabel);
+    }
+}
+
+async function addPostToCart(postId, priceLabel) {
+    const btn = document.getElementById('orderBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menambahkan...';
+    }
+
+    try {
+        const res = await fetch('api/add-to-cart-post.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id: postId })
+        });
+        
+        // Handle 401 unauthenticated
+        if (res.status === 401) {
+            alert('Anda harus login terlebih dahulu.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-cart-plus"></i> ${priceLabel}`;
+            }
+            return;
+        }
+
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Lihat Keranjang`;
+                btn.style.background = '#facc15';
+                btn.style.color = '#1a1a2e';
+                btn.onclick = () => location.href = 'cart.php';
+            }
+        } else {
+            alert(data.message || 'Gagal menambahkan ke keranjang.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-cart-plus"></i> ${priceLabel}`;
+            }
+        }
+    } catch (e) {
+        console.error('Error adding to cart:', e);
+        alert('Terjadi kesalahan jaringan.');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-cart-plus"></i> ${priceLabel}`;
+        }
+    }
+}

@@ -63,6 +63,23 @@ $posts = db_query(
             </div>
         </div>
 
+        <!-- Source File (Opsional) -->
+        <div class="pm-field">
+            <label>Source File Asli <span style="font-weight:400; font-size:12px; color:var(--text-gray);">(File mentah / Resolusi tinggi)</span></label>
+            <div class="pm-upload-area" id="pmSourceUploadArea" style="min-height: 80px; padding: 16px;">
+                <input type="file" id="pmSourceInput" accept=".zip,.rar,.psd,.sai,.clip,image/*" aria-label="Pilih source file">
+                <i class="fas fa-file-archive pm-upload-icon" id="pmSourceUploadIcon" style="font-size: 24px; margin-bottom: 8px;"></i>
+                <p class="pm-upload-label" id="pmSourceUploadText" style="margin-top: 8px; font-size: 13px;">
+                    <span>Pilih file</span> atau seret & lepas di sini<br>
+                    <small style="color:#555566;">ZIP, RAR, PSD, dll - maks. 50 MB</small>
+                </p>
+                <p class="pm-preview-info" id="pmSourcePreviewInfo" style="margin-top:0; font-size:13px;"></p>
+            </div>
+            <small style="font-size:11px;color:#555566;margin-top:4px;display:block;">
+                Akan diberikan ke pembeli. Jika tidak diunggah, gambar karya di atas (tanpa watermark) yang akan diberikan.
+            </small>
+        </div>
+
         <!-- Judul -->
         <div class="pm-field">
             <label for="pmTitle">Judul Karya <span class="pm-required">*</span></label>

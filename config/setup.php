@@ -66,17 +66,18 @@ $tables['artist_profiles'] = "CREATE TABLE IF NOT EXISTS artist_profiles (
 
 // ── POSTS ────────────────────────────────────────────────────
 $tables['posts'] = "CREATE TABLE IF NOT EXISTS posts (
-    id          CHAR(36)      PRIMARY KEY,
-    artist_id   CHAR(36)      NOT NULL,
-    title       VARCHAR(255)  NOT NULL,
-    description TEXT          DEFAULT NULL,
-    image_url   VARCHAR(255)  DEFAULT NULL,
-    price       DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-    is_free     TINYINT(1)    NOT NULL DEFAULT 0,
-    is_nsfw     TINYINT(1)    NOT NULL DEFAULT 0,
-    status      ENUM('active','flagged','removed') NOT NULL DEFAULT 'active',
-    like_count  INT           NOT NULL DEFAULT 0,
-    created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id              CHAR(36)      PRIMARY KEY,
+    artist_id       CHAR(36)      NOT NULL,
+    title           VARCHAR(255)  NOT NULL,
+    description     TEXT          DEFAULT NULL,
+    image_url       VARCHAR(255)  DEFAULT NULL,
+    source_file_url VARCHAR(255)  DEFAULT NULL,
+    price           DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    is_free         TINYINT(1)    NOT NULL DEFAULT 0,
+    is_nsfw         TINYINT(1)    NOT NULL DEFAULT 0,
+    status          ENUM('active','flagged','removed') NOT NULL DEFAULT 'active',
+    like_count      INT           NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (artist_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB";
 
@@ -183,13 +184,15 @@ $tables['commission_option_items'] = "CREATE TABLE IF NOT EXISTS commission_opti
 // ── ORDERS ───────────────────────────────────────────────────
 $tables['orders'] = "CREATE TABLE IF NOT EXISTS orders (
     id                 CHAR(36)      PRIMARY KEY,
+    order_type         ENUM('commission','post') NOT NULL DEFAULT 'commission',
     buyer_id           CHAR(36)      NOT NULL,
     artist_id          CHAR(36)      NOT NULL,
-    tier_id            CHAR(36)      NOT NULL,
+    tier_id            CHAR(36)      DEFAULT NULL,
+    post_id            CHAR(36)      DEFAULT NULL,
     description        TEXT          DEFAULT NULL,
     reference_file_url VARCHAR(255)  DEFAULT NULL,
     notes              TEXT          DEFAULT NULL,
-    tier_price         DECIMAL(12,2) NOT NULL,
+    tier_price         DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     addon_total        DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     total_price        DECIMAL(12,2) NOT NULL,
     selected_options   TEXT          DEFAULT NULL,
@@ -202,7 +205,8 @@ $tables['orders'] = "CREATE TABLE IF NOT EXISTS orders (
     created_at         TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (buyer_id)  REFERENCES users(id)             ON DELETE CASCADE,
     FOREIGN KEY (artist_id) REFERENCES users(id)             ON DELETE CASCADE,
-    FOREIGN KEY (tier_id)   REFERENCES commission_tiers(id)  ON DELETE RESTRICT
+    FOREIGN KEY (tier_id)   REFERENCES commission_tiers(id)  ON DELETE RESTRICT,
+    FOREIGN KEY (post_id)   REFERENCES posts(id)             ON DELETE SET NULL
 ) ENGINE=InnoDB";
 
 // ── ORDER_ADDONS ─────────────────────────────────────────────
@@ -217,13 +221,28 @@ $tables['order_addons'] = "CREATE TABLE IF NOT EXISTS order_addons (
 
 // ── CART_ITEMS ───────────────────────────────────────────────
 $tables['cart_items'] = "CREATE TABLE IF NOT EXISTS cart_items (
-    id       CHAR(36)  PRIMARY KEY,
-    user_id  CHAR(36)  NOT NULL,
-    order_id CHAR(36)  NOT NULL,
-    added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id        CHAR(36)  PRIMARY KEY,
+    user_id   CHAR(36)  NOT NULL,
+    order_id  CHAR(36)  DEFAULT NULL,
+    item_type ENUM('commission','post') NOT NULL DEFAULT 'commission',
+    post_id   CHAR(36)  DEFAULT NULL,
+    added_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id)  REFERENCES users(id)   ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders(id)  ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders(id)  ON DELETE CASCADE,
+    FOREIGN KEY (post_id)  REFERENCES posts(id)   ON DELETE CASCADE
 ) ENGINE=InnoDB";
+
+// ── POST_PURCHASES ──────────────────────────────────────────
+$tables['post_purchases'] = "CREATE TABLE IF NOT EXISTS post_purchases (
+    id           CHAR(36)      PRIMARY KEY,
+    user_id      CHAR(36)      NOT NULL,
+    post_id      CHAR(36)      NOT NULL,
+    price_paid   DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    purchased_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_user_post (user_id, post_id),
+    FOREIGN KEY (user_id) REFERENCES users(id)  ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id)  ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
 // ── PAYMENTS ─────────────────────────────────────────────────
 $tables['payments'] = "CREATE TABLE IF NOT EXISTS payments (

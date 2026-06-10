@@ -15,6 +15,12 @@
     const pmUploadIcon = $('#pmUploadIcon');
     const pmUploadText = $('#pmUploadText');
 
+    const pmSourceUploadArea = $('#pmSourceUploadArea');
+    const pmSourceInput = $('#pmSourceInput');
+    const pmSourcePreviewInfo = $('#pmSourcePreviewInfo');
+    const pmSourceUploadIcon = $('#pmSourceUploadIcon');
+    const pmSourceUploadText = $('#pmSourceUploadText');
+
     const pmTitle     = $('#pmTitle');
     const pmDesc      = $('#pmDesc');
     const pmTags      = $('#pmTags');
@@ -124,6 +130,52 @@
         const file = e.dataTransfer.files[0];
         handleFile(file);
     });
+
+    /* ── UPLOAD SOURCE FILE (OPSIONAL) ────────────────────────── */
+    let _selectedSourceFile = null;
+
+    function handleSourceFile(file) {
+        if (!file) return;
+        if (file.size > 50 * 1024 * 1024) {
+            showToast('Ukuran source file maksimal 50 MB.', true);
+            return;
+        }
+
+        _selectedSourceFile = file;
+
+        if (pmSourceUploadIcon) pmSourceUploadIcon.style.display = 'none';
+        if (pmSourceUploadText) pmSourceUploadText.style.display = 'none';
+
+        if (pmSourcePreviewInfo) {
+            const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+            pmSourcePreviewInfo.textContent = `${file.name} — ${sizeMB} MB`;
+            pmSourcePreviewInfo.classList.add('visible');
+        }
+    }
+
+    if (pmSourceInput) {
+        pmSourceInput.addEventListener('change', e => {
+            if (e.target.files && e.target.files[0]) {
+                handleSourceFile(e.target.files[0]);
+            }
+        });
+
+        pmSourceUploadArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            pmSourceUploadArea.classList.add('dragover');
+        });
+
+        pmSourceUploadArea.addEventListener('dragleave', () => {
+            pmSourceUploadArea.classList.remove('dragover');
+        });
+
+        pmSourceUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            pmSourceUploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleSourceFile(file);
+        });
+    }
 
     /* ── TOGGLE HARGA GRATIS ──────────────────────────────────── */
     pmFreeCheck.addEventListener('change', () => {
@@ -265,6 +317,15 @@
         pmUploadIcon.style.display = '';
         pmUploadText.style.display = '';
 
+        _selectedSourceFile = null;
+        if (pmSourceInput) {
+            pmSourceInput.value = '';
+            pmSourcePreviewInfo.classList.remove('visible');
+            pmSourcePreviewInfo.textContent = '';
+            pmSourceUploadIcon.style.display = '';
+            pmSourceUploadText.style.display = '';
+        }
+
         pmTitle.value = '';
         pmDesc.value = '';
         pmTags.value = '';
@@ -284,6 +345,9 @@
         try {
             const formData = new FormData();
             formData.append('image', _selectedFile);
+            if (_selectedSourceFile) {
+                formData.append('source_file', _selectedSourceFile);
+            }
             formData.append('title', pmTitle.value.trim());
             formData.append('description', pmDesc.value.trim());
             formData.append('tags', pmTags.value.trim());

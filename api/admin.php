@@ -223,6 +223,21 @@ if ($action === 'update_report') {
         exit;
     }
 
+    // Auto-Action jika disetujui
+    if ($status === 'approved') {
+        $r = db_row($conn, "SELECT target_type, target_post_id, target_user_id FROM reports WHERE id = ?", "s", [$id]);
+        if ($r) {
+            if ($r['target_type'] === 'post') {
+                db_execute($conn, "UPDATE posts SET status = 'removed' WHERE id = ?", "s", [$r['target_post_id']]);
+            } else if ($r['target_type'] === 'account') {
+                $u_id = $r['target_user_id'];
+                db_execute($conn, "UPDATE users SET is_banned = 1 WHERE id = ?", "s", [$u_id]);
+                // Soft-delete semua postingan aktif miliknya
+                db_execute($conn, "UPDATE posts SET status = 'removed' WHERE artist_id = ? AND status IN ('active','flagged')", "s", [$u_id]);
+            }
+        }
+    }
+
     echo json_encode(['status' => 'ok', 'message' => $status === 'approved' ? 'Laporan disetujui.' : 'Laporan ditolak.'], JSON_UNESCAPED_UNICODE);
     exit;
 }

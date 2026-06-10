@@ -19,7 +19,7 @@ if (!$post_id) {
     exit;
 }
 
-$post = db_row($conn, "SELECT title, like_count, artist_id, description FROM posts WHERE id = ?", "s", [$post_id]);
+$post = db_row($conn, "SELECT title, like_count, artist_id, description, price, is_free, source_file_url FROM posts WHERE id = ?", "s", [$post_id]);
 if (!$post) {
     http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Post tidak ditemukan.']);
@@ -28,10 +28,16 @@ if (!$post) {
 
 $likes_count = (int)($post['like_count'] ?? 0);
 $artist_id = $post['artist_id'] ?? null;
+$price = (float)($post['price'] ?? 0);
+$is_free = (int)($post['is_free'] ?? 0);
+$has_source = !empty($post['source_file_url']);
 
 $liked = false;
 $saved = false;
 $is_following = false;
+$is_purchased = false;
+$is_owner = false;
+$is_in_cart = false;
 
 if ($user_id) {
     $like = db_row($conn, "SELECT id FROM likes WHERE user_id = ? AND post_id = ?", "ss", [$user_id, $post_id]);
@@ -44,6 +50,19 @@ if ($user_id) {
         $follow = db_row($conn, "SELECT id FROM follows WHERE follower_id = ? AND following_id = ?", "ss", [$user_id, $artist_id]);
         if ($follow) $is_following = true;
     }
+
+    // Cek apakah user adalah pemilik (artis pembuat)
+    if ($user_id === $artist_id) {
+        $is_owner = true;
+    }
+
+    // Cek apakah sudah pernah dibeli
+    $purchase = db_row($conn, "SELECT id FROM post_purchases WHERE user_id = ? AND post_id = ?", "ss", [$user_id, $post_id]);
+    if ($purchase) $is_purchased = true;
+
+    // Cek apakah sudah ada di cart
+    $inCart = db_row($conn, "SELECT id FROM cart_items WHERE user_id = ? AND item_type = 'post' AND post_id = ?", "ss", [$user_id, $post_id]);
+    if ($inCart) $is_in_cart = true;
 }
 
 echo json_encode([
@@ -54,5 +73,12 @@ echo json_encode([
     'artist_id' => $artist_id,
     'is_following' => $is_following,
     'description' => $post['description'] ?? '',
-    'title' => $post['title'] ?? ''
+    'title' => $post['title'] ?? '',
+    // Purchase info
+    'price' => $price,
+    'is_free' => $is_free,
+    'has_source' => $has_source,
+    'is_purchased' => $is_purchased,
+    'is_owner' => $is_owner,
+    'is_in_cart' => $is_in_cart,
 ]);

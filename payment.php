@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/components/bootstrap.php';
 require_login();
 ?>
@@ -231,42 +231,43 @@ require_login();
             document.getElementById('selectedMethodLabel').innerHTML = `Metode terpilih: <span>${label}</span>`;
         }
 
-        function populateOrderSummary() {
-            const order = JSON.parse(localStorage.getItem('galateart_pending_order') || 'null');
-            const cart = JSON.parse(localStorage.getItem('galateart_cart') || '[]');
-            const data = order || cart[cart.length - 1] || null;
+        async function populateOrderSummary() {
+            try {
+                // Fetch dari server (aman, mengabaikan LocalStorage)
+                const res = await fetch('api/get-cart-summary.php');
+                const data = await res.json();
+                
+                if (data.status !== 'ok' || !data.data) return;
+                
+                const item = data.data;
 
-            if (!data) return;
+                const titleEl = document.querySelector('.ga-pay-commission-details h4');
+                const artistEl = document.querySelector('.ga-pay-commission-details .ga-pay-artist-tag');
+                const badgeEl = document.querySelector('.ga-pay-tier-badge');
+                const rows = document.querySelectorAll('.ga-pay-price-rows .ga-pay-price-row');
+                const baseRow = rows[0]?.querySelector('.ga-pay-value');
+                const feeRow = rows[1]?.querySelector('.ga-pay-value');
+                const totalEl = document.getElementById('totalValue');
 
-            const titleEl = document.querySelector('.ga-pay-commission-details h4');
-            const artistEl = document.querySelector('.ga-pay-commission-details .ga-pay-artist-tag');
-            const badgeEl = document.querySelector('.ga-pay-tier-badge');
-            const rows = document.querySelectorAll('.ga-pay-price-rows .ga-pay-price-row');
-            const baseRow = rows[0]?.querySelector('.ga-pay-value');
-            const feeRow = rows[1]?.querySelector('.ga-pay-value');
-            const totalEl = document.getElementById('totalValue');
+                BASE_PRICE = Number(item.total_price || 0);
+                PLATFORM_FEE = Math.round(BASE_PRICE * 0.05);
 
-            BASE_PRICE = Number(data.totalPrice || 0);
-            PLATFORM_FEE = Math.round(BASE_PRICE * 0.05);
-
-            if (titleEl) titleEl.textContent = data.tierName || 'Commission';
-            if (artistEl) artistEl.textContent = data.contact ? `@${data.contact}` : '@artis_lokal';
-            if (badgeEl) badgeEl.textContent = data.addons?.length ? `â­ ${data.addons.length} add-on` : 'â­ Paket terpilih';
-            if (baseRow) baseRow.textContent = `Rp ${BASE_PRICE.toLocaleString('id-ID')}`;
-            if (feeRow) feeRow.textContent = `Rp ${PLATFORM_FEE.toLocaleString('id-ID')}`;
-            if (totalEl) totalEl.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
+                if (titleEl) titleEl.textContent = item.title || 'Commission / Post';
+                if (artistEl) artistEl.textContent = `@${item.artist_username || 'artis'}`;
+                if (badgeEl) badgeEl.textContent = item.badge_text || 'Item Terpilih';
+                if (baseRow) baseRow.textContent = `Rp ${BASE_PRICE.toLocaleString('id-ID')}`;
+                if (feeRow) feeRow.textContent = `Rp ${PLATFORM_FEE.toLocaleString('id-ID')}`;
+                if (totalEl) totalEl.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
+            } catch (err) {
+                console.error("Gagal mengambil ringkasan pesanan:", err);
+            }
         }
 
         // ── PROMO CODE ──
-        const VALID_PROMOS = {
-            'GALATE10': 10,
-            'NEWUSER20': 20,
-            'ARTFEST': 15
-        };
-
         let promoApplied = false;
+        let appliedPromoCode = '';
 
-        function applyPromo() {
+        async function applyPromo() {
             const code = document.getElementById('promoInput').value.trim().toUpperCase();
             const msg = document.getElementById('promoMsg');
             const discountRow = document.getElementById('discountRow');
@@ -279,25 +280,43 @@ require_login();
                 return;
             }
 
-            if (VALID_PROMOS[code]) {
-                const pct = VALID_PROMOS[code];
-                const subtotal = BASE_PRICE + PLATFORM_FEE;
-                discountAmount = Math.round(subtotal * (pct / 100));
-                const finalTotal = subtotal - discountAmount;
+            msg.textContent = 'Memvalidasi...';
+            msg.className = 'ga-pay-promo-msg';
 
-                discountRow.style.display = 'flex';
-                discountVal.textContent = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
-                total.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
+            try {
+                const res = await fetch('api/validate-promo.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await res.json();
 
-                msg.textContent = `✓ Promo ${code} berhasil! Diskon ${pct}% diterapkan.`;
-                msg.className = 'ga-pay-promo-msg ga-pay-success';
-                promoApplied = true;
-            } else {
-                msg.textContent = 'Kode promo tidak valid atau sudah kadaluarsa.';
+                if (data.status === 'ok') {
+                    const pct = data.discount_percent;
+                    const subtotal = BASE_PRICE + PLATFORM_FEE;
+                    discountAmount = Math.round(subtotal * (pct / 100));
+                    const finalTotal = subtotal - discountAmount;
+
+                    discountRow.style.display = 'flex';
+                    discountVal.textContent = `- Rp ${discountAmount.toLocaleString('id-ID')}`;
+                    total.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
+
+                    msg.textContent = `✓ ${data.message} Diskon ${pct}% diterapkan.`;
+                    msg.className = 'ga-pay-promo-msg ga-pay-success';
+                    promoApplied = true;
+                    appliedPromoCode = code;
+                } else {
+                    msg.textContent = data.message || 'Kode promo tidak valid.';
+                    msg.className = 'ga-pay-promo-msg ga-pay-error';
+                    discountAmount = 0;
+                    discountRow.style.display = 'none';
+                    total.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
+                    promoApplied = false;
+                    appliedPromoCode = '';
+                }
+            } catch (err) {
+                msg.textContent = 'Gagal menghubungi server.';
                 msg.className = 'ga-pay-promo-msg ga-pay-error';
-                discountAmount = 0;
-                discountRow.style.display = 'none';
-                total.textContent = `Rp ${(BASE_PRICE + PLATFORM_FEE).toLocaleString('id-ID')}`;
             }
         }
 
@@ -309,19 +328,41 @@ require_login();
         });
 
         // ── CONFIRM PAYMENT ──
-        function confirmPayment() {
+        async function confirmPayment() {
             if (!selectedMethod) return;
 
             const btn = document.getElementById('btnPay');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-            // Simulate processing delay
-            setTimeout(() => {
-                const orderId = 'GAL-' + Math.floor(100000 + Math.random() * 900000);
-                document.getElementById('orderIdDisplay').textContent = `Order #${orderId}`;
-                document.getElementById('successOverlay').classList.add('ga-pay-open');
-            }, 1800);
+            const methodId = selectedMethod.replace('ga-pay-', '');
+
+            try {
+                const res = await fetch('api/mock-checkout.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        method: methodId,
+                        promo_code: appliedPromoCode
+                    })
+                });
+                const data = await res.json();
+
+                if (data.status === 'ok') {
+                    const orderId = 'GAL-' + Math.floor(100000 + Math.random() * 900000);
+                    document.getElementById('orderIdDisplay').textContent = data.order_code ? `Order #${data.order_code}` : `Order #${orderId}`;
+                    document.getElementById('successOverlay').classList.add('ga-pay-open');
+                } else {
+                    alert(data.message || 'Gagal memproses pembayaran.');
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-lock"></i> Bayar`;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Terjadi kesalahan jaringan.');
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-lock"></i> Bayar`;
+            }
         }
     </script>
 </body>

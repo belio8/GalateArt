@@ -101,10 +101,23 @@ window.updateOrderStatus = async function(orderId, status) {
     const menuDD   = $('#dropdownMenu');
     if (!toggle || !dropdown) return;
 
-    toggle.addEventListener('click', e => {
+    toggle.addEventListener('click', async e => {
+        const isOpening = !dropdown.classList.contains('show');
         dropdown.classList.toggle('show');
         if (menuDD) menuDD.classList.remove('show');
         e.stopPropagation();
+
+        if (isOpening) {
+            const badge = $('#notifBadge');
+            if (badge && badge.style.display !== 'none') {
+                badge.style.display = 'none'; // Sembunyikan badge
+                try {
+                    await fetch('api/mark-notifications-read.php', { method: 'POST' });
+                } catch (err) {
+                    console.error('Gagal mark as read:', err);
+                }
+            }
+        }
     });
 
     document.addEventListener('click', e => {

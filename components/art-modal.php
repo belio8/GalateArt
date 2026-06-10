@@ -13,7 +13,7 @@
                     <strong id="phName"></strong>
                     <span id="phSpec">Karya Seni</span>
                 </div>
-                <button class="order-btn" id="orderBtn" onclick="location.href='commission.php'"><i class="fas fa-shopping-cart"></i> Order</button>
+                <button class="order-btn" id="orderBtn"><i class="fas fa-shopping-cart"></i> Order</button>
                 <button class="follow-btn" id="followBtn">Follow</button>
             </div>
             
