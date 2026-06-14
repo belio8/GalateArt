@@ -312,6 +312,18 @@ $tables['reports'] = "CREATE TABLE IF NOT EXISTS reports (
     FOREIGN KEY (target_post_id) REFERENCES posts(id) ON DELETE SET NULL
 ) ENGINE=InnoDB";
 
+// ── ADMIN_ACTIVITY_LOGS ─────────────────────────────────────
+$tables['admin_activity_logs'] = "CREATE TABLE IF NOT EXISTS admin_activity_logs (
+    id         CHAR(36)     PRIMARY KEY,
+    admin_id   CHAR(36)     NOT NULL,
+    action     VARCHAR(50)  NOT NULL,
+    target_type VARCHAR(20) NOT NULL,
+    target_id  CHAR(36)     DEFAULT NULL,
+    detail     TEXT         DEFAULT NULL,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
 // ── 3. Eksekusi semua tabel ───────────────────────────────────
 echo '<div class="sep"></div><h3>📦 Membuat Tabel</h3>';
 foreach ($tables as $name => $sql) {

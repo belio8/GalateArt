@@ -26,6 +26,9 @@ require_login('admin');
     <button class="ga-adm-nav-item" data-page="reports"><i class="fas fa-flag"></i> Laporan <span class="ga-adm-badge" id="ga-adm-report-badge">0</span></button>
     <button class="ga-adm-nav-item" data-page="posts"><i class="fas fa-images"></i> Postingan</button>
     <button class="ga-adm-nav-item" data-page="accounts"><i class="fas fa-users"></i> Akun</button>
+
+    <div class="ga-adm-nav-group-label">Sistem</div>
+    <button class="ga-adm-nav-item" data-page="activity"><i class="fas fa-clock"></i> Log Aktivitas</button>
   </nav>
   <div class="ga-adm-sidebar-footer">
     <form action="api/auth.php" method="post" style="display:inline;">
@@ -156,6 +159,23 @@ require_login('admin');
       </div>
     </section>
 
+    <!-- ── ACTIVITY LOGS ── -->
+    <section class="ga-adm-page-section" id="page-activity">
+      <div class="ga-adm-section-header">
+        <h2>Log Aktivitas Admin</h2>
+      </div>
+      <div class="ga-adm-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aksi</th><th>Admin</th><th>Detail</th><th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="ga-adm-activity-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -228,7 +248,7 @@ let accounts = [];
 /* ========================================================================
    NAVIGATION
 ======================================================================== */
-const PAGE_TITLES = { dashboard:'Dashboard', reports:'Laporan', posts:'Postingan', accounts:'Akun' };
+const PAGE_TITLES = { dashboard:'Dashboard', reports:'Laporan', posts:'Postingan', accounts:'Akun', activity:'Log Aktivitas' };
 
 function showPage(name) {
   document.querySelectorAll('.ga-adm-page-section').forEach(s => s.classList.remove('active'));
@@ -334,21 +354,79 @@ function viewReport(id) {
   const r = reports.find(x => x.id === id);
   if (!r) return;
   document.getElementById('ga-adm-drawer-title-el').textContent = 'Detail Laporan';
+
+  // ── Build the reported-target preview card ──
+  let previewHtml = '';
+
+  if (r.type === 'post') {
+    const imgSrc = r.postImageUrl || '';
+    const postArtist = r.postArtist || '-';
+    const postStatus = r.postStatus || 'unknown';
+    previewHtml = `
+      <div class="ga-adm-report-preview">
+        <div class="ga-adm-report-preview-label"><i class="fas fa-image"></i> Postingan yang Dilaporkan</div>
+        ${imgSrc ? `<img class="ga-adm-report-preview-img" src="${escapeHtml(imgSrc)}" alt="Reported post" onerror="this.style.display='none'">` : '<div class="ga-adm-report-preview-no-img"><i class="fas fa-image"></i> Gambar tidak tersedia</div>'}
+        <div class="ga-adm-report-preview-info">
+          <strong>${escapeHtml(r.targetTitle)}</strong>
+          <span>oleh ${escapeHtml(postArtist)}</span>
+          <span>Status: ${badgeStatus(postStatus)}</span>
+        </div>
+      </div>`;
+  } else {
+    const avatar = r.accountAvatarUrl || '';
+    const uname = r.accountUsername || '-';
+    const email = r.accountEmail || '-';
+    const role = r.accountRole || '-';
+    const isBanned = r.accountIsBanned;
+    previewHtml = `
+      <div class="ga-adm-report-preview">
+        <div class="ga-adm-report-preview-label"><i class="fas fa-user"></i> Akun yang Dilaporkan</div>
+        <div class="ga-adm-report-preview-account">
+          <div class="ga-adm-report-avatar-wrap">
+            ${avatar ? `<img class="ga-adm-report-avatar" src="${escapeHtml(avatar)}" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'ga-adm-report-avatar-placeholder\\'>${escapeHtml(uname[0].toUpperCase())}</div>'">` : `<div class="ga-adm-report-avatar-placeholder">${escapeHtml(uname[0].toUpperCase())}</div>`}
+          </div>
+          <div class="ga-adm-report-account-info">
+            <strong>@${escapeHtml(uname)}</strong>
+            <span>${escapeHtml(email)}</span>
+            <span>Role: ${badgeStatus(role === 'artist' ? 'artist' : role === 'admin' ? 'admin' : 'user')}</span>
+            <span>Status: ${isBanned ? badgeStatus('banned') : badgeStatus('active')}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
   document.getElementById('ga-adm-drawer-body').innerHTML = `
-    <div class="ga-adm-detail-row"><label>ID</label><span>${escapeHtml(String(r.id).substring(0,8))}...</span></div>
-    <div class="ga-adm-detail-row"><label>Tipe Target</label><span>${r.type === 'post' ? 'Postingan' : 'Akun'}</span></div>
-    <div class="ga-adm-detail-row"><label>Target</label><span>${escapeHtml(r.targetTitle)}</span></div>
+    ${previewHtml}
+    <div class="ga-adm-detail-divider"></div>
+    <div class="ga-adm-detail-row"><label>ID Laporan</label><span style="font-family:monospace;font-size:12px">${escapeHtml(String(r.id).substring(0,8))}...</span></div>
+    <div class="ga-adm-detail-row"><label>Tipe Target</label><span>${r.type === 'post' ? '<i class="fas fa-image" style="color:var(--ga-adm-accent)"></i> Postingan' : '<i class="fas fa-user" style="color:var(--ga-adm-warn)"></i> Akun'}</span></div>
     <div class="ga-adm-detail-row"><label>Alasan</label><span>${REASON_LABELS[r.reason]||r.reason}</span></div>
     ${r.message ? `<div class="ga-adm-detail-row"><label>Pesan Tambahan</label><span style="white-space: pre-wrap; background: var(--ga-adm-surface2); padding: 10px; border-radius: 8px; margin-top: 5px;">${escapeHtml(r.message)}</span></div>` : ''}
-    <div class="ga-adm-detail-row"><label>Status</label><span>${badgeStatus(r.status)}</span></div>
+    <div class="ga-adm-detail-row"><label>Status Laporan</label><span>${badgeStatus(r.status)}</span></div>
     <div class="ga-adm-detail-row"><label>Pelapor</label><span>${escapeHtml(r.reporter || '-')}</span></div>
     <div class="ga-adm-detail-row"><label>Waktu</label><span>${new Date(r.createdAt).toLocaleString('id-ID')}</span></div>
   `;
   const actions = document.getElementById('ga-adm-drawer-actions-el');
-  actions.innerHTML = r.status === 'pending' ? `
-    <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport('${escapeHtml(r.id)}','approved');closeDrawer()">Setujui Laporan</button>
-    <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport('${escapeHtml(r.id)}','rejected');closeDrawer()">Tolak Laporan</button>
-  ` : `<button class="ga-adm-btn-sm ga-adm-btn-view" onclick="closeDrawer()">Tutup</button>`;
+  let actionsHtml = '';
+
+  // Navigation link to the reported content
+  if (r.type === 'post' && r.postArtist) {
+    const artistUser = r.postArtist.replace(/^@/, '');
+    actionsHtml += `<button class="ga-adm-btn-sm ga-adm-btn-view" onclick="window.open('visit-profile.php?user=${escapeHtml(artistUser)}','_blank')"><i class="fas fa-external-link-alt"></i> Lihat Postingan</button>`;
+  }
+  if (r.type === 'account' && r.accountUsername) {
+    actionsHtml += `<button class="ga-adm-btn-sm ga-adm-btn-view" onclick="window.open('visit-profile.php?user=${escapeHtml(r.accountUsername)}','_blank')"><i class="fas fa-external-link-alt"></i> Lihat Profil</button>`;
+  }
+
+  if (r.status === 'pending') {
+    actionsHtml += `
+      <button class="ga-adm-btn-sm ga-adm-btn-approve" onclick="updateReport('${escapeHtml(r.id)}','approved');closeDrawer()">Setujui Laporan</button>
+      <button class="ga-adm-btn-sm ga-adm-btn-reject"  onclick="updateReport('${escapeHtml(r.id)}','rejected');closeDrawer()">Tolak Laporan</button>
+    `;
+  } else {
+    actionsHtml += `<button class="ga-adm-btn-sm ga-adm-btn-view" onclick="closeDrawer()">Tutup</button>`;
+  }
+  actions.innerHTML = actionsHtml;
   openDrawer();
 }
 
@@ -551,6 +629,45 @@ function toast(msg) {
 }
 
 /* ========================================================================
+   ACTIVITY LOGS
+======================================================================== */
+const ACTION_LABELS = {
+  ban_account:     { icon: 'fa-user-slash',  color: 'var(--ga-adm-danger)', label: 'Ban Akun' },
+  unban_account:   { icon: 'fa-user-check',  color: 'var(--ga-adm-accent2)', label: 'Unban Akun' },
+  delete_post:     { icon: 'fa-trash',        color: 'var(--ga-adm-danger)', label: 'Hapus Postingan' },
+  restore_post:    { icon: 'fa-undo',         color: 'var(--ga-adm-accent2)', label: 'Pulihkan Postingan' },
+  report_approved: { icon: 'fa-check-circle', color: 'var(--ga-adm-accent2)', label: 'Setujui Laporan' },
+  report_rejected: { icon: 'fa-times-circle', color: 'var(--ga-adm-warn)',   label: 'Tolak Laporan' },
+};
+
+let activityLogs = [];
+
+async function loadActivityLogs() {
+  try {
+    const res = await api('activity_logs', { limit: 50 });
+    activityLogs = res.data || [];
+  } catch { activityLogs = []; }
+  renderActivityLogs();
+}
+
+function renderActivityLogs() {
+  const tbody = document.getElementById('ga-adm-activity-tbody');
+  if (!activityLogs.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="ga-adm-empty-table"><i class="fas fa-clock"></i>Belum ada aktivitas</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = activityLogs.map(log => {
+    const meta = ACTION_LABELS[log.action] || { icon: 'fa-circle', color: 'var(--ga-adm-muted)', label: log.action };
+    return `<tr>
+      <td><span class="ga-adm-log-action" style="color:${meta.color}"><i class="fas ${meta.icon}"></i> ${escapeHtml(meta.label)}</span></td>
+      <td style="color:var(--ga-adm-muted);font-size:12px">@${escapeHtml(log.admin)}</td>
+      <td style="font-size:12.5px">${escapeHtml(log.detail)}</td>
+      <td style="color:var(--ga-adm-muted);font-size:12px;white-space:nowrap">${timeAgo(log.createdAt)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ========================================================================
    LOAD ALL — fetch everything from DB
 ======================================================================== */
 async function loadAll() {
@@ -559,6 +676,7 @@ async function loadAll() {
     loadReports(),
     loadPosts(),
     loadAccounts(),
+    loadActivityLogs(),
   ]);
 }
 

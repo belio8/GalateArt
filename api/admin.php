@@ -40,6 +40,18 @@ if ($method === 'GET') {
     exit;
 }
 
+// ── Helper: log admin activity ──────────────────────────────
+function log_admin_action(mysqli $conn, string $adminId, string $action, string $targetType, ?string $targetId, string $detail): void
+{
+    $logId = uuid();
+    db_execute(
+        $conn,
+        "INSERT INTO admin_activity_logs (id, admin_id, action, target_type, target_id, detail, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+        "ssssss",
+        [$logId, $adminId, $action, $targetType, $targetId, $detail]
+    );
+}
+
 // ════════════════════════════════════════════════════════════
 //  STATS
 // ════════════════════════════════════════════════════════════
@@ -80,6 +92,8 @@ if ($action === 'reports') {
                    r.message,
                    r.status,
                    r.created_at,
+                   r.target_post_id,
+                   r.target_user_id,
                    CASE
                        WHEN r.target_type = 'post' THEN COALESCE(p.title, '(postingan dihapus)')
                        ELSE COALESCE(CONCAT('@', u_target.username), '(akun dihapus)')
@@ -88,9 +102,18 @@ if ($action === 'reports') {
                        WHEN r.target_type = 'post' THEN r.target_post_id
                        ELSE r.target_user_id
                    END AS target_id,
-                   u_reporter.username AS reporter_username
+                   u_reporter.username AS reporter_username,
+                   p.image_url   AS post_image_url,
+                   p.status      AS post_status,
+                   u_post_artist.username AS post_artist,
+                   u_target.username   AS target_username,
+                   u_target.avatar_url AS target_avatar_url,
+                   u_target.email      AS target_email,
+                   u_target.role       AS target_role,
+                   u_target.is_banned  AS target_is_banned
             FROM reports r
             LEFT JOIN posts p            ON p.id = r.target_post_id
+            LEFT JOIN users u_post_artist ON u_post_artist.id = p.artist_id
             LEFT JOIN users u_target     ON u_target.id = r.target_user_id
             LEFT JOIN users u_reporter   ON u_reporter.id = r.reporter_id
             $where
@@ -100,7 +123,7 @@ if ($action === 'reports') {
 
     $reports = [];
     foreach ($rows as $row) {
-        $reports[] = [
+        $entry = [
             'id'           => $row['id'],
             'type'         => $row['target_type'],
             'targetId'     => $row['target_id'],
@@ -111,6 +134,26 @@ if ($action === 'reports') {
             'createdAt'    => $row['created_at'],
             'reporter'     => $row['reporter_username'] ?? null,
         ];
+
+        // Attach post details if target_type is 'post'
+        if ($row['target_type'] === 'post') {
+            $entry['postImageUrl'] = $row['post_image_url'];
+            $entry['postArtist']   = $row['post_artist'] ? ('@' . $row['post_artist']) : null;
+            $entry['postStatus']   = $row['post_status'];
+            $entry['postId']       = $row['target_post_id'];
+        }
+
+        // Attach account details if target_type is 'account'
+        if ($row['target_type'] === 'account') {
+            $entry['accountUsername']  = $row['target_username'];
+            $entry['accountAvatarUrl'] = $row['target_avatar_url'];
+            $entry['accountEmail']     = $row['target_email'];
+            $entry['accountRole']      = $row['target_role'];
+            $entry['accountIsBanned']  = (bool)($row['target_is_banned'] ?? false);
+            $entry['accountId']        = $row['target_user_id'];
+        }
+
+        $reports[] = $entry;
     }
 
     echo json_encode(['status' => 'ok', 'data' => $reports], JSON_UNESCAPED_UNICODE);
@@ -238,6 +281,13 @@ if ($action === 'update_report') {
         }
     }
 
+    // Log activity
+    $reportRow = db_row($conn, "SELECT target_type, target_post_id, target_user_id FROM reports WHERE id = ?", "s", [$id]);
+    $logTarget = $reportRow ? ($reportRow['target_post_id'] ?? $reportRow['target_user_id']) : $id;
+    $logDetail = $status === 'approved' ? 'Menyetujui laporan' : 'Menolak laporan';
+    if ($reportRow) $logDetail .= ' (' . $reportRow['target_type'] . ')';
+    log_admin_action($conn, $user['id'], 'report_' . $status, 'report', $id, $logDetail);
+
     echo json_encode(['status' => 'ok', 'message' => $status === 'approved' ? 'Laporan disetujui.' : 'Laporan ditolak.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -259,6 +309,10 @@ if ($action === 'delete_post') {
         echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus postingan.']);
         exit;
     }
+
+    // Log activity
+    $postRow = db_row($conn, "SELECT title FROM posts WHERE id = ?", "s", [$id]);
+    log_admin_action($conn, $user['id'], 'delete_post', 'post', $id, 'Menghapus postingan: ' . ($postRow['title'] ?? $id));
 
     echo json_encode(['status' => 'ok', 'message' => 'Postingan dihapus.'], JSON_UNESCAPED_UNICODE);
     exit;
@@ -304,6 +358,13 @@ if ($action === 'toggle_ban') {
     }
 
     $msg = $newBanned ? 'Akun di-ban. Semua postingan di-remove.' : 'Akun di-unban. Postingan dipulihkan.';
+
+    // Log activity
+    $targetUser = db_row($conn, "SELECT username FROM users WHERE id = ?", "s", [$id]);
+    $logAction = $newBanned ? 'ban_account' : 'unban_account';
+    $logDetail = ($newBanned ? 'Mem-ban' : 'Meng-unban') . ' akun: @' . ($targetUser['username'] ?? $id);
+    log_admin_action($conn, $user['id'], $logAction, 'account', $id, $logDetail);
+
     echo json_encode(['status' => 'ok', 'message' => $msg, 'is_banned' => (bool)$newBanned], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -326,7 +387,44 @@ if ($action === 'restore_post') {
         exit;
     }
 
+    // Log activity
+    $postRow = db_row($conn, "SELECT title FROM posts WHERE id = ?", "s", [$id]);
+    log_admin_action($conn, $user['id'], 'restore_post', 'post', $id, 'Memulihkan postingan: ' . ($postRow['title'] ?? $id));
+
     echo json_encode(['status' => 'ok', 'message' => 'Postingan dipulihkan.'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ════════════════════════════════════════════════════════════
+//  ACTIVITY LOGS (GET)
+// ════════════════════════════════════════════════════════════
+if ($action === 'activity_logs') {
+    $limit = min((int)($_GET['limit'] ?? 50), 100);
+    if ($limit < 1) $limit = 50;
+
+    $sql = "SELECT l.id, l.action, l.target_type, l.target_id, l.detail, l.created_at,
+                   u.username AS admin_username
+            FROM admin_activity_logs l
+            JOIN users u ON u.id = l.admin_id
+            ORDER BY l.created_at DESC
+            LIMIT ?";
+
+    $rows = db_query($conn, $sql, "i", [$limit]);
+
+    $logs = [];
+    foreach ($rows as $row) {
+        $logs[] = [
+            'id'          => $row['id'],
+            'action'      => $row['action'],
+            'targetType'  => $row['target_type'],
+            'targetId'    => $row['target_id'],
+            'detail'      => $row['detail'],
+            'admin'       => $row['admin_username'],
+            'createdAt'   => $row['created_at'],
+        ];
+    }
+
+    echo json_encode(['status' => 'ok', 'data' => $logs], JSON_UNESCAPED_UNICODE);
     exit;
 }
 

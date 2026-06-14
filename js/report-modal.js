@@ -4,12 +4,12 @@
   /* ───────── MODAL HTML ───────── */
   const REPORT_OPTIONS = [
     { id: 'sensitive', title: 'Konten sensitif tidak ditandai', desc: 'Konten eksplisit secara seksual, NSFW, kekerasan, gore, dan konten sensitif lainnya yang tidak diberi label.' },
-    { id: 'hashtag',   title: 'Penyalahgunaan hashtag / kategori', desc: 'Menyalahgunakan hashtag dan kategori.' },
-    { id: 'ai',        title: 'AI / tracing / penipuan / scam', desc: 'Akun palsu, penipuan, evidential tracing, heavy referencing, penggunaan AI tidak etis.' },
-    { id: 'harass',    title: 'Pelecehan / doxxing / ancaman', desc: 'Membagikan atau mengancam membagikan informasi pribadi, pelecehan terhadap individu, hasutan pelecehan.' },
-    { id: 'hate',      title: 'Menghasut kebencian, kekerasan, atau menyakiti diri', desc: 'Ancaman kekerasan, hasutan kekerasan, ujaran kebencian. Mendorong, mempromosikan, atau berbagi cara menyakiti diri sendiri. Perilaku ilegal, dll.' },
-    { id: 'misrep',    title: 'Penyamaran / representasi palsu', desc: 'Peniruan identitas, identitas menyesatkan, atau iklan palsu.' },
-    { id: 'other',     title: 'Lainnya', desc: '' },
+    { id: 'hashtag', title: 'Penyalahgunaan hashtag / kategori', desc: 'Menyalahgunakan hashtag dan kategori.' },
+    { id: 'ai', title: 'AI / tracing / penipuan / scam', desc: 'Akun palsu, penipuan, evidential tracing, heavy referencing, penggunaan AI tidak etis.' },
+    { id: 'harass', title: 'Pelecehan / doxxing / ancaman', desc: 'Membagikan atau mengancam membagikan informasi pribadi, pelecehan terhadap individu, hasutan pelecehan.' },
+    { id: 'hate', title: 'Menghasut kebencian, kekerasan, atau menyakiti diri', desc: 'Ancaman kekerasan, hasutan kekerasan, ujaran kebencian. Mendorong, mempromosikan, atau berbagi cara menyakiti diri sendiri. Perilaku ilegal, dll.' },
+    { id: 'misrep', title: 'Penyamaran / representasi palsu', desc: 'Peniruan identitas, identitas menyesatkan, atau iklan palsu.' },
+    { id: 'other', title: 'Lainnya', desc: '' },
   ];
 
   const overlay = document.createElement('div');
@@ -79,6 +79,13 @@
   }
 
   function openReportModal(target) {
+    // ── Guard: harus login dulu ──
+    if (!window.GA_CURRENT_USER) {
+      const loginModal = document.getElementById('loginModal');
+      if (loginModal) loginModal.classList.add('show');
+      return;
+    }
+
     currentTarget = target;
     selectedReason = null;
     // reset
@@ -119,9 +126,9 @@
     document.querySelectorAll('.art-card, .post-card').forEach((card, i) => {
       if (card.querySelector('.ga-rpt-card-menu-btn')) return; // skip if already injected
       const artistName = card.dataset.artist || card.querySelector('.card-avatar-tooltip')?.textContent || '';
-      const hashEl   = card.querySelector('.hashtags');
-      const targetTitle = card.dataset.title || (hashEl ? hashEl.textContent : `Post #${i+1}`);
-      const targetId    = card.dataset.postId || `card-${i}-${Date.now()}`;
+      const hashEl = card.querySelector('.hashtags');
+      const targetTitle = card.dataset.title || (hashEl ? hashEl.textContent : `Post #${i + 1}`);
+      const targetId = card.dataset.postId || `card-${i}-${Date.now()}`;
 
       const btn = document.createElement('button');
       btn.className = 'ga-rpt-card-menu-btn';
@@ -130,7 +137,7 @@
 
       const menu = document.createElement('div');
       menu.className = 'ga-rpt-card-ctx-menu';
-      
+
       const isOwner = window.GA_CURRENT_USER && window.GA_CURRENT_USER === artistName.replace(/^@/, '');
 
       if (isOwner) {
@@ -157,7 +164,7 @@
       menu.addEventListener('click', e => {
         e.stopPropagation();
         e.preventDefault();
-        
+
         const action = e.target.closest('[data-action]')?.dataset.action;
         if (!action) return;
 
@@ -195,7 +202,8 @@
     reportBtn.style.marginTop = '6px';
     reportBtn.addEventListener('click', () => {
       const name = document.getElementById('phName')?.textContent || 'post';
-      openReportModal({ type: 'post', id: 'modal-post', title: name });
+      const postId = window._currentPostId || 'unknown';
+      openReportModal({ type: 'post', id: postId, title: name });
     });
     bar.after(reportBtn);
   }
